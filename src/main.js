@@ -18,7 +18,7 @@ function initIntro() {
     const iciText = iciWrapper.querySelector('[data-scramble="scroll"]');
 
     // Create audio element for the sound effect
-    const flashSound = new Audio('https://cdn.jsdelivr.net/gh/koppkvn/rc-code@master/src/assets/dig-typ.mp3');
+    const flashSound = new Audio('https://cdn.jsdelivr.net/gh/koppkvn/rc-code@master/src/assets/dig-typ2.mp3');
 
     gsap.set(iciWrapper, { autoAlpha: 0 });
 
