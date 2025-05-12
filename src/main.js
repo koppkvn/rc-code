@@ -30,7 +30,7 @@ function initIntro() {
         start: "top top",
         end: "+=200%", // Enough space for all animations
         pin: true,
-        markers: true,
+        // markers: true,
         id: "masterPin"
     });
 
@@ -40,7 +40,7 @@ function initIntro() {
             start: "top top",
             end: "+=150%", // Just for the bar animations
             scrub: true,
-            markers: { startColor: "blue", endColor: "blue" },
+            // markers: { startColor: "blue", endColor: "blue" },
             id: "barsScrub",
             onLeave: function () {
                 // When the scrubbed animation completes, play the flash animation
