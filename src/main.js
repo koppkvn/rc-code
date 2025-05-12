@@ -18,7 +18,7 @@ function initIntro() {
     const iciText = iciWrapper.querySelector('[data-scramble="scroll"]');
 
     // Create audio element for the sound effect
-    const flashSound = new Audio('/path/to/your-sound-effect.mp3');
+    const flashSound = new Audio('https://cdn.jsdelivr.net/gh/koppkvn/rc-code@master/src/assets/dig-typ.mp3');
 
     gsap.set(iciWrapper, { autoAlpha: 0 });
 
@@ -53,6 +53,8 @@ function initIntro() {
             onEnterBack: function () {
                 // When scrolling back into the bars section, reset the flash animation
                 flashAndScrambleTl.reverse();
+                flashSound.currentTime = 0; // Reset sound to beginning
+                flashSound.play();
                 // Reset visibility states
                 // gsap.set(iciWrapper, { autoAlpha: 0 });
                 // gsap.set(iciSvg, { visibility: "hidden" });
@@ -98,7 +100,7 @@ function initIntro() {
         scrambleText: {
             text: "{original}",
             chars: 'upperCase',
-            speed: 0.95,
+            speed: 1,
             tweenLength: false,
         }
     }, "label");
