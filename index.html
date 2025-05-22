@@ -1,34 +1,98 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8" />
-  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Vite App</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
 </head>
+<style>
+    body {
+        background: #0d0d0d;
+        font-family: 'Arial', sans-serif;
+        color: white;
+        display: flex;
+        justify-content: center;
+        padding-top: 100px;
+    }
+
+    .timeline-wrapper {
+        position: relative;
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        width: 100%;
+        max-width: 1100px;
+    }
+
+    .timeline-line {
+        position: absolute;
+        top: 40px;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background-color: #555;
+        z-index: 0;
+    }
+
+    .timeline-item {
+        position: relative;
+        text-align: center;
+        width: 20%;
+        z-index: 1;
+    }
+
+    .label {
+        font-size: 12px;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+
+    .line-connector {
+        width: 2px;
+        height: 40px;
+        background-color: #555;
+        margin: 0 auto;
+    }
+
+    .center .label {
+        margin-bottom: 4px;
+    }
+
+    .center .sub-label {
+        margin-top: 8px;
+        color: #f6c744;
+        font-size: 12px;
+        font-weight: bold;
+    }
+</style>
 
 <body>
+    <div class="timeline-wrapper">
+        <div class="timeline-line"></div>
 
-  <script type="module" src="/src/main.js"></script>
-
-  <!--<script type="module" src="https://192.168.10.128:3000/@vite/client"></script>
-<script type="module" src="https://192.168.10.128:3000/src/main.js"></script>
-
-
-
-<script src="https://cdn.jsdelivr.net/npm/swup@4.8.1/dist/Swup.umd.min.js"></script>
-<script src="https://koppkvn.github.io/bucket/swuppreload.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/ScrollTrigger.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/CustomEase.min.js"></script>
-<script src="https://koppkvn.github.io/bucket/splittext.min.js"></script>
-<script src="https://koppkvn.github.io/bucket/lenis.js"></script>
-<script src="https://koppkvn.github.io/bucket/DrawSVGPlugin.min.js"></script>
-
--->
-
-
+        <div class="timeline-item">
+            <div class="label">SECTION 1</div>
+            <div class="line-connector"></div>
+        </div>
+        <div class="timeline-item">
+            <div class="label">COSMOS</div>
+            <div class="line-connector"></div>
+        </div>
+        <div class="timeline-item center">
+            <div class="label">REBOOT CAMP</div>
+            <div class="line-connector"></div>
+            <div class="sub-label">TA SECTION</div>
+        </div>
+        <div class="timeline-item">
+            <div class="label">KAOS</div>
+            <div class="line-connector"></div>
+        </div>
+        <div class="timeline-item">
+            <div class="label">NEMESIS</div>
+            <div class="line-connector"></div>
+        </div>
+    </div>
 </body>
 
 </html>
