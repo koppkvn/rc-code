@@ -1,11 +1,24 @@
-
-
 function initLenis() {
     window.lenis = new Lenis();
     window.lenis.on('scroll', ScrollTrigger.update);
     gsap.ticker.add((time) => { window.lenis.raf(time * 1000); });
     gsap.ticker.lagSmoothing(0);
+}
 
+// Add this function to handle scroll to top
+function scrollToTop() {
+    // Prevent browser scroll restoration
+    if ('scrollRestoration' in history) {
+        history.scrollRestoration = 'manual';
+    }
+
+    // Scroll to top immediately when the page loads
+    window.scrollTo(0, 0);
+
+    // If lenis is available, also use it to scroll
+    if (window.lenis) {
+        window.lenis.scrollTo(0, { immediate: true });
+    }
 }
 
 function initIntro() {
@@ -306,6 +319,7 @@ function initScrollLock() {
 
         // initTreeDiagram();
 
+        initTreeDiagramWrapper(); // on page load
 
         // initSectionTwo();
         // initSectionThree();
@@ -359,12 +373,7 @@ function initTreeDiagram() {
         yPercent: 100,
     })
     mm.add("(max-width: 767px)", () => {
-        gsap.set(".parent-section .section.is--timeline", {
-            position: "relative"
-        })
-        gsap.set(".section.is--placeholder", {
-            height: () => document.querySelector(".tree-container.is--timeline").offsetHeight * 1
-        })
+
 
 
     })
@@ -394,8 +403,16 @@ function initTreeDiagram() {
         autoAlpha: 0
     });
 
+    gsap.set(".text-wrapper-barca", {
+        position: "absolute",
+        left: "unset",
+    })
 
-    let hasCreatedTriggers = false;
+    gsap.set(".text-wrapper-barca .lineInner", {
+        yPercent: 100,
+    })
+
+
     // create the main timeline
     const treeTlOne = gsap.timeline({
         scrollTrigger: {
@@ -403,55 +420,56 @@ function initTreeDiagram() {
             start: "top top",
             end: "+=2000%",
             pin: true,
+            pinSpacing: "margin",
             scrub: true,
-            markers: false,
+            markers: true,
             onLeave: () => {
 
-                mm.add("(max-width: 768px)", () => {
-                    if (!hasCreatedTriggers) {
+                // mm.add("(max-width: 768px)", () => {
+                //     if (!hasCreatedTriggers) {
 
-                        hasCreatedTriggers = true; // ✅ set the flag so it only runs once
+                //         hasCreatedTriggers = true; // ✅ set the flag so it only runs once
 
-                        document.querySelectorAll(".panel .text-wrapper").forEach(wrapper => {
-                            ScrollTrigger.create({
-                                trigger: wrapper,
-                                start: "top center+=10%",
-                                end: "bottom center",
-                                markers: false,
-                                onEnter: () => {
-                                    gsap.to(wrapper.querySelectorAll(".panel [data-split='lines'] .lineInner"), {
-                                        yPercent: 0,
-                                    })
-                                    if (wrapper.querySelector(".panel .t-inner-wrapper.is--spec")) {
-                                        gsap.to(wrapper.querySelectorAll(".panel .t-inner-wrapper.is--spec"), {
-                                            autoAlpha: 1,
-                                            yPercent: 0,
-                                            duration: 1,
-                                            ease: "power2.out"
-                                        })
-                                    }
-                                    console.log("entered");
+                //         document.querySelectorAll(".panel .text-wrapper").forEach(wrapper => {
+                //             ScrollTrigger.create({
+                //                 trigger: wrapper,
+                //                 start: "top center+=10%",
+                //                 end: "bottom center",
+                //                 markers: false,
+                //                 onEnter: () => {
+                //                     gsap.to(wrapper.querySelectorAll(".panel [data-split='lines'] .lineInner"), {
+                //                         yPercent: 0,
+                //                     })
+                //                     if (wrapper.querySelector(".panel .t-inner-wrapper.is--spec")) {
+                //                         gsap.to(wrapper.querySelectorAll(".panel .t-inner-wrapper.is--spec"), {
+                //                             autoAlpha: 1,
+                //                             yPercent: 0,
+                //                             duration: 1,
+                //                             ease: "power2.out"
+                //                         })
+                //                     }
+                //                     console.log("entered");
 
-                                }, onLeaveBack: () => {
-                                    gsap.to(wrapper.querySelectorAll(".panel [data-split='lines'] .lineInner"), {
-                                        yPercent: 100,
-                                    })
+                //                 }, onLeaveBack: () => {
+                //                     gsap.to(wrapper.querySelectorAll(".panel [data-split='lines'] .lineInner"), {
+                //                         yPercent: 100,
+                //                     })
 
-                                    if (wrapper.querySelector(".panel .t-inner-wrapper.is--spec")) {
-                                        gsap.to(wrapper.querySelectorAll(".panel .t-inner-wrapper.is--spec"), {
-                                            autoAlpha: 0,
-                                            yPercent: 10,
-                                            duration: 1,
-                                            ease: "power2.out"
-                                        })
-                                    }
-                                    console.log("exited"); // 👈 this triggers when scrolling back up
-                                }
+                //                     if (wrapper.querySelector(".panel .t-inner-wrapper.is--spec")) {
+                //                         gsap.to(wrapper.querySelectorAll(".panel .t-inner-wrapper.is--spec"), {
+                //                             autoAlpha: 0,
+                //                             yPercent: 10,
+                //                             duration: 1,
+                //                             ease: "power2.out"
+                //                         })
+                //                     }
+                //                     console.log("exited"); // 👈 this triggers when scrolling back up
+                //                 }
 
-                            });
-                        });
-                    }
-                })
+                //             });
+                //         });
+                //     }
+                // })
             }
         },
         // ease: "linear",
@@ -1269,39 +1287,85 @@ function initTreeDiagram() {
                 Flip.fit(dot, barcelonaDot, {
                     duration: 1, // needed for Flip to work but overwritten by scrub
                     ease: "none"
-                }), "<+=1"
+                }), "<+=.3"
                 // add all tweens at the same point in the timeline
             );
         });
 
+        treeTlOne.to({}, {
+            onStart: function () {
+                console.log("start")
+                gsap.to(".text-wrapper-map .lineInner", {
+                    yPercent: -100,
+                })
+                gsap.to(".text-wrapper-barca .lineInner", {
+                    yPercent: 0,
+                })
+            },
+            onReverseComplete: function () {
+                gsap.to(".text-wrapper-map .lineInner", {
+                    yPercent: 0,
+                })
 
+                gsap.to(".text-wrapper-barca .lineInner", {
+                    yPercent: 100,
+                })
+            }
+        }, "<")
     })
 
     // same as above but on mobile
     mm.add("(max-width: 767px)", () => {
+
+
+        // gsap.set(".section.is--timeline", {
+        //     position: "absolute",
+        //     top: "0",
+        // })
+        // const timelineOne = gsap.timeline({
+        //     scrollTrigger: {
+        //         trigger: ".parent-section",
+        //         start: "bottom top",
+        //         endTrigger: ".section.is--timeline",
+        //         end: "bottom top",
+        //         pin: true,
+        //         scrub: true,
+        //         markers: true,
+
+        //     },
+        // });
+        // gsap.set(".map-svg path", { drawSVG: "0% 100%" });
+        gsap.set(".parent-section .section.is--timeline", {
+            position: "relative"
+        })
+        gsap.set(".section.is--placeholder", {
+            height: () => document.querySelector(".section.is--timeline").offsetHeight
+        })
 
         treeTlOne.add(Flip.fit(".section.is--compare .tree-right-wrapper .line-wrapper-bottom", ".section.is--timeline .timeline-wrapper", {
             ease: "none",
             duration: 1,
             // duration: 2,
             onStart: function () {
-                gsap.to(".section.is--compare [data-split='lines'] ", {
-                    autoAlpha: 0,
+                console.log("start");
+
+                gsap.to(".section.is--compare [data-split='lines'] .lineInner", {
+                    yPercent: -100,
                 })
             },
 
 
 
             onReverseComplete: function () {
-                gsap.to(".section.is--compare [data-split='lines'] ", {
-                    autoAlpha: 1,
+                gsap.to(".section.is--compare [data-split='lines'] .lineInner", {
+                    yPercent: 0,
                 })
             }
         },))
 
         treeTlOne.to(".section.is--compare .is--reallywant", {
 
-            height: "+=400",
+            height: "+=100vh",
             transformOrigin: "top",
             duration: 1,
             ease: "none"
@@ -1309,7 +1373,7 @@ function initTreeDiagram() {
 
             .to(".section.is--compare .label.is--compare3", {
 
-                y: "+=400",
+                y: "+=100vh",
                 transformOrigin: "top",
                 duration: 1,
                 ease: "none"
@@ -1321,7 +1385,8 @@ function initTreeDiagram() {
             }, "<")
             .to(".section.is--personnes .is--toi", {
                 autoAlpha: 0,
-                y: "-=100",
+                y: "-=300",
+                ease: "none"
 
             }, "<")
 
@@ -1335,6 +1400,48 @@ function initTreeDiagram() {
                 duration: 0.001,
 
                 onStart: function () {
+
+                    gsap.to(".panel [data-split='lines'] .lineInner", {
+                        yPercent: 0,
+                    })
+
+                    gsap.to(".panel .t-inner-wrapper.is--spec", {
+                        autoAlpha: 1,
+                        yPercent: 0,
+                        duration: 1,
+                        ease: "power2.out"
+                    })
+                    // if (!hasCreatedTriggers) {
+
+                    //     hasCreatedTriggers = true; // ✅ set the flag so it only runs once
+
+                    //     document.querySelectorAll(".panel .text-wrapper").forEach(wrapper => {
+                    //         ScrollTrigger.create({
+                    //             trigger: wrapper,
+                    //             start: "top center+=10%",
+                    //             end: "bottom center",
+                    //             markers: true,
+                    //             onEnter: () => {
+                    //                 gsap.to(wrapper.querySelectorAll(".panel [data-split='lines'] .lineInner"), {
+                    //                     yPercent: 0,
+                    //                 })
+                    //                 if (wrapper.querySelector(".panel .t-inner-wrapper.is--spec")) {
+                    //                     gsap.to(wrapper.querySelectorAll(".panel .t-inner-wrapper.is--spec"), {
+                    //                         autoAlpha: 1,
+                    //                         yPercent: 0,
+                    //                         duration: 1,
+                    //                         ease: "power2.out"
+                    //                     })
+                    //                 }
+                    //                 console.log("entered");
+
+                    //             },
+
+                    //         });
+                    //     });
+                    // }
+
+
                     gsap.fromTo(".tree-container.is--timeline .dot-wrapper .dot .dot-bg", {
                         scale: 0,
                         autoAlpha: 1
@@ -1356,17 +1463,46 @@ function initTreeDiagram() {
                     //     yPercent: 100,
                     // })
 
-                    gsap.to(".panel.is--third .text-wrapper.is--third .t-inner-wrapper.is--spec", {
-                        autoAlpha: 0,
-                        duration: 1,
-                        ease: "power2.out"
-                    },)
+                    // gsap.to(".panel.is--third .text-wrapper.is--third .t-inner-wrapper.is--spec", {
+                    //     autoAlpha: 0,
+                    //     duration: 1,
+                    //     ease: "power2.out"
+                    // },)
                     gsap.to(".section.is--compare .inscription-rc", {
                         autoAlpha: 1,
                     })
 
+                    gsap.to(".section.is--timeline .timeline-wrapper .white-line", {
+                        scaleY: 0,
+                        transformOrigin: "bottom",
+                        duration: .5,
+                        ease: "power2.out"
+                    }, "<")
+
+                    gsap.to(".panel [data-split='lines'] .lineInner", {
+                        yPercent: 100,
+                    })
+
+                    gsap.to(".panel .t-inner-wrapper.is--spec", {
+                        autoAlpha: 0,
+                        yPercent: 10,
+                        duration: 1,
+                        ease: "power2.out"
+                    })
+
                 },
                 onComplete: function () {
+                    gsap.fromTo(".section.is--timeline .timeline-wrapper .white-line", {
+                        scaleY: 0,
+                    }, {
+                        scaleY: 1,
+                        transformOrigin: "bottom",
+                        duration: .5,
+                        ease: "power2.out"
+                    }, "<")
+
+
+
 
                     // gsap.to(".panel [data-split='lines'] .lineInner", {
                     //     yPercent: 0,
@@ -1381,11 +1517,6 @@ function initTreeDiagram() {
 
                 }
             }, "<")
-            .from(".section.is--timeline .timeline-wrapper .white-line", {
-                scaleY: 0,
-                transformOrigin: "bottom",
-                duration: .5,
-            }, "<")
 
         // gsap.set(".section.is--timeline .timeline-wrapper .white-line", {
         //     scaleY: 0,
@@ -1397,11 +1528,21 @@ function initTreeDiagram() {
             end: `+=${document.querySelector(".section.is--timeline .timeline-wrapper").offsetHeight}`,
             // scrub: 0,
             pin: ".section.is--timeline .timeline-wrapper .white-line",
-            anticipatePin: 1,
+            pinSpacing: true,
+            // anticipatePin: 1,
             pinReparent: true,
             markers: false,
+            // onEnter: function () {
+            //     gsap.to(".section.is--timeline .timeline-wrapper .white-line", {
+            //         scaleY: 1,
+            //         transformOrigin: "bottom",
+            //         duration: 1,
+            //         ease: "power2.out"
+            //     })
+            // },
 
         })
+        let once = false;
         const timeline = gsap.timeline({
             scrollTrigger: {
                 trigger: ".section.is--placeholder",
@@ -1409,35 +1550,100 @@ function initTreeDiagram() {
                 end: `+=${document.querySelector(".section.is--timeline .timeline-wrapper").offsetHeight}`,
                 // scrub: 0,
                 pin: ".dot-wrapper.is--timeline",
-                anticipatePin: 1,
+                // anticipatePin: 1,
                 pinReparent: true,
                 markers: false,
 
-            }
+            },
+
         });
 
+        const pinDuration = window.innerHeight * 3; // because +=300%
 
-        // timeline.from(".section.is--timeline .timeline-wrapper .white-line", {
-        //     scaleY: 0,
-        //     transformOrigin: "top",
-        //     ease: "none",
-        //     overwrite: "auto"
-        // })
-        // const timeline = gsap.timeline({
-        //     scrollTrigger: {
-        //         trigger: ".section.is--placeholder",
-        //         start: "top bottom",
-        //         end: `+=${document.querySelector(".section.is--timeline .timeline-wrapper").offsetHeight}`,
-        //         scrub: true,
-        //     }
-        // })
+        document.querySelector(".map-spacer").style.height = `${pinDuration}px`;
 
-        // timeline
 
-        //     .to(".section.is--timeline .dot-wrapper", {
-        //         y: () => document.querySelector(".section.is--timeline .timeline-wrapper").offsetHeight,
-        //         ease: "none",
-        //     }, "<")
+        const mapTl = gsap.timeline({
+            scrollTrigger: {
+                trigger: ".map-spacer",
+                start: "top bottom",
+                end: `+=${pinDuration}`,
+                pin: ".section.is--map",
+                pinReparent: true,
+                scrub: true,
+                markers: { startColor: "pink", endColor: "blue", fontSize: 20 }
+            }
+
+
+        });
+
+        mapTl.to(".map-svg path", {
+            drawSVG: "0% 100%",
+
+            onStart: function () {
+                gsap.to(".section.is--map .text-wrapper-map [data-split='lines'] .lineInner", {
+                    yPercent: 0,
+                    duration: 1,
+                    ease: "power2.out"
+                },)
+            },
+            onReverseComplete: function () {
+                gsap.to(".section.is--map .text-wrapper-map [data-split='lines'] .lineInner", {
+                    yPercent: 100,
+                    duration: 1,
+                    ease: "power2.out"
+                },)
+            }
+        })
+
+            .to(".section.is--map .map-container", {
+                scale: 1.6,
+            }, "<")
+            .to(".map-container", {
+                yPercent: -50,
+                xPercent: 30,
+                scale: 1.6,
+                ease: "power1.out"
+            },)
+            .to(".map-container mask rect", {
+                xPercent: -30,
+                scale: 1.6,
+            }, "<")
+
+        const allDots = gsap.utils.toArray(".dot-video, .dot-normal");
+        const barcelonaDot = document.querySelector(".dot-barcelona");
+
+        allDots.forEach(dot => {
+            mapTl.add(
+                Flip.fit(dot, barcelonaDot, {
+                    duration: 1, // needed for Flip to work but overwritten by scrub
+                    ease: "none"
+                }), "<+=.3"
+                // add all tweens at the same point in the timeline
+            );
+        });
+
+        mapTl.to({}, {
+            onStart: function () {
+                console.log("start")
+                gsap.to(".text-wrapper-map .lineInner", {
+                    yPercent: -100,
+                })
+                gsap.to(".text-wrapper-barca .lineInner", {
+                    yPercent: 0,
+                })
+            },
+            onReverseComplete: function () {
+                gsap.to(".text-wrapper-map .lineInner", {
+                    yPercent: 0,
+                })
+
+                gsap.to(".text-wrapper-barca .lineInner", {
+                    yPercent: -100,
+                })
+            }
+        }, "<")
+
     })
 
 
@@ -1445,33 +1651,6 @@ function initTreeDiagram() {
 
 
 
-// function initFadeText() {
-//     gsap.utils.toArray(".fade-in").forEach((text) => {
-//         ScrollTrigger.create({
-//             trigger: text,
-//             start: "left center", // when the left edge of the text hits center of viewport
-//             horizontal: true,
-//             scrub: false,
-//             toggleActions: "play none none reverse",
-//             onEnter: () => {
-//                 gsap.to(text, {
-//                     opacity: 1,
-//                     y: 0,
-//                     duration: 1,
-//                     ease: "power2.out"
-//                 });
-//             },
-//             onLeaveBack: () => {
-//                 gsap.to(text, {
-//                     opacity: 0,
-//                     y: 20,
-//                     duration: 1,
-//                     ease: "power2.out"
-//                 });
-//             }
-//         });
-//     });
-// }
 
 function initSplit() {
     let elementToSplit = document.querySelectorAll('[data-split="lines"]');
@@ -1498,60 +1677,75 @@ function initSplit() {
 
 }
 
-// function initSkeletonLoad() {
-//     const skeletonLoadTargets = document.querySelectorAll('[data-load-skeleton="load"]');
-//     skeletonLoadTargets.forEach(target => {
-//         // Get the words and skeleton overlays for this specific target
-//         const words = target.querySelectorAll('.word');
-//         const skeletonOverlays = target.querySelectorAll('.skeleton-overlay');
 
-//         // Calculate a proportional delay based on the number of words
-//         // This ensures the animation timing remains consistent regardless of word count
-//         const wordCount = words.length;
-//         const staggerTime = 0.02; // Time between each word animation
-//         const totalFromDuration = 1; // Base duration for the from animation
+function initHeroAnimation() {
+    window.lenis.scrollTo(0, { immediate: true });
+    document.body.removeAttribute('data-preload');
+    CustomEase.create("easeOutQuad", "0.25,0.46,0.45,0.94");
+    CustomEase.create("easeOutQuart", ".165, .84, .44, 1");
 
-//         // Create the timeline with ScrollTrigger
-//         const targetTimeline = gsap.timeline({
-//             scrollTrigger: {
-//                 trigger: target,
-//                 start: "top bottom", // when target's top hits the bottom of viewport
-//             },
-//         });
 
-//         // Set up the animation sequence with proportional timing
-//         targetTimeline
-//             .set(words, {
-//                 autoAlpha: 0
-//             })
-//             .from(skeletonOverlays, {
-//                 autoAlpha: 0,
-//                 stagger: staggerTime,
-//                 duration: totalFromDuration,
-//                 onStart: function () {
-//                     // Create a delayed call that triggers exactly at the midpoint of the "from" animation
-//                     // This ensures the "to" animation starts halfway through, regardless of word count
-//                     const totalFromAnimTime = totalFromDuration + (wordCount - 1) * staggerTime;
-//                     const halfwayPoint = totalFromAnimTime / 2;
+    gsap.set(".container.is--hero .scroll-circle", {
+        rotation: -90,
+        transformOrigin: "center"
+    })
 
-//                     gsap.delayedCall(halfwayPoint, function () {
-//                         gsap.to(skeletonOverlays, {
-//                             autoAlpha: 0,
-//                             stagger: staggerTime,
-//                             duration: totalFromDuration,
-//                             overwrite: true
-//                         });
-//                     });
-//                 }
-//             })
-//             .to(words, {
-//                 autoAlpha: 1,
-//                 stagger: 0.02,
-//                 duration: 1
-//             }, "-=.3");
-//     });
-// }
 
+    let tl = gsap.timeline({})
+
+    tl.from(".hero-content [data-split='lines'] .lineInner", {
+        yPercent: 100,
+        duration: 1,
+        ease: "easeOutQuart",
+        stagger: 0.1
+    })
+        .from(".header .logo", {
+            autoAlpha: 0,
+            duration: 1,
+            ease: "easeOutQuart"
+        }, "<")
+
+        .from(".hero-content .button", {
+            autoAlpha: 0,
+            yPercent: 100,
+            duration: 1,
+            ease: "easeOutQuart"
+        }, "<")
+        .to(".header .button--secondary", {
+            duration: 1,
+            ease: "easeOutQuart",
+            scrambleText: {
+                text: "{original}",
+                chars: "upperCase",
+                speed: 1,
+                tweenLength: false,
+                revealDelay: 0.5
+            }
+
+        }, "<")
+
+        .fromTo(".container.is--hero .scroll-circle", {
+            drawSVG: "0% 0%"
+        }, {
+            drawSVG: "0% 100%",
+            duration: 1,
+            ease: "easeOutQuart"
+        }, "<")
+        .from(".container.is--hero .scroll-arrow", {
+            autoAlpha: 0,
+            duration: 1,
+            ease: "power1.out"
+        }, "<")
+        .to(".container.is--hero .scroll-arrow", {
+            y: 2,
+            duration: 0.8,
+            repeat: -1,
+            yoyo: true,
+            ease: "easeOutQuart"
+        })
+
+
+}
 
 
 let treeDiagramContext;
@@ -1568,20 +1762,25 @@ function initTreeDiagramWrapper() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    gsap.registerPlugin(ScrollTrigger, SplitText, Flip, DrawSVGPlugin);
+    // Scroll to top immediately
+    scrollToTop();
+
+    gsap.registerPlugin(ScrollTrigger, SplitText, Flip, DrawSVGPlugin, CustomEase);
     document.fonts.ready.then(() => {
         initLenis();
         initSplit();
-        // initTreeDiagram();
+        initHeroAnimation();
+        initIntro();
+        initTrackerCheckboxes(); // Initialize tracker checkboxes
+        initScrollLock(); // Initialize scroll lock
 
-        initTreeDiagramWrapper(); // on page load
-        // initFadeText();
-
-        // initIntro();
-        // initTrackerCheckboxes(); // Initialize tracker checkboxes
-        // initScrollLock(); // Initialize scroll lock
+        // Ensure we're at the top after everything is initialized
+        scrollToTop();
     })
 });
+
+// Also add a window load event to catch any late scroll restoration
+window.addEventListener('load', scrollToTop);
 
 // Re-init on resize with debounce
 // let resizeTimeout;
