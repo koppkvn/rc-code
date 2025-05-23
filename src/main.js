@@ -1,3 +1,6 @@
+import "./styles/main.scss";
+
+
 function initLenis() {
     window.lenis = new Lenis();
     window.lenis.on('scroll', ScrollTrigger.update);
