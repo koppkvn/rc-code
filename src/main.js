@@ -1687,14 +1687,8 @@ function initHeroAnimation() {
     CustomEase.create("easeOutQuad", "0.25,0.46,0.45,0.94");
     CustomEase.create("easeOutQuart", ".165, .84, .44, 1");
     const bgVideo = document.getElementById("hero-bg-video");
-    if (bgVideo) {
-        // wait until the browser says it’s ready
-        bgVideo.addEventListener("canplay", () => bgVideo.play());
-    }
 
-    gsap.set("#hero-bg-video", {
-        opacity: 0.8,
-    })
+
 
     gsap.set(".container.is--hero .scroll-circle", {
         rotation: -90,
@@ -1754,7 +1748,18 @@ function initHeroAnimation() {
             yoyo: true,
             ease: "easeOutQuart"
         })
+        .call(() => {
+            if (bgVideo && bgVideo.paused) {
 
+                bgVideo.play().catch(() => { });
+
+
+            }
+        }, null, 0); // 0.5 is seconds offset from timeline start
+    gsap.set(bgVideo, { opacity: 0.8 });
+    // bgVideo.addEventListener('playing', () => {
+    //     gsap.set(bgVideo, { opacity: 0.8 });
+    // });
 
 }
 
