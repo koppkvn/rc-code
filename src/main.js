@@ -427,7 +427,7 @@ function initScrollLock() {
         // initTreeDiagram();
 
         initTreeDiagramWrapper(); // on page load
-
+        // initVideoMap();
         // initSectionTwo();
         // initSectionThree();
         // etc.
@@ -525,6 +525,7 @@ function initTreeDiagram() {
 
     // create the main timeline
     const treeTlOne = gsap.timeline({
+
         scrollTrigger: {
             trigger: ".parent-section",
             start: "top top",
@@ -532,7 +533,8 @@ function initTreeDiagram() {
             pin: true,
             pinSpacing: "margin",
             scrub: true,
-            markers: false,
+            // markers: false,
+            // invalidateOnRefresh: true,
             onLeave: () => {
 
                 // mm.add("(max-width: 48rem)", () => {
@@ -980,10 +982,10 @@ function initTreeDiagram() {
 
 
     // we move "toi" to the top on mobile only
-    mm.add("(max-width: 47.9375rem)", () => {
+    mm.add("(max-width: 767px)", () => {
         console.log("mobile");
         treeTlOne.to(".tree-container.is--three .tree-child-wrapper.is--one", {
-            yPercent: -650, // adjust as needed
+            yPercent: -560, // adjust as needed
             duration: 1.2,
         }, "focusSection");
 
@@ -1111,7 +1113,7 @@ function initTreeDiagram() {
         .addLabel("timeline", "+=1")
 
     // desktop only
-    mm.add("(min-width: 48rem)", () => {
+    mm.add("(min-width: 768px)", () => {
 
         // we move the line to the position of the other line
         treeTlOne.add(Flip.fit(".section.is--compare .tree-right-wrapper .line-wrapper-bottom", ".section.is--timeline .timeline-wrapper", {
@@ -1384,8 +1386,9 @@ function initTreeDiagram() {
                 ease: "power1.out"
             },)
             .to(".map-container mask rect", {
-                xPercent: -30,
-                scale: 1.6,
+                xPercent: 10,
+                yPercent: 50,
+                scale: .5,
                 duration: 5,
             }, "<")
         // Get all the dots, except the Barcelona one
@@ -1425,7 +1428,7 @@ function initTreeDiagram() {
     })
 
     // same as above but on mobile
-    mm.add("(max-width: 47.9375rem)", () => {
+    mm.add("(max-width: 767px)", () => {
 
 
         // gsap.set(".section.is--timeline", {
@@ -1450,6 +1453,10 @@ function initTreeDiagram() {
         })
         gsap.set(".section.is--placeholder", {
             height: () => document.querySelector(".section.is--timeline").offsetHeight
+        })
+
+        gsap.set(".dot-video, .dot-normal", {
+            scale: .6,
         })
 
         treeTlOne.add(Flip.fit(".section.is--compare .tree-right-wrapper .line-wrapper-bottom", ".section.is--timeline .timeline-wrapper", {
@@ -1641,7 +1648,7 @@ function initTreeDiagram() {
             pinSpacing: true,
             // anticipatePin: 1,
             pinReparent: true,
-            markers: false,
+            markers: true,
             // onEnter: function () {
             //     gsap.to(".section.is--timeline .timeline-wrapper .white-line", {
             //         scaleY: 1,
@@ -1660,6 +1667,7 @@ function initTreeDiagram() {
                 end: `+=${document.querySelector(".section.is--timeline .timeline-wrapper").offsetHeight}`,
                 // scrub: 0,
                 pin: ".dot-wrapper.is--timeline",
+                // invalidateOnRefresh: true,
                 // anticipatePin: 1,
                 pinReparent: true,
                 markers: false,
@@ -1668,7 +1676,7 @@ function initTreeDiagram() {
 
         });
 
-        const pinDuration = window.innerHeight * 3; // because +=300%
+        const pinDuration = window.innerHeight * 5; // because +=300%
 
         document.querySelector(".map-spacer").style.height = `${pinDuration}px`;
 
@@ -1681,7 +1689,10 @@ function initTreeDiagram() {
                 pin: ".section.is--map",
                 pinReparent: true,
                 scrub: true,
+                // invalidateOnRefresh: true,
                 markers: { startColor: "pink", endColor: "blue", fontSize: 20 }
+            }, defaults: {
+                duration: 1,
             }
 
 
@@ -1706,18 +1717,39 @@ function initTreeDiagram() {
             }
         })
 
+            .from(".map-container .dot-normal, .map-container .dot-video", {
+                onStart: function () {
+                    gsap.fromTo(".map-container .dot-video .dot-bg", {
+                        scale: 0,
+                        autoAlpha: 1,
+                    }, {
+                        scale: 1.3,
+                        autoAlpha: 0,
+                        duration: 1,
+                        repeat: -1,
+                        ease: "power1.inOut"
+                    })
+
+                },
+                stagger: 0.5,
+                autoAlpha: 0,
+                duration: 5,
+            }, "<")
             .to(".section.is--map .map-container", {
-                scale: 1.6,
+                scale: 2,
+                duration: 2,
             }, "<")
             .to(".map-container", {
-                yPercent: -50,
-                xPercent: 30,
-                scale: 1.6,
+                yPercent: -85,
+                xPercent: 45,
+                scale: 2.6,
+                duration: 2,
                 ease: "power1.out"
             },)
             .to(".map-container mask rect", {
-                xPercent: -30,
-                scale: 1.6,
+                xPercent: -10,
+                yPercent: 25,
+                duration: 1,
             }, "<")
 
         const allDots = gsap.utils.toArray(".dot-video, .dot-normal");
@@ -1759,7 +1791,205 @@ function initTreeDiagram() {
 
 }
 
+function initVideoMap() {
 
+    gsap.set(".video-modal", {
+        position: "fixed",
+        pointerEvents: "none",
+        top: 0,
+        left: 0,
+        width: "100%",
+        height: "100%",
+    })
+    gsap.set(".video-container", {
+        autoAlpha: 0,
+        yPercent: 20
+    })
+
+    gsap.set(".video-modal-bg", {
+        autoAlpha: 0,
+        backdropFilter: "blur(10px)",
+    })
+
+    gsap.set(".video-2", {
+        autoAlpha: 0,
+    })
+    gsap.set(".svg-play", {
+        autoAlpha: 0,
+    })
+
+    gsap.set(".close-button", {
+        top: 0,
+    })
+    const modal = document.querySelector('.video-modal');
+    const playButton = modal.querySelector('.play-button');
+    const video = modal.querySelector('video');
+    const durationBox = modal.querySelector('.video-duration');
+    const closeButton = document.querySelector('.close-button');
+    const modalBg = document.querySelector('.video-modal-bg');
+    const closeButtonText = closeButton.textContent.toUpperCase();
+    let openingTl;
+
+
+    function closeVideoModal() {
+        const video = modal.querySelector('video');
+        if (openingTl) {
+            openingTl.kill();
+        }
+
+        window.lenis.start();
+        const closeTl = gsap.timeline();
+
+        closeTl
+            .to(".close-button", {
+                yPercent: 0,
+                duration: 0.5,
+                ease: "easeOutQuart"
+            })
+            .to(".video-container", {
+                autoAlpha: 0,
+                yPercent: 20,
+                duration: 0.5,
+                ease: "easeOutQuart"
+            }, "<")
+            .to(".video-modal-bg", {
+                autoAlpha: 0,
+                duration: 0.5,
+                ease: "easeOutQuart"
+            }, "<")
+            .to(".video-2", {
+                autoAlpha: 0,
+                duration: 0.5,
+                ease: "easeOutQuart"
+            }, "<")
+            .call(() => {
+                video.pause();
+                video.currentTime = 0;
+                gsap.set(modal, {
+                    pointerEvents: "none"
+                });
+
+                document.removeEventListener('keydown', handleEscKey);
+            });
+    }
+
+
+    function handleEscKey(e) {
+        if (e.key === 'Escape') {
+            closeVideoModal();
+        }
+    }
+    closeButton.addEventListener('mouseenter', () => {
+        gsap.to(closeButton, {
+            duration: 0.5,
+            scrambleText: {
+                text: closeButtonText,
+                chars: "upperCase",
+                speed: 0.7,
+            }
+        });
+    });
+
+    closeButton.addEventListener('click', closeVideoModal);
+    modalBg.addEventListener('click', closeVideoModal);
+    playButton.addEventListener('click', () => {
+
+
+        if (video.paused) {
+            video.play();
+
+            gsap.to(".svg-pause path", {
+                morphSVG: ".svg-pause path",
+                duration: 1,
+                ease: "easeOutQuart"
+            })
+            // Here you could animate the play button to show pause state
+        } else {
+            video.pause();
+            gsap.to(".svg-pause path", {
+                morphSVG: ".svg-play path",
+                duration: 1,
+                ease: "easeOutQuart"
+            })
+            // Here you could animate the play button to show play state
+        }
+    });
+
+    document.querySelectorAll('.dot-video').forEach(dot => {
+        gsap.set(dot, {
+            cursor: "pointer",
+            pointerEvents: "auto",
+        })
+        dot.addEventListener('click', function () {
+            const videoUrl = this.dataset.video;
+            window.lenis.stop();
+
+            video.src = videoUrl;
+            video.currentTime = 0;
+
+
+            gsap.set(modal, {
+                pointerEvents: "auto",
+            })
+            // Create a single timeline for opening animations
+            openingTl = gsap.timeline();
+
+            openingTl
+                .to(".video-container", {
+                    autoAlpha: 1,
+                    yPercent: 0,
+                    duration: 1,
+                    ease: "easeOutQuart"
+                })
+                .to(".video-modal-bg", {
+                    autoAlpha: 1,
+                    duration: 1,
+                    ease: "easeOutQuart"
+                }, "<")
+                .to(".close-button", {
+                    yPercent: -140,
+                    duration: 1,
+                    ease: "easeOutQuart",
+                },) // Changed delay to timeline position
+
+
+            document.addEventListener('keydown', handleEscKey);
+
+            video.addEventListener('canplay', () => {
+                gsap.to(".video-2", {
+                    autoAlpha: 1,
+                    duration: 1,
+                    ease: "easeOutQuart"
+                });
+
+
+
+                // Start playing once ready
+                video.play();
+            }, { once: true }); // only listen once for initial load
+
+            // Handle play/pause toggle
+
+
+
+            video.addEventListener('timeupdate', () => {
+                const currentTime = video.currentTime;
+                const mins = Math.floor(currentTime / 60);
+                const secs = Math.floor(currentTime % 60).toString().padStart(2, '0');
+                durationBox.textContent = `${mins}:${secs} `;
+            });
+            // video.play();
+            // modal.style.display = "flex";
+            // Show duration (wait for metadata to load)
+            // video.onloadedmetadata = function () {
+            //     const duration = video.duration; // seconds
+            //     const mins = Math.floor(duration / 60);
+            //     const secs = Math.floor(duration % 60).toString().padStart(2, '0');
+            //     durationBox.textContent = `${mins}:${secs} min`;
+            // };
+        });
+    });
+}
 
 
 function initSplit() {
@@ -1792,6 +2022,8 @@ function initSplit() {
 
 
 function initAgeGate() {
+
+    window.lenis.stop();
     gsap.set(" .header .logo ", {
         autoAlpha: 0,
     });
@@ -1921,6 +2153,7 @@ function initAgeGate() {
             }, "<")
             .add(() => {
                 tlHeroAnimation.play();
+                window.lenis.start();
             }, "<+.2")
     });
 
@@ -2083,18 +2316,28 @@ document.addEventListener("DOMContentLoaded", () => {
     // Scroll to top immediately
     scrollToTop();
 
-    gsap.registerPlugin(ScrollTrigger, SplitText, Flip, DrawSVGPlugin, CustomEase);
+    gsap.registerPlugin(ScrollTrigger, SplitText, Flip, DrawSVGPlugin, CustomEase, MorphSVGPlugin);
     document.fonts.ready.then(() => {
         initLenis();
         initSplit();
-        initAgeGate();
+        // initAgeGate();
 
-        tlHeroAnimation = initHeroAnimation();
-        initIntro();
-        initTrackerCheckboxes(); // Initialize tracker checkboxes
-        initScrollLock(); // Initialize scroll lock
-        initTrackerSection();
-        // Ensure we're at the top after everything is initialized
+        // tlHeroAnimation = initHeroAnimation();
+        // initIntro();
+        // initTrackerCheckboxes(); 
+        // initScrollLock(); 
+        // initTrackerSection();
+        initVideoMap();
+
+        //to remove
+        initTreeDiagramWrapper(); // on page load
+        initVideoMap();
+        document.body.removeAttribute('data-preload');
+
+        // to remove top 
+
+
+
         scrollToTop();
     })
 });
