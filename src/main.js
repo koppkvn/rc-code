@@ -2323,9 +2323,8 @@ document.addEventListener("DOMContentLoaded", () => {
     gsap.registerPlugin(ScrollTrigger, SplitText, Flip, DrawSVGPlugin, CustomEase, MorphSVGPlugin);
     document.fonts.ready.then(() => {
         initLenis();
-        initSplit();
         initAgeGate();
-
+        initSplit();
         tlHeroAnimation = initHeroAnimation();
         initIntro();
         initTrackerCheckboxes();
