@@ -978,14 +978,56 @@ function initTreeDiagram() {
         .to(".tree-container.is--three .tree-child-wrapper:not(.is--one), .tree-container.is--three .tree-horizontal-line, .tree-container.is--three .tree-header-wrapper, .tree-container.is--three .tree-child-wrapper.is--one .line", {
             autoAlpha: 0,
             duration: 1.2,
+
         }, "focusSection")
+
+        .to({}, {
+            onComplete: function () {
+                gsap.to(".section.is--compare [data-split='lines'] .lineInner", {
+                    yPercent: 0,
+                    duration: .6,
+                    stagger: 0.05,
+                    ease: "power1.out"
+                })
+
+                gsap.to(".header-section.is--groupe", {
+                    autoAlpha: 0,
+                })
+
+                gsap.to(".section.is--personnes [data-split='lines'] .lineInner", {
+                    yPercent: 100,
+                    duration: .6,
+                    stagger: 0.05,
+                    ease: "power1.out"
+                })
+
+            },
+            onReverseComplete: function () {
+                gsap.to(".section.is--compare [data-split='lines'] .lineInner", {
+                    yPercent: 100,
+                    duration: .6,
+                    stagger: 0.05,
+                    ease: "power1.out"
+                })
+                gsap.to(".header-section.is--groupe", {
+                    autoAlpha: 1,
+                })
+
+                gsap.to(".section.is--personnes [data-split='lines'] .lineInner", {
+                    yPercent: 0,
+                    duration: .6,
+                    stagger: 0.05,
+                    ease: "power1.out"
+                })
+            }
+        }, "<+.2")
 
 
     // we move "toi" to the top on mobile only
     mm.add("(max-width: 767px)", () => {
         console.log("mobile");
         treeTlOne.to(".tree-container.is--three .tree-child-wrapper.is--one", {
-            yPercent: -560, // adjust as needed
+            yPercent: -770, // adjust as needed
             duration: 1.2,
         }, "focusSection");
 
@@ -999,44 +1041,7 @@ function initTreeDiagram() {
         scaleX: window.innerWidth <= 767 ? 1 : 0,
         scaleY: window.innerWidth <= 767 ? 0 : 1,
         transformOrigin: window.innerWidth <= 767 ? "top" : "left",
-        onComplete: function () {
-            gsap.to(".section.is--compare [data-split='lines'] .lineInner", {
-                yPercent: 0,
-                duration: .6,
-                stagger: 0.05,
-                ease: "power1.out"
-            })
 
-            gsap.to(".header-section.is--groupe", {
-                autoAlpha: 0,
-            })
-
-            gsap.to(".section.is--personnes [data-split='lines'] .lineInner", {
-                yPercent: 100,
-                duration: .6,
-                stagger: 0.05,
-                ease: "power1.out"
-            })
-
-        },
-        onReverseComplete: function () {
-            gsap.to(".section.is--compare [data-split='lines'] .lineInner", {
-                yPercent: 100,
-                duration: .6,
-                stagger: 0.05,
-                ease: "power1.out"
-            })
-            gsap.to(".header-section.is--groupe", {
-                autoAlpha: 1,
-            })
-
-            gsap.to(".section.is--personnes [data-split='lines'] .lineInner", {
-                yPercent: 0,
-                duration: .6,
-                stagger: 0.05,
-                ease: "power1.out"
-            })
-        }
     }, "focusSection")
 
 
@@ -1456,7 +1461,7 @@ function initTreeDiagram() {
         })
 
         gsap.set(".dot-video, .dot-normal", {
-            scale: .6,
+            scale: .5,
         })
 
         treeTlOne.add(Flip.fit(".section.is--compare .tree-right-wrapper .line-wrapper-bottom", ".section.is--timeline .timeline-wrapper", {
@@ -1893,6 +1898,7 @@ function initVideoMap() {
     closeButton.addEventListener('click', closeVideoModal);
     modalBg.addEventListener('click', closeVideoModal);
     playButton.addEventListener('click', () => {
+        console.log("click");
 
 
         if (video.paused) {
@@ -2320,19 +2326,18 @@ document.addEventListener("DOMContentLoaded", () => {
     document.fonts.ready.then(() => {
         initLenis();
         initSplit();
-        // initAgeGate();
+        initAgeGate();
 
-        // tlHeroAnimation = initHeroAnimation();
-        // initIntro();
-        // initTrackerCheckboxes(); 
-        // initScrollLock(); 
-        // initTrackerSection();
+        tlHeroAnimation = initHeroAnimation();
+        initIntro();
+        initTrackerCheckboxes();
+        initScrollLock();
+        initTrackerSection();
         initVideoMap();
-
         //to remove
-        initTreeDiagramWrapper(); // on page load
-        initVideoMap();
-        document.body.removeAttribute('data-preload');
+        // initTreeDiagramWrapper(); // on page load
+        // initVideoMap();
+        // document.body.removeAttribute('data-preload');
 
         // to remove top 
 
