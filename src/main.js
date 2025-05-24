@@ -6,6 +6,12 @@ function initLenis() {
     window.lenis.on('scroll', ScrollTrigger.update);
     gsap.ticker.add((time) => { window.lenis.raf(time * 1000); });
     gsap.ticker.lagSmoothing(0);
+
+
+    CustomEase.create("easeOutQuad", "0.25,0.46,0.45,0.94");
+    CustomEase.create("easeOutQuart", ".165, .84, .44, 1");
+    CustomEase.create("easeInOutQuad", ".455, .03, .515, .955");
+    CustomEase.create("easeInOutQuart", ".77, 0, .175, 1");
 }
 
 // Add this function to handle scroll to top
@@ -123,6 +129,104 @@ function initIntro() {
 
 }
 
+function initTrackerSection() {
+    gsap.set(".purgatoire-message", {
+        autoAlpha: 0,
+    })
+
+    gsap.set(".tracker-highlight", {
+        autoAlpha: 0,
+    })
+
+    gsap.from(".section.is--tracker [data-split='lines'] .lineInner", {
+        yPercent: 100,
+        duration: 1,
+        ease: "easeOutQuart",
+        stagger: 0.1,
+        scrollTrigger: {
+            trigger: ".section.is--tracker",
+            start: "top 80%",
+            toggleActions: "play none none none",
+            markers: false
+        }
+    })
+
+    let tl = gsap.timeline({
+        scrollTrigger: {
+            trigger: ".section.is--tracker .tracker-container",
+            start: "top 80%",
+            end: "bottom bottom",
+            toggleActions: "play none none none",
+            // markers: true
+        }
+    })
+
+    tl.from(".container.is--tracker .tracker-row > div:not(.tracker-row-line)", {
+        autoAlpha: 0,
+        duration: 1,
+        ease: "easeOutQuart",
+        stagger: 0.03,
+    })
+        .to(".container.is--tracker .header-line", {
+            scaleX: 0,
+            duration: 1,
+            transformOrigin: "right",
+            ease: "easeOutQuart",
+        }, "<")
+
+        .to(".container.is--tracker .header-subtitle, .container.is--tracker .header-title, .container.is--tracker .header-number", {
+            scrambleText: {
+                text: "{original}",
+            },
+        }, "<")
+
+    tl.to(".container.is--tracker .tracker-row .tracker-row-line", {
+        xPercent: 100,
+        duration: 1,
+        ease: "easeOutQuart",
+        stagger: 0.03,
+
+        onComplete: function () {
+            gsap.to(".purgatoire-message .wordInner", {
+                duration: 1,
+
+                scrambleText: {
+                    text: "{original}",
+                    speed: 0.65,
+                },
+            });
+
+            gsap.to(".purgatoire-message", {
+                autoAlpha: 1,
+                duration: 1,
+                ease: "easeOutQuart",
+            })
+
+            gsap.to('.tracker-highlight', {
+                autoAlpha: 1,
+                duration: 1,
+                ease: "easeOutQuart",
+            });
+
+            // gsap.fromTo(".tracker-checkbox.is--button", {
+            //     backgroundColor: "#5f5f5f",
+
+            // }, {
+            //     backgroundColor: "#2f2f2f",
+
+            //     duration: 1,
+            //     ease: "power1.out",
+            //     stagger: .4,
+            //     repeat: -1,
+            // })
+        }
+    }, "<")
+
+    // tl.from(".container.is--tracker .tracker-row div:not(.tracker-row-line)", {
+
+
+}
+
 function initTrackerCheckboxes() {
     const trackerButtons = document.querySelectorAll('.tracker-checkbox.is--button');
     const pompeCounterEl = document.querySelector('.tracker-pompes .color');
@@ -180,7 +284,7 @@ function initTrackerCheckboxes() {
             gsap.to(this, {
                 scale: 1.05,
                 duration: 0.2,
-                border: '1px solid white'
+                border: '.0625rem solid white'
             });
         });
 
@@ -192,7 +296,7 @@ function initTrackerCheckboxes() {
 
             // Return to normal state
             gsap.to(this, {
-                border: '1px solid transparent',
+                border: '.0625rem solid transparent',
                 scale: 1,
                 duration: 0.2
             });
@@ -208,7 +312,7 @@ function initTrackerCheckboxes() {
             this.setAttribute('data-clicked', 'true');
 
             // Toggle white border on the button
-            this.style.border = '1px solid white';
+            this.style.border = '.0625rem solid white';
 
             // Remove any hover effects when clicked
             gsap.to(this, {
@@ -349,9 +453,12 @@ function initTreeDiagram() {
     gsap.set(".parent-section", {
         height: "100vh"
     })
+    gsap.set(".mask-2", {
+        display: "inline",
+    })
 
     // set the width of the timeline wrapper to 400vw on desktop only
-    mm.add("(min-width: 768px)", () => {
+    mm.add("(min-width: 48rem)", () => {
         gsap.set(".tree-container.is--timeline", {
             width: "400vw",
             flexDirection: "row",
@@ -375,7 +482,7 @@ function initTreeDiagram() {
     gsap.set(".panel [data-split='lines'] .lineInner", {
         yPercent: 100,
     })
-    mm.add("(max-width: 767px)", () => {
+    mm.add("(max-width: 47.9375rem)", () => {
 
 
 
@@ -425,10 +532,10 @@ function initTreeDiagram() {
             pin: true,
             pinSpacing: "margin",
             scrub: true,
-            markers: true,
+            markers: false,
             onLeave: () => {
 
-                // mm.add("(max-width: 768px)", () => {
+                // mm.add("(max-width: 48rem)", () => {
                 //     if (!hasCreatedTriggers) {
 
                 //         hasCreatedTriggers = true; // ✅ set the flag so it only runs once
@@ -667,7 +774,7 @@ function initTreeDiagram() {
             autoAlpha: 0
         }, "focusSection")
         .to(" .tree-container.is--first .tree-horizontal-line", {
-            // width: "+=200px",
+            // width: "+=12.5rem",
             autoAlpha: 0,
             transformOrigin: "center"
         }, "focusSection")
@@ -787,7 +894,7 @@ function initTreeDiagram() {
             autoAlpha: 0
         }, "focusSection")
         .to(" .tree-container.is--second .tree-horizontal-line", {
-            // width: "+=200px",
+            // width: "+=12.5rem",
             autoAlpha: 0,
             transformOrigin: "center"
         }, "focusSection")
@@ -873,7 +980,7 @@ function initTreeDiagram() {
 
 
     // we move "toi" to the top on mobile only
-    mm.add("(max-width: 767px)", () => {
+    mm.add("(max-width: 47.9375rem)", () => {
         console.log("mobile");
         treeTlOne.to(".tree-container.is--three .tree-child-wrapper.is--one", {
             yPercent: -650, // adjust as needed
@@ -1004,7 +1111,7 @@ function initTreeDiagram() {
         .addLabel("timeline", "+=1")
 
     // desktop only
-    mm.add("(min-width: 768px)", () => {
+    mm.add("(min-width: 48rem)", () => {
 
         // we move the line to the position of the other line
         treeTlOne.add(Flip.fit(".section.is--compare .tree-right-wrapper .line-wrapper-bottom", ".section.is--timeline .timeline-wrapper", {
@@ -1318,7 +1425,7 @@ function initTreeDiagram() {
     })
 
     // same as above but on mobile
-    mm.add("(max-width: 767px)", () => {
+    mm.add("(max-width: 47.9375rem)", () => {
 
 
         // gsap.set(".section.is--timeline", {
@@ -1663,29 +1770,174 @@ function initSplit() {
             type: "lines",
             mask: "lines",
             linesClass: "lineInner",
+            ignore: ".sup",
         });
 
-        // splitInstance.words.forEach(word => {
-
-        //     const placeholder = document.createElement('div');
-        //     placeholder.className = 'skeleton-overlay';
-
-        //     word.parentElement.appendChild(placeholder);
-        // })
 
     });
 
-    // Create a skeleton animation for each target element
 
+    let elementToSplitWords = document.querySelectorAll('[data-split="words"]');
+
+    elementToSplitWords.forEach(target => {
+        let splitInstance = new SplitText(target, {
+            type: "words",
+            mask: "words",
+            wordsClass: "wordInner",
+            ignore: ".sup",
+        });
+    });
 
 }
 
 
+function initAgeGate() {
+    gsap.set(" .header .logo ", {
+        autoAlpha: 0,
+    });
+    gsap.set(".overlay-logo-wrapper", {
+        position: "absolute",
+    })
+
+    gsap.set(".overlay-load", {
+        backgroundColor: "rgba(0, 0, 0, 0)",
+        position: "fixed",
+        pointerEvents: "none",
+    });
+    const yesBtn = document.querySelector('.button.is--yes');
+    const noBtn = document.querySelector('.button.is--no');
+
+    let tl = gsap.timeline({ defaults: { ease: "easeOutQuart" } });
+
+    // Number animation: uses an object for the value, then updates the text
+    let numberObj = { val: 0 };
+    tl.to(".overlay-logo-div", {
+        xPercent: 100,
+        duration: 1.5,
+        ease: "easeInOutQuart",
+        onComplete: function () {
+            gsap.set(".overlay-logo-div", {
+                autoAlpha: 0,
+            })
+        }
+    }, 0) // <--- Start at 0s
+
+        .to(numberObj, {
+            val: 100,
+            duration: 2,
+            onUpdate: function () {
+                // Always round or floor for integers, and append "%"
+                document.querySelector(".logo-number .lineInner").textContent = Math.round(numberObj.val) + "%";
+            }
+        }, 0)
+
+        .to(".overlay-load .overlay-logo ", {
+            y: -100,
+            ease: "easeInOutQuart",
+            duration: 1,
+        })
+        .to(".logo-number .lineInner", {
+            yPercent: -100,
+            duration: 1,
+            ease: "easeInOutQuart",
+        }, "<")
+
+
+        .from(".overlay-text-wrapper [data-split='lines'] .lineInner", {
+            yPercent: 100,
+            stagger: 0.1,
+            duration: 1,
+            ease: "easeInOutQuart",
+            onComplete: function () {
+                gsap.set(".overlay-load", {
+                    pointerEvents: "auto",
+                })
+            }
+        }, "<")
+
+        .from(".overlay-line", {
+            transformOrigin: "center",
+            scaleX: 0,
+            opacity: 0,
+            duration: 1,
+            ease: "easeInOutQuart",
+        }, "<")
+
+
+    document.querySelectorAll('.overlay-button-wrapper .button .lineInner').forEach(btn => {
+        let originalText = btn.textContent.toUpperCase();
+
+        btn.addEventListener('mouseenter', () => {
+            gsap.to(btn, {
+                duration: 0.5,
+                color: "#fc0",
+                scrambleText: {
+                    text: originalText,
+                    chars: "upperCase", // or "alpha", "numbers", etc.
+                    speed: 0.7,
+                }
+            });
+        });
+
+        btn.addEventListener('mouseleave', () => {
+            gsap.to(btn, {
+                duration: 0.5,
+                color: "#878787",
+            });
+        });
+    })
+    // "Yes" → execute code (e.g., hide age gate, init site)
+    yesBtn.addEventListener('click', () => {
+        gsap.set(".overlay-load", {
+            pointerEvents: "none",
+        })
+
+        tl.to(".overlay-line", {
+            scaleX: 0,
+            opacity: 0,
+            duration: 1,
+            ease: "easeOutQuart",
+        },)
+
+
+        tl.add(Flip.fit(".overlay-load .overlay-logo", ".header .logo", {
+            duration: 1.2,
+            ease: "easeOutQuart",
+            scale: true,
+            onComplete: function () {
+                gsap.set(".overlay-load .overlay-logo", {
+                    display: "none",
+                })
+
+                gsap.set(".header .logo", {
+                    autoAlpha: 1,
+                })
+            }
+        }), "<")
+
+            .to(".overlay-text-wrapper .lineInner", {
+                autoAlpha: 0,
+                yPercent: -100,
+            }, "<")
+            .add(() => {
+                tlHeroAnimation.play();
+            }, "<+.2")
+    });
+
+    // "No" → redirect to another website
+    noBtn.addEventListener('click', () => {
+        window.location.href = 'https://www.elioavilamunoz.com'; // Change to your target URL
+    });
+
+
+
+
+}
+
 function initHeroAnimation() {
     window.lenis.scrollTo(0, { immediate: true });
     document.body.removeAttribute('data-preload');
-    CustomEase.create("easeOutQuad", "0.25,0.46,0.45,0.94");
-    CustomEase.create("easeOutQuart", ".165, .84, .44, 1");
+
     const bgVideo = document.getElementById("hero-bg-video");
 
 
@@ -1694,21 +1946,28 @@ function initHeroAnimation() {
         rotation: -90,
         transformOrigin: "center"
     })
+    gsap.set(".button.button--secondary, .hero-video", {
+        autoAlpha: 0,
+    })
 
+    gsap.set(bgVideo, { opacity: 0 });
 
-    let tl = gsap.timeline({})
+    let tl = gsap.timeline({ paused: true })
 
     tl.from(".hero-content [data-split='lines'] .lineInner", {
         yPercent: 100,
         duration: 1,
         ease: "easeOutQuart",
-        stagger: 0.1
+        stagger: 0.1,
+        onStart: function () {
+            gsap.set(".button.button--secondary, .hero-video", {
+                autoAlpha: 1,
+            })
+
+            console.log("start")
+        }
     })
-        .from(".header .logo", {
-            autoAlpha: 0,
-            duration: 1,
-            ease: "easeOutQuart"
-        }, "<")
+
 
         .from(".hero-content .button", {
             autoAlpha: 0,
@@ -1750,22 +2009,65 @@ function initHeroAnimation() {
         })
         .call(() => {
             if (bgVideo && bgVideo.paused) {
-
+                // Start the video
                 bgVideo.play().catch(() => { });
 
-
+                // Wait for the video to actually start playing, then fade it in
+                bgVideo.addEventListener('playing', () => {
+                    gsap.to(bgVideo, {
+                        opacity: 0.8,
+                        duration: 0.5,
+                        ease: "easeOutQuart"
+                    });
+                }, { once: true }); // Use once: true so the event only fires once
             }
-        }, null, 0); // 0.5 is seconds offset from timeline start
-    gsap.set(bgVideo, { opacity: 0.8 });
+        }, null, .2);
+
     // bgVideo.addEventListener('playing', () => {
     //     gsap.set(bgVideo, { opacity: 0.8 });
     // });
+    const btn = document.querySelector('.button.is--main');
+    const targetSection = document.querySelector('.container.is--intro');
 
+    btn.addEventListener('click', () => {
+        // Get the top position of the target section
+        const sectionTop = targetSection.getBoundingClientRect().top + window.scrollY;
+        // Add your offset (e.g., 50px)
+        const offset = 400;
+        // Use Lenis to scroll smoothly
+        lenis.scrollTo(sectionTop + offset, { duration: 1.2, immediate: false });
+    });
+
+
+    document.querySelectorAll('.button.button--secondary').forEach(btn => {
+        let originalText = btn.textContent.toUpperCase();
+
+        btn.addEventListener('mouseenter', () => {
+            gsap.to(btn, {
+                duration: 0.5,
+                color: "#fc0",
+                scrambleText: {
+                    text: originalText,
+                    chars: "upperCase", // or "alpha", "numbers", etc.
+                    speed: 0.7,
+                }
+            });
+        });
+
+        btn.addEventListener('mouseleave', () => {
+            gsap.to(btn, {
+                duration: 0.5,
+                color: "white",
+            });
+        });
+    })
+
+    return tl;
 }
 
 
 let treeDiagramContext;
-
+let tlHeroAnimation;
 function initTreeDiagramWrapper() {
     // Clear old animations & ScrollTriggers
     if (treeDiagramContext) {
@@ -1785,11 +2087,13 @@ document.addEventListener("DOMContentLoaded", () => {
     document.fonts.ready.then(() => {
         initLenis();
         initSplit();
-        initHeroAnimation();
+        initAgeGate();
+
+        tlHeroAnimation = initHeroAnimation();
         initIntro();
         initTrackerCheckboxes(); // Initialize tracker checkboxes
         initScrollLock(); // Initialize scroll lock
-
+        initTrackerSection();
         // Ensure we're at the top after everything is initialized
         scrollToTop();
     })

@@ -1,9 +1,58 @@
-.hero-video {
+:root {
 
-    mask-image: radial-gradient(ellipse 60% 50% at center,
-            rgba(0, 0, 0, 1) 5%,
-            rgba(0, 0, 0, .8) 15%,
-            rgba(0, 0, 0, 0.5) 30%,
-            rgba(0, 0, 0, 0) 100%);
+    --ease-out-quart: cubic-bezier(.165, .84, .44, 1);
 
+
+}
+
+@media (max-width: 767px) {
+    .tracker-wrapper-mobile {
+        /* Standard syntax */
+        mask-image: linear-gradient(to right, transparent 0%, black 100%, black 100%);
+        /* For Safari/Chrome */
+    }
+}
+
+.container.is--hero .button .wordInner {
+    text-shadow: 0 2em 0 var(--black);
+}
+
+.container.is--hero .button {
+    .wordInner {
+        transition: all .6s var(--ease-out-quart);
+    }
+
+    svg {
+        transition: all .6s var(--ease-out-quart);
+    }
+
+    &:hover {
+        .wordInner {
+            transform: translateY(-2em);
+        }
+
+        svg {
+            transform: translateX(4em);
+        }
+    }
+}
+
+.button .wordInner-mask:nth-child(1) {
+    .wordInner {
+        transition-delay: 0s;
+    }
+
+}
+
+.button .wordInner-mask:nth-child(2) {
+
+    .wordInner {
+        transition-delay: 0.02s;
+    }
+}
+
+.button .wordInner-mask:nth-child(3) {
+    .wordInner {
+        transition-delay: 0.04s;
+    }
 }
