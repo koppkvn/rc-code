@@ -2319,33 +2319,34 @@ function initTreeDiagramWrapper() {
 document.addEventListener("DOMContentLoaded", () => {
     // Scroll to top immediately
     scrollToTop();
-
     gsap.registerPlugin(ScrollTrigger, SplitText, Flip, DrawSVGPlugin, CustomEase, MorphSVGPlugin);
-    document.fonts.ready.then(() => {
-        initLenis();
-        initAgeGate();
-        initSplit();
-        tlHeroAnimation = initHeroAnimation();
-        initIntro();
-        initTrackerCheckboxes();
-        initScrollLock();
-        initTrackerSection();
-        initVideoMap();
-        //to remove
-        // initTreeDiagramWrapper(); // on page load
-        // initVideoMap();
-        // document.body.removeAttribute('data-preload');
-
-        // to remove top 
 
 
+    // document.fonts.ready.then(() => {
+    initLenis();
+    initSplit();
+    initAgeGate();
+    tlHeroAnimation = initHeroAnimation();
+    initIntro();
+    initTrackerCheckboxes();
+    initScrollLock();
+    initTrackerSection();
+    initVideoMap();
+    //to remove
+    // initTreeDiagramWrapper(); // on page load
+    // initVideoMap();
+    // document.body.removeAttribute('data-preload');
 
-        scrollToTop();
-    })
+    // to remove top 
+
+
+
+    scrollToTop();
+    // })
 });
 
 // Also add a window load event to catch any late scroll restoration
-window.addEventListener('load', scrollToTop);
+// window.addEventListener('load', scrollToTop);
 
 // Re-init on resize with debounce
 // let resizeTimeout;
