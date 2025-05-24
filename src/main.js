@@ -1,5 +1,3 @@
-import "./styles/main.scss";
-
 
 function initLenis() {
     window.lenis = new Lenis();
