@@ -10,6 +10,7 @@ function initLenis() {
     CustomEase.create("easeOutQuart", ".165, .84, .44, 1");
     CustomEase.create("easeInOutQuad", ".455, .03, .515, .955");
     CustomEase.create("easeInOutQuart", ".77, 0, .175, 1");
+
 }
 
 // Add this function to handle scroll to top
@@ -165,18 +166,7 @@ function initTrackerSection() {
         ease: "easeOutQuart",
         stagger: 0.03,
     })
-        .to(".container.is--tracker .header-line", {
-            scaleX: 0,
-            duration: 1,
-            transformOrigin: "right",
-            ease: "easeOutQuart",
-        }, "<")
 
-        .to(".container.is--tracker .header-subtitle, .container.is--tracker .header-title, .container.is--tracker .header-number", {
-            scrambleText: {
-                text: "{original}",
-            },
-        }, "<")
 
     tl.to(".container.is--tracker .tracker-row .tracker-row-line", {
         xPercent: 100,
@@ -220,6 +210,29 @@ function initTrackerSection() {
         }
     }, "<")
 
+
+    let tl2 = gsap.timeline({
+        scrollTrigger: {
+            trigger: ".section.is--tracker",
+            start: "top bottom",
+            end: "bottom bottom",
+            toggleActions: "play none none none",
+            // markers: true,
+        }
+    })
+
+    tl2.to(".container.is--tracker .header-line", {
+        scaleX: 0,
+        duration: 1,
+        transformOrigin: "right",
+        ease: "easeOutQuart",
+    }, "<")
+
+        .to(".container.is--tracker .header-subtitle, .container.is--tracker .header-title, .container.is--tracker .header-number", {
+            scrambleText: {
+                text: "{original}",
+            },
+        }, "<")
     // tl.from(".container.is--tracker .tracker-row div:not(.tracker-row-line)", {
 
 
@@ -369,7 +382,6 @@ function initScrollLock() {
         return section.compareDocumentPosition(trackerSection) & Node.DOCUMENT_POSITION_PRECEDING;
     });
     const trackerButtons = document.querySelectorAll('.tracker-checkbox.is--button');
-    console.log(allSectionsAfterTracker);
 
     // Flag to track if content has been unlocked
     let contentUnlocked = false;
@@ -486,7 +498,11 @@ function initTreeDiagram() {
 
     })
 
+    const videoBarca = document.querySelector(".video-barca");
+    gsap.set(".barca-video-wrapper", {
+        autoAlpha: 0,
 
+    })
 
     // create the master pin 
     // ScrollTrigger.create({
@@ -523,11 +539,14 @@ function initTreeDiagram() {
 
     // create the main timeline
     const treeTlOne = gsap.timeline({
-
+        defaults: {
+            duration: 1,
+            ease: "linear",
+        },
         scrollTrigger: {
             trigger: ".parent-section",
             start: "top top",
-            end: "+=2000%",
+            end: "+=2500%",
             pin: true,
             pinSpacing: "margin",
             scrub: true,
@@ -1111,7 +1130,9 @@ function initTreeDiagram() {
                 scrambleInscriptionRc.play(0);
             }
         })
-
+        .to({}, {
+            duration: 2
+        })
 
         .addLabel("timeline", "+=1")
 
@@ -1417,6 +1438,24 @@ function initTreeDiagram() {
                 gsap.to(".text-wrapper-barca .lineInner", {
                     yPercent: 0,
                 })
+
+                gsap.to(".barca-video-wrapper", {
+                    autoAlpha: 1,
+                    duration: 1,
+                    ease: "easeOutQuart",
+                    onStart: function () {
+                        videoBarca.addEventListener("canplay", () => {
+                            gsap.to(video, {
+                                opacity: 1,
+                                duration: 0.5,
+                                onComplete: () => {
+                                    video.play();
+                                }
+                            });
+                        });
+                    }
+                })
+
             },
             onReverseComplete: function () {
                 gsap.to(".text-wrapper-map .lineInner", {
@@ -1787,8 +1826,10 @@ function initTreeDiagram() {
                     yPercent: -100,
                 })
             }
-        }, "<")
-
+        }, "<-=3")
+        mapTl.to({}, {
+            duration: 2
+        },)
     })
 
 
@@ -2026,6 +2067,8 @@ function initSplit() {
 
 
 function initAgeGate() {
+
+    // scrollToTop();
 
     window.lenis.stop();
     gsap.set(" .header .logo ", {
@@ -2322,31 +2365,26 @@ document.addEventListener("DOMContentLoaded", () => {
     gsap.registerPlugin(ScrollTrigger, SplitText, Flip, DrawSVGPlugin, CustomEase, MorphSVGPlugin);
 
 
-    // document.fonts.ready.then(() => {
     initLenis();
     initSplit();
-    initAgeGate();
-    tlHeroAnimation = initHeroAnimation();
-    initIntro();
-    initTrackerCheckboxes();
-    initScrollLock();
-    initTrackerSection();
+    // initAgeGate();
+    // tlHeroAnimation = initHeroAnimation();
+    // initIntro();
+    // initTrackerCheckboxes();
+    // initScrollLock();
+    // initTrackerSection();
     initVideoMap();
     //to remove
-    // initTreeDiagramWrapper(); // on page load
-    // initVideoMap();
-    // document.body.removeAttribute('data-preload');
+    initTreeDiagramWrapper(); // on page load
+    initVideoMap();
+    document.body.removeAttribute('data-preload');
 
     // to remove top 
 
-
-
-    scrollToTop();
-    // })
 });
 
 // Also add a window load event to catch any late scroll restoration
-// window.addEventListener('load', scrollToTop);
+window.addEventListener('load', scrollToTop);
 
 // Re-init on resize with debounce
 // let resizeTimeout;
