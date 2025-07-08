@@ -1,4 +1,7 @@
 
+import "./styles/main.scss";
+
+
 function initLenis() {
     window.lenis = new Lenis();
     window.lenis.on('scroll', ScrollTrigger.update);
@@ -49,7 +52,7 @@ function initIntro() {
     ScrollTrigger.create({
         trigger: ".section.is--intro",
         start: "top top",
-        end: "+=200%", // Enough space for all animations
+        end: "+=220%", // Enough space for all animations
         pin: true,
 
         // markers: true,
@@ -129,9 +132,16 @@ function initIntro() {
 }
 
 function initTrackerSection() {
-    gsap.set(".purgatoire-message", {
-        autoAlpha: 0,
-    })
+
+    const buttonsToGlow = document.querySelectorAll(".is--glow");
+
+    buttonsToGlow.forEach(button => {
+        button.classList.toggle("is--glow");
+    });
+
+    // gsap.set(".purgatoire-message", {
+    //     autoAlpha: 0,
+    // })
 
     gsap.set(".tracker-highlight", {
         autoAlpha: 0,
@@ -175,26 +185,33 @@ function initTrackerSection() {
         stagger: 0.03,
 
         onComplete: function () {
-            gsap.to(".purgatoire-message .wordInner", {
-                duration: 1,
+            // gsap.to(".purgatoire-message .wordInner", {
+            //     duration: 1,
 
-                scrambleText: {
-                    text: "{original}",
-                    speed: 0.65,
-                },
-            });
+            //     scrambleText: {
+            //         text: "{original}",
+            //         speed: 0.65,
+            //     },
+            // });
 
-            gsap.to(".purgatoire-message", {
-                autoAlpha: 1,
-                duration: 1,
-                ease: "easeOutQuart",
-            })
+            // gsap.to(".purgatoire-message", {
+            //     autoAlpha: 1,
+            //     duration: 1,
+            //     ease: "easeOutQuart",
+            // })
 
             gsap.to('.tracker-highlight', {
                 autoAlpha: 1,
                 duration: 1,
                 ease: "easeOutQuart",
             });
+
+            setTimeout(() => {
+                buttonsToGlow.forEach(button => {
+                    button.classList.toggle("is--glow");
+                });
+            }, 2000);
+
 
             // gsap.fromTo(".tracker-checkbox.is--button", {
             //     backgroundColor: "#5f5f5f",
@@ -241,7 +258,7 @@ function initTrackerSection() {
 function initTrackerCheckboxes() {
     const trackerButtons = document.querySelectorAll('.tracker-checkbox.is--button');
     const pompeCounterEl = document.querySelector('.tracker-pompes .color');
-    let pompeCount = 50; // Initial count
+    let pompeCount = 40; // Initial count
 
     // Object to use for GSAP animation of the counter
     let counterObj = { value: pompeCount };
@@ -318,7 +335,9 @@ function initTrackerCheckboxes() {
             if (this.getAttribute('data-clicked') === 'true') {
                 return; // Do nothing if already clicked
             }
-
+            document.querySelectorAll(".is--glow").forEach(el => {
+                el.classList.remove("is--glow");
+            });
             // Mark as clicked
             this.setAttribute('data-clicked', 'true');
 
@@ -358,8 +377,8 @@ function initTrackerCheckboxes() {
                 // Animate the counter down
                 gsap.to(counterObj, {
                     value: targetValue,
-                    duration: 1.2,
-                    ease: "power1.out",
+                    duration: .8,
+                    ease: "easeOutQuart",
                     onUpdate: function () {
                         // Update the display with the rounded current value
                         const currentValue = Math.round(counterObj.value);
@@ -470,12 +489,12 @@ function initTreeDiagram() {
     // set the width of the timeline wrapper to 400vw on desktop only
     mm.add("(min-width: 48rem)", () => {
         gsap.set(".tree-container.is--timeline", {
-            width: "400vw",
+            width: "260vw",
             flexDirection: "row",
         })
 
         gsap.set(".tree-container.is--timeline .timeline-wrapper", {
-            width: "400vw",
+            width: "260vw",
             left: `${window.innerWidth / 2}px`,
             opacity: 1,
         })
@@ -551,58 +570,9 @@ function initTreeDiagram() {
             pin: true,
             pinSpacing: "margin",
             scrub: true,
-            // markers: false,
-            // invalidateOnRefresh: true,
-            onLeave: () => {
 
-                // mm.add("(max-width: 48rem)", () => {
-                //     if (!hasCreatedTriggers) {
 
-                //         hasCreatedTriggers = true; // ✅ set the flag so it only runs once
-
-                //         document.querySelectorAll(".panel .text-wrapper").forEach(wrapper => {
-                //             ScrollTrigger.create({
-                //                 trigger: wrapper,
-                //                 start: "top center+=10%",
-                //                 end: "bottom center",
-                //                 markers: false,
-                //                 onEnter: () => {
-                //                     gsap.to(wrapper.querySelectorAll(".panel [data-split='lines'] .lineInner"), {
-                //                         yPercent: 0,
-                //                     })
-                //                     if (wrapper.querySelector(".panel .t-inner-wrapper.is--spec")) {
-                //                         gsap.to(wrapper.querySelectorAll(".panel .t-inner-wrapper.is--spec"), {
-                //                             autoAlpha: 1,
-                //                             yPercent: 0,
-                //                             duration: 1,
-                //                             ease: "power2.out"
-                //                         })
-                //                     }
-                //                     console.log("entered");
-
-                //                 }, onLeaveBack: () => {
-                //                     gsap.to(wrapper.querySelectorAll(".panel [data-split='lines'] .lineInner"), {
-                //                         yPercent: 100,
-                //                     })
-
-                //                     if (wrapper.querySelector(".panel .t-inner-wrapper.is--spec")) {
-                //                         gsap.to(wrapper.querySelectorAll(".panel .t-inner-wrapper.is--spec"), {
-                //                             autoAlpha: 0,
-                //                             yPercent: 10,
-                //                             duration: 1,
-                //                             ease: "power2.out"
-                //                         })
-                //                     }
-                //                     console.log("exited"); // 👈 this triggers when scrolling back up
-                //                 }
-
-                //             });
-                //         });
-                //     }
-                // })
-            }
         },
-        // ease: "linear",
     });
 
 
@@ -700,6 +670,18 @@ function initTreeDiagram() {
         autoAlpha: 0
     });
 
+    gsap.set(".section.is--personnes .header-title, .section.is--personnes .header-number", {
+        autoAlpha: 0
+    });
+
+    gsap.set(".section.is--compare .header-title, .section.is--compare .header-number", {
+        autoAlpha: 0
+    });
+
+    gsap.set(".section.is--timeline .header-title, .section.is--timeline .header-number", {
+        autoAlpha: 0
+    });
+
     // hide header title and number on groupe section
     gsap.set(".section.is--groupe .header-title, .section.is--groupe .header-number", {
         autoAlpha: 0
@@ -740,7 +722,18 @@ function initTreeDiagram() {
         .to(".tree-container.is--first .tree-horizontal-line", {
             scaleX: 1,
             duration: 2,
+
+        })
+        .to(".tree-container.is--first .tree-child-wrapper .line", {
+            scaleY: 1,
+        })
+        .to(".tree-container.is--first .tree-child-wrapper .label", {
+            autoAlpha: 1,
+
             onStart: function () {
+                scrambleChildLabel.play(0);
+                console.log("LES SECTIONS ");
+
                 gsap.to(".section.is--section [data-split='lines'] .lineInner", {
                     yPercent: 0,
                     duration: .6,
@@ -778,15 +771,6 @@ function initTreeDiagram() {
                 },);
             }
         })
-        .to(".tree-container.is--first .tree-child-wrapper .line", {
-            scaleY: 1,
-        })
-        .to(".tree-container.is--first .tree-child-wrapper .label", {
-            autoAlpha: 1,
-            onStart: function () {
-                scrambleChildLabel.play(0);
-            }
-        })
         // end of first tree container
         .addLabel("focusSection", "+=1")
         // hiding of first tree container
@@ -806,81 +790,12 @@ function initTreeDiagram() {
         .to(".tree-container.is--first .tree-child-wrapper.is--three", {
             yPercent: -302,
             duration: 2,
-            onComplete: function () {
-                gsap.to(".section.is--section [data-split='lines'] .lineInner", {
-                    yPercent: -100,
-                    duration: .6,
-                    stagger: 0.05,
-                    ease: "power1.out"
-                })
 
-                gsap.to(".section.is--groupe [data-split='lines'] .lineInner", {
-                    yPercent: 0,
-                    duration: .6,
-                    stagger: 0.05,
-                    ease: "power1.out"
-                })
-
-                gsap.to(".section.is--groupe .header-title, .section.is--groupe .header-number", {
-                    duration: 1,
-                    onStart: function () {
-                        gsap.set(".section.is--groupe .header-title, .section.is--groupe .header-number", {
-                            autoAlpha: 1
-                        });
-                        gsap.to(".section.is--section .header-title, .section.is--section .header-number", {
-                            autoAlpha: 0
-                        })
-                    },
-
-                    scrambleText: {
-                        text: "{original}",
-                        chars: 'upperCase',
-                        speed: 1,
-                        // tweenLength: false,
-                    }
-                },);
-
-            },
-            onReverseComplete: function () {
-                gsap.to(".section.is--section [data-split='lines'] .lineInner", {
-                    yPercent: 0,
-                    duration: .6,
-                    stagger: 0.05,
-                    ease: "power1.out"
-                })
-
-                gsap.to(".section.is--groupe [data-split='lines'] .lineInner", {
-                    yPercent: 100,
-                    duration: .6,
-                    stagger: 0.05,
-                    ease: "power1.out"
-                })
-
-                gsap.to(".section.is--groupe .header-title, .section.is--groupe .header-number", {
-                    autoAlpha: 0
-                },);
-
-                gsap.to(".section.is--section .header-title, .section.is--section .header-number", {
-                    duration: 1,
-                    onStart: function () {
-                        gsap.set(".section.is--section .header-title, .section.is--section .header-number", {
-                            autoAlpha: 1
-                        });
-                    },
-
-                    scrambleText: {
-                        text: "{original}",
-                        chars: 'upperCase',
-                        speed: 1,
-                        // tweenLength: false,
-                    }
-                },);
-            }
-        }, "focusSection")
+        }, "<")
         .to(".tree-container.is--first .tree-child-wrapper.is--three .line", {
             autoAlpha: 0,
             duration: 0.1,
-        }, "focusSection")
+        }, "<")
 
 
         //  beginning of second tree container
@@ -902,8 +817,78 @@ function initTreeDiagram() {
         })
         .to(".tree-container.is--second .tree-child-wrapper .label", {
             autoAlpha: 1,
+
+
             onStart: function () {
                 scrambleChildLabelTwo.play(0);
+                gsap.to(".section.is--section [data-split='lines'] .lineInner", {
+                    yPercent: -100,
+                    duration: .6,
+                    stagger: 0.05,
+                    ease: "power1.out"
+                })
+
+                gsap.to(".section.is--groupe [data-split='lines'] .lineInner", {
+                    yPercent: 0,
+                    duration: .6,
+                    stagger: 0.05,
+                    ease: "power1.out"
+                })
+
+                // gsap.to(".section.is--groupe .header-title, .section.is--groupe .header-number", {
+                //     duration: 1,
+                //     onStart: function () {
+                //         gsap.set(".section.is--groupe .header-title, .section.is--groupe .header-number", {
+                //             autoAlpha: 1
+                //         });
+                //         gsap.to(".section.is--section .header-title, .section.is--section .header-number", {
+                //             autoAlpha: 0
+                //         })
+                //     },
+
+                //     scrambleText: {
+                //         text: "{original}",
+                //         chars: 'upperCase',
+                //         speed: 1,
+                //         // tweenLength: false,
+                //     }
+                // },);
+
+            },
+            onReverseComplete: function () {
+                gsap.to(".section.is--section [data-split='lines'] .lineInner", {
+                    yPercent: 0,
+                    duration: .6,
+                    stagger: 0.05,
+                    ease: "power1.out"
+                })
+
+                gsap.to(".section.is--groupe [data-split='lines'] .lineInner", {
+                    yPercent: 100,
+                    duration: .6,
+                    stagger: 0.05,
+                    ease: "power1.out"
+                })
+
+                // gsap.to(".section.is--groupe .header-title, .section.is--groupe .header-number", {
+                //     autoAlpha: 0
+                // },);
+
+                // gsap.to(".section.is--section .header-title, .section.is--section .header-number", {
+                //     duration: 1,
+                //     onStart: function () {
+                //         gsap.set(".section.is--section .header-title, .section.is--section .header-number", {
+                //             autoAlpha: 1
+                //         });
+                //     },
+
+                //     scrambleText: {
+                //         text: "{original}",
+                //         chars: 'upperCase',
+                //         speed: 1,
+                //         // tweenLength: false,
+                //     }
+                // },);
             }
         })
 
@@ -928,37 +913,7 @@ function initTreeDiagram() {
         .to(".tree-container.is--second .tree-child-wrapper.is--three", {
             yPercent: -302,
             duration: 2,
-            onComplete: function () {
-                gsap.to(".section.is--groupe [data-split='lines'] .lineInner", {
-                    yPercent: -100,
-                    duration: .6,
-                    stagger: 0.05,
-                    ease: "power1.out"
-                })
 
-                gsap.to(".section.is--personnes [data-split='lines'] .lineInner", {
-                    yPercent: 0,
-                    duration: .6,
-                    stagger: 0.05,
-                    ease: "power1.out"
-                })
-
-            },
-            onReverseComplete: function () {
-                gsap.to(".section.is--groupe [data-split='lines'] .lineInner", {
-                    yPercent: 0,
-                    duration: .6,
-                    stagger: 0.05,
-                    ease: "power1.out"
-                })
-
-                gsap.to(".section.is--personnes [data-split='lines'] .lineInner", {
-                    yPercent: 100,
-                    duration: .6,
-                    stagger: 0.05,
-                    ease: "power1.out"
-                })
-            }
         }, "focusSection")
         .to(".tree-container.is--second .tree-child-wrapper.is--three .line", {
             autoAlpha: 0,
@@ -986,8 +941,42 @@ function initTreeDiagram() {
         })
         .to(".tree-container.is--three .tree-child-wrapper .label", {
             autoAlpha: 1,
+
             onStart: function () {
                 scrambleChildLabelThree.play(0);
+
+                gsap.to(".section.is--groupe [data-split='lines'] .lineInner", {
+                    yPercent: -100,
+                    duration: .6,
+                    stagger: 0.05,
+                    ease: "power1.out"
+                })
+                console.log("onComplete");
+
+                gsap.to(".section.is--personnes [data-split='lines'] .lineInner", {
+                    yPercent: 0,
+                    duration: .6,
+                    stagger: 0.05,
+                    ease: "power1.out"
+                })
+
+
+
+            },
+            onReverseComplete: function () {
+                gsap.to(".section.is--groupe [data-split='lines'] .lineInner", {
+                    yPercent: 0,
+                    duration: .6,
+                    stagger: 0.05,
+                    ease: "power1.out"
+                })
+
+                gsap.to(".section.is--personnes [data-split='lines'] .lineInner", {
+                    yPercent: 100,
+                    duration: .6,
+                    stagger: 0.05,
+                    ease: "power1.out"
+                })
             }
         })
         .addLabel("focusSection", "+=1")
@@ -999,46 +988,7 @@ function initTreeDiagram() {
 
         }, "focusSection")
 
-        .to({}, {
-            onComplete: function () {
-                gsap.to(".section.is--compare [data-split='lines'] .lineInner", {
-                    yPercent: 0,
-                    duration: .6,
-                    stagger: 0.05,
-                    ease: "power1.out"
-                })
 
-                gsap.to(".header-section.is--groupe", {
-                    autoAlpha: 0,
-                })
-
-                gsap.to(".section.is--personnes [data-split='lines'] .lineInner", {
-                    yPercent: 100,
-                    duration: .6,
-                    stagger: 0.05,
-                    ease: "power1.out"
-                })
-
-            },
-            onReverseComplete: function () {
-                gsap.to(".section.is--compare [data-split='lines'] .lineInner", {
-                    yPercent: 100,
-                    duration: .6,
-                    stagger: 0.05,
-                    ease: "power1.out"
-                })
-                gsap.to(".header-section.is--groupe", {
-                    autoAlpha: 1,
-                })
-
-                gsap.to(".section.is--personnes [data-split='lines'] .lineInner", {
-                    yPercent: 0,
-                    duration: .6,
-                    stagger: 0.05,
-                    ease: "power1.out"
-                })
-            }
-        }, "<+.2")
 
 
     // we move "toi" to the top on mobile only
@@ -1080,8 +1030,75 @@ function initTreeDiagram() {
 
         .to(".tree-container.is--compare .tree-right-wrapper .label", {
             autoAlpha: 1,
+
+
             onStart: function () {
+
                 scrambleChildLabelCompare.play(0);
+                gsap.to(".section.is--compare [data-split='lines'] .lineInner", {
+                    yPercent: 0,
+                    duration: .6,
+                    stagger: 0.05,
+                    ease: "power1.out"
+                })
+
+                // gsap.to(".header-section.is--groupe, .header-section", {
+                //     autoAlpha: 0,
+                // })
+
+                gsap.to(".section.is--section .header-title, .section.is--section .header-number", {
+                    autoAlpha: 0
+                },);
+
+                gsap.to(".section.is--compare .header-title, .section.is--compare .header-number", {
+                    duration: 1,
+                    onStart: function () {
+                        gsap.set(".section.is--compare .header-title, .section.is--compare .header-number", {
+                            autoAlpha: 1
+                        });
+                    },
+
+                    scrambleText: {
+                        text: "{original}",
+                        chars: 'upperCase',
+                        speed: 1,
+                        // tweenLength: false,
+                    }
+                },);
+
+                gsap.to(".section.is--personnes [data-split='lines'] .lineInner", {
+                    yPercent: -100,
+                    duration: .6,
+                    stagger: 0.05,
+                    ease: "power1.out"
+                })
+
+            },
+            onReverseComplete: function () {
+                gsap.to(".section.is--compare [data-split='lines'] .lineInner", {
+                    yPercent: 100,
+                    duration: .6,
+                    stagger: 0.05,
+                    ease: "power1.out"
+                })
+                gsap.to(".header-section.is--groupe, .header-section", {
+                    autoAlpha: 1,
+                })
+
+                gsap.to(".section.is--personnes [data-split='lines'] .lineInner", {
+                    yPercent: 0,
+                    duration: .6,
+                    stagger: 0.05,
+                    ease: "power1.out"
+                })
+
+                gsap.to(".section.is--section .header-title, .section.is--section .header-number", {
+                    autoAlpha: 1
+                },);
+
+                gsap.to(".section.is--compare .header-title, .section.is--compare .header-number", {
+                    autoAlpha: 0
+                },);
             }
         })
 
@@ -1140,10 +1157,16 @@ function initTreeDiagram() {
     // desktop only
     mm.add("(min-width: 768px)", () => {
 
+        gsap.set(" .panel.is--second, .panel.is--third, .panel.is--fourth, .panel.is--fifth", {
+            width: "50%",
+            minWidth: "unset",
+            marginLeft: "-400px"
+        });
+
         // we move the line to the position of the other line
         treeTlOne.add(Flip.fit(".section.is--compare .tree-right-wrapper .line-wrapper-bottom", ".section.is--timeline .timeline-wrapper", {
             ease: "none",
-            duration: 10,
+            duration: 4,
             onStart: function () {
                 gsap.to(".section.is--compare [data-split='lines'] ", {
                     autoAlpha: 0,
@@ -1157,22 +1180,23 @@ function initTreeDiagram() {
         },))
 
         // we make the long line grow
-        treeTlOne.to(".section.is--compare .is--reallywant", {
+        treeTlOne
+            // .to(".section.is--compare .is--reallywant", {
 
-            width: "+=400",
-            transformOrigin: "left",
-            duration: 3,
-            ease: "none"
-        }, "<")
+            //     width: "+=200",
+            //     transformOrigin: "left",
+            //     duration: 4,
+            //     ease: "none"
+            // }, "<")
 
-            // we push the label at the end of the line to the right
-            .to(".section.is--compare .label.is--compare3", {
+            // // we push the label at the end of the line to the right
+            // .to(".section.is--compare .label.is--compare3", {
 
-                x: "+=400",
-                transformOrigin: "left",
-                duration: 3,
-                ease: "none"
-            }, "<")
+            //     x: "+=200",
+            //     transformOrigin: "left",
+            //     duration: 4,
+            //     ease: "none"
+            // }, "<")
             //we hide the rest at the same time
             .to(".section.is--compare .line-wrapper-top, .section.is--compare .line.is--vertical, .section.is--compare .tree-left-side", {
                 autoAlpha: 0,
@@ -1186,17 +1210,54 @@ function initTreeDiagram() {
             .to(".section.is--timeline .tree-container.is--timeline", {
                 xPercent: -100,
                 ease: "none",
-                duration: 20,
+                duration: 35,
                 onStart: function () {
                     // we hide the long line
-                    gsap.set(".section.is--compare .is--reallywant", {
+                    gsap.to(".section.is--compare .is--reallywant", {
                         autoAlpha: 0
                     })
 
+                    gsap.to(".section.is--compare .is--reallywant", {
+                        width: "+=400",
+                        transformOrigin: "left",
+                        duration: 1.5,
+                        ease: "easeOutQuart"
+                    }, "<")
+
+                    // we push the label at the end of the line to the right
+                    gsap.to(".section.is--compare .label.is--compare3", {
+
+                        x: "+=400",
+                        transformOrigin: "left",
+                        duration: 1.5,
+                        ease: "easeOutQuart"
+                    }, "<")
                     // we show the new long line that takes the full width
-                    gsap.set(".section.is--timeline .timeline-wrapper", {
+                    gsap.to(".section.is--timeline .timeline-wrapper", {
                         autoAlpha: 1
                     })
+
+
+
+                    gsap.to(".section.is--compare .header-title, .section.is--compare .header-number", {
+                        autoAlpha: 0
+                    },);
+
+                    gsap.to(".section.is--timeline .header-title, .section.is--timeline .header-number", {
+                        duration: 1,
+                        onStart: function () {
+                            gsap.set(".section.is--timeline .header-title, .section.is--timeline .header-number", {
+                                autoAlpha: 1
+                            });
+                        },
+
+                        scrambleText: {
+                            text: "{original}",
+                            chars: 'upperCase',
+                            speed: 1,
+                            // tweenLength: false,
+                        }
+                    },);
 
                 },
                 onReverseComplete: function () {
@@ -1209,6 +1270,29 @@ function initTreeDiagram() {
                     // gsap.to(".section.is--compare .inscription-rc", {
                     //     autoAlpha: 1
                     // })
+
+                    gsap.to(".section.is--compare .is--reallywant", {
+                        width: "-=400",
+                        transformOrigin: "left",
+                        duration: 1,
+                        ease: "easeOutQuart"
+                    }, "<")
+
+                    gsap.to(".section.is--compare .label.is--compare3", {
+                        x: "-=400",
+                        transformOrigin: "left",
+                        duration: 1,
+                        ease: "easeOutQuart"
+                    }, "<")
+
+                    gsap.to(".section.is--timeline .header-title, .section.is--timeline .header-number", {
+                        autoAlpha: 0
+                    },);
+
+                    gsap.to(".section.is--compare .header-title, .section.is--compare .header-number", {
+                        autoAlpha: 1
+                    },);
+
                 },
 
             }, "horizontal")
@@ -1221,7 +1305,7 @@ function initTreeDiagram() {
                 scaleX: 0,
                 transformOrigin: "left",
                 ease: "none",
-                duration: 20,
+                duration: 35,
             }, "horizontal")
 
 
@@ -1243,6 +1327,12 @@ function initTreeDiagram() {
                     // },)
 
                     gsap.to(".panel.is--first .text-wrapper.is--first [data-split='lines'] .lineInner", {
+                        yPercent: 100,
+                        duration: 1,
+                        ease: "power2.out"
+                    },)
+
+                    gsap.to(".panel.is--second .text-wrapper.is--second [data-split='lines'] .lineInner", {
                         yPercent: 100,
                         duration: 1,
                         ease: "power2.out"
@@ -1356,6 +1446,17 @@ function initTreeDiagram() {
             },)
             .to(".timeline-wrapper", {
                 autoAlpha: 0,
+
+                onStart: function () {
+                    gsap.to(".section.is--timeline .header-title, .section.is--timeline .header-number", {
+                        autoAlpha: 0
+                    },);
+                },
+                onReverseComplete: function () {
+                    gsap.to(".section.is--timeline .header-title, .section.is--timeline .header-number", {
+                        autoAlpha: 1
+                    },);
+                }
             },)
             .to(".map-svg path", {
                 drawSVG: "0% 100%", // or "0 100" depending on your preference
@@ -1419,7 +1520,7 @@ function initTreeDiagram() {
             .to(".map-container mask rect", {
                 xPercent: 10,
                 yPercent: 50,
-                scale: .5,
+                scale: 1,
                 duration: 5,
             }, "<")
         // Get all the dots, except the Barcelona one
@@ -1890,7 +1991,7 @@ function initVideoMap() {
 
     gsap.set(".video-modal-bg", {
         autoAlpha: 0,
-        backdropFilter: "blur(10px)",
+        // backdropFilter: "blur(10px)",
     })
 
     gsap.set(".video-2", {
@@ -2252,6 +2353,7 @@ function initAgeGate() {
 
 }
 
+
 function initHeroAnimation() {
     window.lenis.scrollTo(0, { immediate: true });
     document.body.removeAttribute('data-preload');
@@ -2272,6 +2374,8 @@ function initHeroAnimation() {
 
     let tl = gsap.timeline({ paused: true })
 
+
+
     tl.from(".hero-content [data-split='lines'] .lineInner", {
         yPercent: 100,
         duration: 1,
@@ -2283,6 +2387,14 @@ function initHeroAnimation() {
             })
 
             console.log("start")
+            gsap.to(".scroll-arrow", {
+                y: 45,
+                duration: 1.2,
+                ease: "easeOutQuart",
+                repeat: -1,
+                delay: 1.2,
+                repeatDelay: 1
+            })
         }
     })
 
@@ -2318,13 +2430,7 @@ function initHeroAnimation() {
             duration: 1,
             ease: "power1.out"
         }, "<")
-        .to(".container.is--hero .scroll-arrow", {
-            y: 2,
-            duration: 0.8,
-            repeat: -1,
-            yoyo: true,
-            ease: "easeOutQuart"
-        })
+
         .call(() => {
             if (bgVideo && bgVideo.paused) {
                 // Start the video
@@ -2397,6 +2503,193 @@ function initTreeDiagramWrapper() {
     });
 }
 
+
+function initAchat() {
+    // Webflow Checkout Integration Script
+    // Add this to your Webflow site's custom code section
+
+    (function () {
+        'use strict';
+
+        // Configuration - Update this with your deployed Astro site URL
+        const CHECKOUT_URL = 'https://astro-rc-paiement.vercel.app/checkout';
+
+        // Product pricing and discount logic
+        const PRODUCTS = {
+            'reboot-camp': { name: 'Reboot Camp', price: 800 },
+            'agenda': { name: 'Agenda', price: 60 },
+            'drapeau': { name: 'Drapeau', price: 40 },
+            'tshirt': { name: 'T-shirt', price: 50 },
+            'cours-finance': { name: 'Cours Finance', price: 49 },
+            'contenu-anglais': { name: 'Contenu Anglais', price: 149 },
+            'appel-1': { name: '1 appel avec Elio', price: 200 },
+            'appel-2': { name: '2 appels avec Elio', price: 400 },
+            'appel-3': { name: '3 appels avec Elio', price: 600 }
+        };
+
+        // Discount rules
+        const DISCOUNTS = {
+            material: {
+                condition: (selectedItems) => {
+                    const materialItems = selectedItems.filter(id => ['agenda', 'drapeau', 'tshirt'].includes(id));
+                    return materialItems.length === 3;
+                },
+                discount: 51
+            },
+            formation: {
+                condition: (selectedItems) => {
+                    const hasRebootCamp = selectedItems.includes('reboot-camp');
+                    const hasCoursFinance = selectedItems.includes('cours-finance');
+                    const hasContenuAnglais = selectedItems.includes('contenu-anglais');
+                    return hasRebootCamp && hasCoursFinance && hasContenuAnglais;
+                },
+                discount: 251
+            }
+        };
+
+        // Calculate total with discounts
+        function calculateTotal(selectedItems) {
+            let total = 0;
+
+            // Add selected items
+            selectedItems.forEach(itemId => {
+                const product = PRODUCTS[itemId];
+                if (product) {
+                    total += product.price;
+                }
+            });
+
+            // Apply discounts
+            let totalDiscount = 0;
+            for (const [category, discountRule] of Object.entries(DISCOUNTS)) {
+                if (discountRule.condition(selectedItems)) {
+                    totalDiscount += discountRule.discount;
+                }
+            }
+
+            return total - totalDiscount;
+        }
+
+        // Get selected items from form
+        function getSelectedItems(form) {
+            const selectedItems = [];
+
+            // Check checkboxes
+            const checkboxes = form.querySelectorAll('input[type="checkbox"]:checked');
+            checkboxes.forEach(checkbox => {
+
+                console.log(checkbox.name);
+
+                if (PRODUCTS[checkbox.name]) {
+                    selectedItems.push(checkbox.name);
+                }
+            });
+
+            // Check radio buttons
+            // const radios = form.querySelectorAll('input[type="radio"]:checked');
+            // radios.forEach(radio => {
+            //     if (PRODUCTS[radio.value]) {
+            //         selectedItems.push(radio.value);
+            //     }
+            // });
+
+
+            const slider = form.querySelector('#appel-slider');
+            if (slider) {
+                const sliderValue = parseInt(slider.value);
+                const callValues = ['', 'appel-1', 'appel-2', 'appel-3'];
+
+                if (sliderValue > 0 && callValues[sliderValue] && PRODUCTS[callValues[sliderValue]]) {
+                    selectedItems.push(callValues[sliderValue]);
+                }
+            }
+
+            return selectedItems;
+        }
+
+        // Update total display (if you have a total element)
+        function updateTotal(selectedItems) {
+            const totalElement = document.querySelector('[data-total]');
+            if (totalElement) {
+                const total = calculateTotal(selectedItems);
+                totalElement.textContent = `${total.toFixed(2)}€`;
+            }
+        }
+
+        // Handle form submission
+        function handleFormSubmit(event) {
+            event.preventDefault();
+
+            const form = event.target;
+            const selectedItems = getSelectedItems(form);
+
+            // Validate that at least one item is selected
+            if (selectedItems.length === 0) {
+                alert('Veuillez sélectionner au moins un produit.');
+                return false;
+            }
+
+            // Validate engagement checkbox
+            const engagementCheckbox = form.querySelector('[name="engagement"]');
+            if (engagementCheckbox && !engagementCheckbox.checked) {
+                alert('Vous devez accepter de respecter vos engagements.');
+                return false;
+            }
+
+            // Build URL with form data
+            const params = new URLSearchParams();
+            selectedItems.forEach(itemId => {
+                params.append(itemId, 'on');
+            });
+
+            // Add engagement if checked
+            if (engagementCheckbox && engagementCheckbox.checked) {
+                params.append('engagement', 'on');
+            }
+
+            // Redirect to checkout
+            const checkoutUrl = `${CHECKOUT_URL}?${params.toString()}`;
+            window.location.href = checkoutUrl;
+
+            return false;
+        }
+
+        // Initialize when DOM is ready
+        function init() {
+            // Find the checkout form
+            const form = document.querySelector('.form-achat');
+            if (!form) {
+                console.warn('Checkout form not found. Make sure your form has the class "form-achat"');
+                return;
+            }
+
+            // Add submit handler
+            form.addEventListener('submit', handleFormSubmit);
+
+            // Add change handlers for real-time total updates
+            const inputs = form.querySelectorAll('input[type="checkbox"], input[type="radio"]');
+            inputs.forEach(input => {
+                input.addEventListener('change', () => {
+                    const selectedItems = getSelectedItems(form);
+                    updateTotal(selectedItems);
+                });
+            });
+
+            // Initialize total
+            const selectedItems = getSelectedItems(form);
+            updateTotal(selectedItems);
+        }
+
+        // Run initialization
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+
+    })();
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     // Scroll to top immediately
     scrollToTop();
@@ -2404,18 +2697,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     initLenis();
-    initSplit();
-    initAgeGate();
-    tlHeroAnimation = initHeroAnimation();
-    initIntro();
-    initTrackerCheckboxes();
-    initScrollLock();
-    initTrackerSection();
-    initVideoMap();
-    //to remove
-    // initTreeDiagramWrapper(); // on page load
+    initAchat();
+    document.fonts.ready.then(() => {
+        initSplit();
+        initAgeGate();
+        tlHeroAnimation = initHeroAnimation();
+        initIntro();
+        initTrackerCheckboxes();
+        initScrollLock();
+        initTrackerSection();
+        initVideoMap();
+
+
+
+        //to remove
+        // initTreeDiagramWrapper(); // on page load
+    });
     // initVideoMap();
-    // document.body.removeAttribute('data-preload');
+    document.body.removeAttribute('data-preload');
 
     // to remove top 
 
