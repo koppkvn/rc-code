@@ -1,5 +1,5 @@
 
-// import "./styles/main.scss";
+import "./styles/main.scss";
 
 
 function initLenis() {
@@ -210,6 +210,7 @@ function initTrackerSection() {
                 buttonsToGlow.forEach(button => {
                     button.classList.toggle("is--glow");
                 });
+
             }, 2000);
 
 
@@ -226,6 +227,11 @@ function initTrackerSection() {
             // })
         }
     }, "<")
+        .from(".iphone-wrapper", {
+            opacity: 0,
+            duration: 1,
+            ease: "easeOutQuart",
+        }, "-=1")
 
 
     let tl2 = gsap.timeline({

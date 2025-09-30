@@ -1,63 +1,63 @@
-// :root {
+:root {
 
-//     --ease-out-quart: cubic-bezier(.165, .84, .44, 1);
-
-
-// }
+    --ease-out-quart: cubic-bezier(.165, .84, .44, 1);
 
 
+}
 
-// @media (max-width: 767px) {
-//     .tracker-wrapper-mobile {
-//         /* Standard syntax */
-//         mask-image: linear-gradient(to right, transparent 0%, black 100%, black 100%);
-//         /* For Safari/Chrome */
-//     }
-// }
 
-// .container.is--hero .button .wordInner {
-//     text-shadow: 0 2em 0 var(--black);
-// }
 
-// .container.is--hero .button {
-//     .wordInner {
-//         transition: all .6s var(--ease-out-quart);
-//     }
+@media (max-width: 767px) {
+    .tracker-wrapper-mobile {
+        /* Standard syntax */
+        mask-image: linear-gradient(to right, transparent 0%, black 100%, black 100%);
+        /* For Safari/Chrome */
+    }
+}
 
-//     svg {
-//         transition: all .6s var(--ease-out-quart);
-//     }
+.container.is--hero .button .wordInner {
+    text-shadow: 0 2em 0 var(--black);
+}
 
-//     &:hover {
-//         .wordInner {
-//             transform: translateY(-2em);
-//         }
+.container.is--hero .button {
+    .wordInner {
+        transition: all .6s var(--ease-out-quart);
+    }
 
-//         svg {
-//             transform: translateX(4em);
-//         }
-//     }
-// }
+    svg {
+        transition: all .6s var(--ease-out-quart);
+    }
 
-// .button .wordInner-mask:nth-child(1) {
-//     .wordInner {
-//         transition-delay: 0s;
-//     }
+    &:hover {
+        .wordInner {
+            transform: translateY(-2em);
+        }
 
-// }
+        svg {
+            transform: translateX(4em);
+        }
+    }
+}
 
-// .button .wordInner-mask:nth-child(2) {
+.button .wordInner-mask:nth-child(1) {
+    .wordInner {
+        transition-delay: 0s;
+    }
 
-//     .wordInner {
-//         transition-delay: 0.02s;
-//     }
-// }
+}
 
-// .button .wordInner-mask:nth-child(3) {
-//     .wordInner {
-//         transition-delay: 0.04s;
-//     }
-// }
+.button .wordInner-mask:nth-child(2) {
+
+    .wordInner {
+        transition-delay: 0.02s;
+    }
+}
+
+.button .wordInner-mask:nth-child(3) {
+    .wordInner {
+        transition-delay: 0.04s;
+    }
+}
 
 
 .wait-message-span.is--glow {
@@ -251,3 +251,12 @@
 
 
 .achat-block.is--slider {}
+
+
+.iphone-wrapper {
+
+
+    mask-image: linear-gradient(to bottom, black 30%, transparent 44%);
+    mask-repeat: no-repeat;
+    mask-size: 100% 100%;
+}
