@@ -2888,10 +2888,14 @@ document.addEventListener("DOMContentLoaded", () => {
     initAchat();
     document.fonts.ready.then(() => {
         initSplit();
+
+        // TO COMMENT
         initAgeGate();
         tlHeroAnimation = initHeroAnimation();
+        // TO COMMENT
         initIntro();
         initTrackerCheckboxes();
+        // TO COMMENT
         initScrollLock();
         initTrackerSection();
         initVideoMap();
