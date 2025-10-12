@@ -2888,18 +2888,18 @@ document.addEventListener("DOMContentLoaded", () => {
     initAchat();
     document.fonts.ready.then(() => {
         initSplit();
-        // initAgeGate();
+        initAgeGate();
         tlHeroAnimation = initHeroAnimation();
-        // initIntro();
+        initIntro();
         initTrackerCheckboxes();
-        // initScrollLock();
+        initScrollLock();
         initTrackerSection();
         initVideoMap();
 
 
 
         //to remove
-        initTreeDiagramWrapper(); // on page load
+        // initTreeDiagramWrapper(); // on page load
     });
     // initVideoMap();
     document.body.removeAttribute('data-preload');
