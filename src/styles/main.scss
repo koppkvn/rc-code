@@ -5,6 +5,11 @@
 
 }
 
+.tracker-wrapper-mobile {
+    /* Standard syntax */
+    mask-image: linear-gradient(to right, transparent 0%, black 100%, black 100%);
+    /* For Safari/Chrome */
+}
 
 
 @media (max-width: 767px) {
@@ -14,6 +19,9 @@
         /* For Safari/Chrome */
     }
 }
+
+
+
 
 .container.is--hero .button .wordInner {
     text-shadow: 0 2em 0 var(--black);

@@ -233,6 +233,15 @@ function initTrackerSection() {
             ease: "easeOutQuart",
         }, "-=1")
 
+        .from(".svg-wrapper svg", {
+            opacity: 0,
+            duration: 1,
+            stagger: .2,
+
+            ease: "easeOutQuart",
+        }, "-=1")
+
+
 
     let tl2 = gsap.timeline({
         scrollTrigger: {
@@ -494,23 +503,32 @@ function initTreeDiagram() {
 
     // set the width of the timeline wrapper to 400vw on desktop only
     mm.add("(min-width: 48rem)", () => {
-        gsap.set(".tree-container.is--timeline", {
-            width: "260vw",
-            flexDirection: "row",
+
+        gsap.set("section.is--timeline .timeline-container", {
+            width: "200vw",
+
         })
 
-        gsap.set(".tree-container.is--timeline .timeline-wrapper", {
-            width: "260vw",
-            left: `${window.innerWidth / 2}px`,
-            opacity: 1,
+        gsap.set("section.is--timeline .timeline-panels-wrapper", {
+            flexDirection: "row"
         })
+        // gsap.set(".tree-container.is--timeline", {
+        //     width: "260vw",
+        //     flexDirection: "row",
+        // })
 
-        gsap.set(".section.is--timeline, .section.is--timeline .container.is--timeline, .section.is--timeline .container.is--timeline .tree-container", {
-            height: "100vh"
-        })
-        gsap.set(".section.is--timeline .container.is--timeline .tree-container", {
-            position: "absolute",
-        })
+        // gsap.set(".tree-container.is--timeline .timeline-wrapper", {
+        //     width: "260vw",
+        //     left: `${window.innerWidth / 2}px`,
+        //     opacity: 1,
+        // })
+
+        // gsap.set(".section.is--timeline, .section.is--timeline .container.is--timeline, .section.is--timeline .container.is--timeline .tree-container", {
+        //     height: "100vh"
+        // })
+        // gsap.set(".section.is--timeline .container.is--timeline .tree-container", {
+        //     position: "absolute",
+        // })
     })
 
     // hide split lines on panels
@@ -572,7 +590,7 @@ function initTreeDiagram() {
         scrollTrigger: {
             trigger: ".parent-section",
             start: "top top",
-            end: "+=3000%",
+            end: "+=4000%",
             pin: true,
             pinSpacing: "margin",
             scrub: true,
@@ -693,6 +711,11 @@ function initTreeDiagram() {
         autoAlpha: 0
     });
 
+    gsap.set(".section.is--groupe p.is--second", {
+        position: "absolute",
+        right: 0
+    })
+
 
     treeTlOne.set(".tree-header-wrapper .label", {
         autoAlpha: 0,
@@ -715,93 +738,93 @@ function initTreeDiagram() {
         .set(".tree-child-wrapper .label", {
             autoAlpha: 0,
         })
-        .to(".tree-container.is--first .tree-header-wrapper .label", {
-            autoAlpha: 1,
-            onStart: function () {
-                scrambleLabel.play(0);
-            }
-        })
-        .to(".tree-container.is--first .tree-header-wrapper .line", {
-            scaleY: 1,
+        // .to(".tree-container.is--first .tree-header-wrapper .label", {
+        //     autoAlpha: 1,
+        //     onStart: function () {
+        //         scrambleLabel.play(0);
+        //     }
+        // })
+        // .to(".tree-container.is--first .tree-header-wrapper .line", {
+        //     scaleY: 1,
 
-        })
-        .to(".tree-container.is--first .tree-horizontal-line", {
-            scaleX: 1,
-            duration: 2,
+        // })
+        // .to(".tree-container.is--first .tree-horizontal-line", {
+        //     scaleX: 1,
+        //     duration: 2,
 
-        })
-        .to(".tree-container.is--first .tree-child-wrapper .line", {
-            scaleY: 1,
-        })
-        .to(".tree-container.is--first .tree-child-wrapper .label", {
-            autoAlpha: 1,
+        // })
+        // .to(".tree-container.is--first .tree-child-wrapper .line", {
+        //     scaleY: 1,
+        // })
+        // .to(".tree-container.is--first .tree-child-wrapper .label", {
+        //     autoAlpha: 1,
 
-            onStart: function () {
-                scrambleChildLabel.play(0);
-                console.log("LES SECTIONS ");
+        //     onStart: function () {
+        //         scrambleChildLabel.play(0);
+        //         console.log("LES SECTIONS ");
 
-                gsap.to(".section.is--section [data-split='lines'] .lineInner", {
-                    yPercent: 0,
-                    duration: .6,
-                    stagger: 0.05,
-                    ease: "power1.out"
-                })
+        //         gsap.to(".section.is--section [data-split='lines'] .lineInner", {
+        //             yPercent: 0,
+        //             duration: .6,
+        //             stagger: 0.05,
+        //             ease: "power1.out"
+        //         })
 
-                // Add scramble text animation 
-                gsap.to(".section.is--section .header-title, .section.is--section .header-number", {
-                    duration: 1,
-                    onStart: function () {
-                        gsap.set(".section.is--section .header-title, .section.is--section .header-number", {
-                            autoAlpha: 1
-                        });
-                    },
+        //         // Add scramble text animation 
+        //         gsap.to(".section.is--section .header-title, .section.is--section .header-number", {
+        //             duration: 1,
+        //             onStart: function () {
+        //                 gsap.set(".section.is--section .header-title, .section.is--section .header-number", {
+        //                     autoAlpha: 1
+        //                 });
+        //             },
 
-                    scrambleText: {
-                        text: "{original}",
-                        chars: 'upperCase',
-                        speed: 1,
-                        // tweenLength: false,
-                    }
-                },);
-            },
-            onReverseComplete: function () {
-                gsap.to(".section.is--section [data-split='lines'] .lineInner", {
-                    yPercent: 100,
-                    duration: .6,
-                    stagger: 0.05,
-                    ease: "power1.out"
-                })
+        //             scrambleText: {
+        //                 text: "{original}",
+        //                 chars: 'upperCase',
+        //                 speed: 1,
+        //                 // tweenLength: false,
+        //             }
+        //         },);
+        //     },
+        //     onReverseComplete: function () {
+        //         gsap.to(".section.is--section [data-split='lines'] .lineInner", {
+        //             yPercent: 100,
+        //             duration: .6,
+        //             stagger: 0.05,
+        //             ease: "power1.out"
+        //         })
 
-                gsap.to(".section.is--section .header-title, .section.is--section .header-number", {
-                    autoAlpha: 0
-                },);
-            }
-        })
+        //         gsap.to(".section.is--section .header-title, .section.is--section .header-number", {
+        //             autoAlpha: 0
+        //         },);
+        //     }
+        // })
         // end of first tree container
-        .addLabel("focusSection", "+=1")
-        // hiding of first tree container
-        .to(".tree-container.is--first .tree-child-wrapper:not(.is--three)", {
-            autoAlpha: 0
-        }, "focusSection")
-        .to(" .tree-container.is--first .tree-horizontal-line", {
-            // width: "+=12.5rem",
-            autoAlpha: 0,
-            transformOrigin: "center"
-        }, "focusSection")
+        // .addLabel("focusSection", "+=1")
+        // // hiding of first tree container
+        // .to(".tree-container.is--first .tree-child-wrapper:not(.is--three)", {
+        //     autoAlpha: 0
+        // }, "focusSection")
+        // .to(" .tree-container.is--first .tree-horizontal-line", {
+        //     // width: "+=12.5rem",
+        //     autoAlpha: 0,
+        //     transformOrigin: "center"
+        // }, "focusSection")
 
-        .to(".tree-container.is--first .tree-header-wrapper", {
-            transformOrigin: "top",
-            autoAlpha: 0
-        }, "focusSection")
-        .to(".tree-container.is--first .tree-child-wrapper.is--three", {
-            yPercent: -302,
-            duration: 2,
+        // .to(".tree-container.is--first .tree-header-wrapper", {
+        //     transformOrigin: "top",
+        //     autoAlpha: 0
+        // }, "focusSection")
+        // .to(".tree-container.is--first .tree-child-wrapper.is--three", {
+        //     yPercent: -302,
+        //     duration: 2,
 
-        }, "<")
-        .to(".tree-container.is--first .tree-child-wrapper.is--three .line", {
-            autoAlpha: 0,
-            duration: 0.1,
-        }, "<")
+        // }, "<")
+        // .to(".tree-container.is--first .tree-child-wrapper.is--three .line", {
+        //     autoAlpha: 0,
+        //     duration: 0.1,
+        // }, "<")
 
 
         //  beginning of second tree container
@@ -823,8 +846,6 @@ function initTreeDiagram() {
         })
         .to(".tree-container.is--second .tree-child-wrapper .label", {
             autoAlpha: 1,
-
-
             onStart: function () {
                 scrambleChildLabelTwo.play(0);
                 gsap.to(".section.is--section [data-split='lines'] .lineInner", {
@@ -834,32 +855,12 @@ function initTreeDiagram() {
                     ease: "power1.out"
                 })
 
-                gsap.to(".section.is--groupe [data-split='lines'] .lineInner", {
+                gsap.to(".section.is--groupe [data-split='lines'].is--first .lineInner", {
                     yPercent: 0,
                     duration: .6,
                     stagger: 0.05,
                     ease: "power1.out"
                 })
-
-                // gsap.to(".section.is--groupe .header-title, .section.is--groupe .header-number", {
-                //     duration: 1,
-                //     onStart: function () {
-                //         gsap.set(".section.is--groupe .header-title, .section.is--groupe .header-number", {
-                //             autoAlpha: 1
-                //         });
-                //         gsap.to(".section.is--section .header-title, .section.is--section .header-number", {
-                //             autoAlpha: 0
-                //         })
-                //     },
-
-                //     scrambleText: {
-                //         text: "{original}",
-                //         chars: 'upperCase',
-                //         speed: 1,
-                //         // tweenLength: false,
-                //     }
-                // },);
-
             },
             onReverseComplete: function () {
                 gsap.to(".section.is--section [data-split='lines'] .lineInner", {
@@ -869,36 +870,82 @@ function initTreeDiagram() {
                     ease: "power1.out"
                 })
 
-                gsap.to(".section.is--groupe [data-split='lines'] .lineInner", {
+                gsap.to(".section.is--groupe [data-split='lines'].is--first .lineInner", {
                     yPercent: 100,
                     duration: .6,
                     stagger: 0.05,
                     ease: "power1.out"
                 })
 
-                // gsap.to(".section.is--groupe .header-title, .section.is--groupe .header-number", {
-                //     autoAlpha: 0
-                // },);
-
-                // gsap.to(".section.is--section .header-title, .section.is--section .header-number", {
-                //     duration: 1,
-                //     onStart: function () {
-                //         gsap.set(".section.is--section .header-title, .section.is--section .header-number", {
-                //             autoAlpha: 1
-                //         });
-                //     },
-
-                //     scrambleText: {
-                //         text: "{original}",
-                //         chars: 'upperCase',
-                //         speed: 1,
-                //         // tweenLength: false,
-                //     }
-                // },);
             }
         })
 
+        .to({}, {
+            duration: 3, // Adjust this: 3 = more scroll distance to read
+            ease: "none"
+        })
+
         .addLabel("focusSection", "+=1")
+        .to({}, {
+            duration: 0.01, // Minimal duration
+            onStart: function () {
+                gsap.to(".section.is--groupe p[data-split='lines'].is--second .lineInner", {
+                    yPercent: 0,
+                    duration: .6,
+                    stagger: 0.05,
+                    ease: "power1.out"
+                })
+
+                gsap.to(".section.is--groupe p[data-split='lines'].is--first .lineInner", {
+                    yPercent: 100,
+                    duration: .6,
+                    stagger: 0.05,
+                    ease: "power1.out"
+                })
+            },
+            onReverseComplete: function () {
+                gsap.to(".section.is--groupe p[data-split='lines'].is--second .lineInner", {
+                    yPercent: 100,
+                    duration: .6,
+                    stagger: 0.05,
+                    ease: "power1.out"
+                })
+
+                gsap.to(".section.is--groupe p[data-split='lines'].is--first .lineInner", {
+                    yPercent: 0,
+                    duration: .6,
+                    stagger: 0.05,
+                    ease: "power1.out"
+                })
+            }
+        })
+        .to({}, {
+            duration: 3, // Adjust this: 3 = more scroll distance to read
+            ease: "none"
+        })
+        // .to({}, {
+        //     duration: 0.01,
+        //     onStart: function () {
+        //         gsap.to(".section.is--groupe p[data-split='lines'].is--second .lineInner", {
+        //             yPercent: -100,  // or 100 to slide down, -100 to slide up
+        //             duration: .6,
+        //             stagger: 0.05,
+        //             ease: "power1.out"
+        //         })
+        //     },
+        //     onReverseComplete: function () {
+        //         // Show it again when scrolling back
+        //         gsap.to(".section.is--groupe p[data-split='lines'].is--second .lineInner", {
+        //             yPercent: 0,
+        //             duration: .6,
+        //             stagger: 0.05,
+        //             ease: "power1.out"
+        //         })
+        //     }
+        // })
+        .addLabel("focusSection", "+=1")
+
+
 
         // hiding of second tree container
         .to(".tree-container.is--second .tree-child-wrapper:not(.is--three)", {
@@ -951,13 +998,13 @@ function initTreeDiagram() {
             onStart: function () {
                 scrambleChildLabelThree.play(0);
 
-                gsap.to(".section.is--groupe [data-split='lines'] .lineInner", {
+                gsap.to(".section.is--groupe [data-split='lines'].is--second .lineInner, .section.is--groupe h2[data-split='lines'] .lineInner", {
                     yPercent: -100,
                     duration: .6,
                     stagger: 0.05,
                     ease: "power1.out"
                 })
-                console.log("onComplete");
+
 
                 gsap.to(".section.is--personnes [data-split='lines'] .lineInner", {
                     yPercent: 0,
@@ -970,7 +1017,7 @@ function initTreeDiagram() {
 
             },
             onReverseComplete: function () {
-                gsap.to(".section.is--groupe [data-split='lines'] .lineInner", {
+                gsap.to(".section.is--groupe [data-split='lines'].is--second .lineInner, .section.is--groupe h2[data-split='lines'] .lineInner", {
                     yPercent: 0,
                     duration: .6,
                     stagger: 0.05,
@@ -1048,6 +1095,12 @@ function initTreeDiagram() {
                     ease: "power1.out"
                 })
 
+                gsap.set(".label.color.is--compare", {
+                    autoAlpha: 1,
+                })
+                gsap.set(".tree-child-wrapper.is--one.is--toi .label", {
+                    autoAlpha: 0,
+                })
                 // gsap.to(".header-section.is--groupe, .header-section", {
                 //     autoAlpha: 0,
                 // })
@@ -1081,6 +1134,12 @@ function initTreeDiagram() {
 
             },
             onReverseComplete: function () {
+                gsap.set(".label.color.is--compare", {
+                    autoAlpha: 0,
+                })
+                gsap.set(".tree-child-wrapper.is--one.is--toi .label", {
+                    autoAlpha: 1,
+                })
                 gsap.to(".section.is--compare [data-split='lines'] .lineInner", {
                     yPercent: 100,
                     duration: .6,
@@ -1163,92 +1222,203 @@ function initTreeDiagram() {
     // desktop only
     mm.add("(min-width: 768px)", () => {
 
-        gsap.set(" .panel.is--second, .panel.is--third, .panel.is--fourth, .panel.is--fifth", {
-            width: "50%",
-            minWidth: "unset",
-            marginLeft: "-400px"
-        });
+        treeTlOne
+            .to(".tree-wrapper.is--compare", {
+                // Set transform origin with the offset
+                duration: 5,
+                transformOrigin: () => {
+                    const treeLeftSide = document.querySelector(".tree-left-side");
+                    const treeLeftSideWidth = treeLeftSide ? treeLeftSide.offsetWidth : 0;
+                    // Set origin to the offset position from left, and bottom
+                    return `${treeLeftSideWidth}px bottom`;
+                },
+
+                // Scale by 2
+                scale: 2,
+
+                // Now we don't need to subtract the offset since it's built into the transform origin
+                x: () => {
+                    const element = document.querySelector(".tree-wrapper.is--compare");
+                    if (!element) return 0;
+
+                    const rect = element.getBoundingClientRect();
+                    const currentLeft = rect.left;
+
+                    // Since transform origin is already offset, just center normally
+                    const treeLeftSide = document.querySelector(".tree-left-side");
+                    const treeLeftSideWidth = treeLeftSide ? treeLeftSide.offsetWidth : 0;
+                    const targetLeft = window.innerWidth / 2;
+
+                    // Adjust for the transform origin offset
+                    return targetLeft - currentLeft - treeLeftSideWidth;
+                },
+
+                y: () => {
+                    const element = document.querySelector(".tree-wrapper.is--compare");
+                    if (!element) return 0;
+                    const rect = element.getBoundingClientRect();
+                    const currentBottom = rect.bottom;
+                    const targetBottom = window.innerHeight / 2;
+                    return targetBottom - currentBottom;
+                },
+
+                ease: "power2.inOut",
+
+            }, "timeline")
+
+            // Fade out animations remain the same
+            .to(".tree-wrapper.is--compare .tree-left-side, .tree-wrapper.is--compare .line.is--vertical, .tree-wrapper.is--compare .line-wrapper-top, .tree-wrapper.is--compare .inscription-rc", {
+                autoAlpha: 0,
+                duration: 5,
+                ease: "power2.inOut",
+                onStart: function () {
+                    gsap.to(".section.is--compare [data-split='lines'] .lineInner", {
+                        yPercent: -100,
+                        duration: .6,
+                        stagger: 0.05,
+                        ease: "expo.out"
+                    })
+                },
+                onReverseComplete: function () {
+                    gsap.to(".section.is--compare [data-split='lines'] .lineInner", {
+                        yPercent: 0,
+                        duration: .6,
+                        stagger: 0.05,
+                        ease: "expo.out"
+                    })
+                }
+            }, "<")
+
+
+
 
         // we move the line to the position of the other line
-        treeTlOne.add(Flip.fit(".section.is--compare .tree-right-wrapper .line-wrapper-bottom", ".section.is--timeline .timeline-wrapper", {
-            ease: "none",
-            duration: 4,
-            onStart: function () {
-                gsap.to(".section.is--compare [data-split='lines'] ", {
-                    autoAlpha: 0,
-                })
-            },
-            onReverseComplete: function () {
-                gsap.to(".section.is--compare [data-split='lines'] ", {
-                    autoAlpha: 1,
-                })
-            }
-        },))
+        // treeTlOne.add(Flip.fit(".section.is--compare .tree-right-wrapper .line-wrapper-bottom", ".section.is--timeline .timeline-wrapper", {
+        //     ease: "none",
+        //     duration: 4,
+        //     onStart: function () {
+        //         gsap.to(".section.is--compare [data-split='lines'] ", {
+        //             autoAlpha: 0,
+        //         })
+        //     },
+        //     onReverseComplete: function () {
+        //         gsap.to(".section.is--compare [data-split='lines'] ", {
+        //             autoAlpha: 1,
+        //         })
+        //     }
+        // },))
 
         // we make the long line grow
+
+        // START HORIZONTAL TIMELINE
+
         treeTlOne
-            // .to(".section.is--compare .is--reallywant", {
+            // First, create the white progress line before the animation starts
+            .to({}, {
+                duration: 0.001,
+                onComplete: function () {
+                    // Create the white progress line as a fixed element
+                    if (!document.querySelector(".line-progress")) {
+                        const progressLine = document.createElement("div");
+                        progressLine.className = "line-progress";
 
-            //     width: "+=200",
-            //     transformOrigin: "left",
-            //     duration: 4,
-            //     ease: "none"
-            // }, "<")
+                        // Get the actual position of the gray line after all transforms
+                        const grayLine = document.querySelector(".tree-wrapper.is--compare .line.is--reallywant");
+                        let grayLineTop = window.innerHeight / 2; // Default to center
+                        if (grayLine) {
+                            const grayLineRect = grayLine.getBoundingClientRect();
+                            grayLineTop = grayLineRect.top + (grayLineRect.height / 2); // Get the vertical center of the gray line
+                        }
 
-            // // we push the label at the end of the line to the right
-            // .to(".section.is--compare .label.is--compare3", {
+                        progressLine.style.cssText = `
+    position: fixed;
+    top: ${grayLineTop}px;  /* Use the exact position of the gray line */
+    left: 0;  /* Start from left edge of screen */
+    width: 50%;  /* Width to center of screen */
+    height: 4px;  /* Match the gray line height */
+    background-color: white;
+    transform: translateY(-50%) scaleX(0);  /* Center vertically and start scaled to 0 */
+    transform-origin: right center;  /* Scale from right edge (at screen center) */
+    z-index: 50;
+`;
+                        // Append to body instead of inside the scaled container
+                        document.body.appendChild(progressLine);
+                    }
 
-            //     x: "+=200",
-            //     transformOrigin: "left",
-            //     duration: 4,
-            //     ease: "none"
-            // }, "<")
-            //we hide the rest at the same time
-            .to(".section.is--compare .line-wrapper-top, .section.is--compare .line.is--vertical, .section.is--compare .tree-left-side", {
-                autoAlpha: 0,
-                // scale: .5
-            }, "<")
-            .to(".section.is--personnes .is--toi", {
-                autoAlpha: 0
-            }, "<")
+                    // Make sure the timeline section is visible
+                    gsap.set(".section.is--timeline", {
+                        autoAlpha: 1
+                    });
 
-            // we move the the right trough the 400vw container
-            .to(".section.is--timeline .tree-container.is--timeline", {
-                xPercent: -100,
+                    // Reset the gray line position
+                    gsap.set(".tree-wrapper.is--compare .line.is--reallywant", {
+                        transformOrigin: "left center",
+                        x: 0
+                    });
+                }
+            }, "=+0")
+
+            // Now animate the timeline container with the progress updates
+            .to(".section.is--timeline .timeline-container", {
+                xPercent: -50,  // Container is 200vw wide, so -50 moves it fully
                 ease: "none",
                 duration: 35,
+
+                onUpdate: function (self) {
+                    // Get the progress directly from the tween (0 to 1)
+                    const progress = this.progress();
+
+                    // Debug log to see if it's updating
+
+                    // White line grows quickly at the beginning
+                    let whiteLineProgress;
+                    if (progress < 0.2) {
+                        // In the first 20% of scroll, white line grows to full size
+                        whiteLineProgress = progress / 0.2;  // Goes from 0 to 1
+                    } else {
+                        // After that, white line stays at full size
+                        whiteLineProgress = 1;
+                    }
+
+                    // Update the white progress line
+                    const progressLine = document.querySelector(".line-progress");
+                    if (progressLine) {
+                        // Use transform to maintain the vertical centering while scaling
+                        gsap.set(progressLine, {
+                            transform: `translateY(-50%) scaleX(${whiteLineProgress})`
+                        });
+                    }
+
+                    // Move the gray line at the end
+                    const grayLine = document.querySelector(".tree-wrapper.is--compare .line.is--reallywant");
+                    if (grayLine) {
+                        if (progress > 0.8) {
+                            // In the last 20% of scroll, start moving the gray line
+                            const endProgress = (progress - 0.8) / 0.2; // 0 to 1 for the last 20%
+
+                            // Calculate how much to move the gray line
+                            const grayLineWidth = grayLine.getBoundingClientRect().width;
+                            const moveDistance = (grayLineWidth / 2); // Half the width to get right edge to center
+
+                            gsap.set(grayLine, {
+                                x: -endProgress * moveDistance
+                            });
+                        } else {
+                            // Keep gray line in place
+                            gsap.set(grayLine, {
+                                x: 0
+                            });
+                        }
+                    }
+                },
+
                 onStart: function () {
-                    // we hide the long line
-                    gsap.to(".section.is--compare .is--reallywant", {
-                        autoAlpha: 0
-                    })
-
-                    gsap.to(".section.is--compare .is--reallywant", {
-                        width: "+=400",
-                        transformOrigin: "left",
-                        duration: 1.5,
-                        ease: "easeOutQuart"
-                    }, "<")
-
-                    // we push the label at the end of the line to the right
-                    gsap.to(".section.is--compare .label.is--compare3", {
-
-                        x: "+=400",
-                        transformOrigin: "left",
-                        duration: 1.5,
-                        ease: "easeOutQuart"
-                    }, "<")
-                    // we show the new long line that takes the full width
-                    gsap.to(".section.is--timeline .timeline-wrapper", {
-                        autoAlpha: 1
-                    })
-
-
-
+                    // Hide compare section headers
                     gsap.to(".section.is--compare .header-title, .section.is--compare .header-number", {
                         autoAlpha: 0
-                    },);
+                    });
 
+                    // Show timeline section headers
                     gsap.to(".section.is--timeline .header-title, .section.is--timeline .header-number", {
                         duration: 1,
                         onStart: function () {
@@ -1256,214 +1426,226 @@ function initTreeDiagram() {
                                 autoAlpha: 1
                             });
                         },
-
                         scrambleText: {
                             text: "{original}",
                             chars: 'upperCase',
                             speed: 1,
-                            // tweenLength: false,
                         }
-                    },);
-
+                    });
                 },
+
+                onComplete: function () {
+                    console.log("Timeline animation complete");
+                    // Ensure final state
+                    const grayLine = document.querySelector(".tree-wrapper.is--compare .line.is--reallywant");
+                    if (grayLine) {
+                        const grayLineWidth = grayLine.getBoundingClientRect().width;
+                        gsap.set(grayLine, {
+                            x: -(grayLineWidth / 2)
+                        });
+                    }
+                },
+
                 onReverseComplete: function () {
-                    gsap.set(".section.is--compare .is--reallywant", {
-                        autoAlpha: 1
-                    })
-                    gsap.set(".section.is--timeline .timeline-wrapper", {
+                    // Clean up the white line when reversing
+                    const progressLine = document.querySelector(".line-progress");
+                    if (progressLine) {
+                        progressLine.remove();
+                    }
+                }
+
+            }, "<")  // Slight delay to ensure white line is created first
+
+
+
+            // Now you can animate it properly
+            .to(".section.is--timeline, .section.is--compare", {
+                autoAlpha: 0,
+                duration: 2,
+                ease: "power2.inOut",
+
+                onStart: function () {
+                    const element = document.querySelector(".line-progress");
+                    console.log(element);
+
+                    gsap.to(element, {
                         autoAlpha: 0
                     })
-                    // gsap.to(".section.is--compare .inscription-rc", {
-                    //     autoAlpha: 1
-                    // })
-
-                    gsap.to(".section.is--compare .is--reallywant", {
-                        width: "-=400",
-                        transformOrigin: "left",
-                        duration: 1,
-                        ease: "easeOutQuart"
-                    }, "<")
-
-                    gsap.to(".section.is--compare .label.is--compare3", {
-                        x: "-=400",
-                        transformOrigin: "left",
-                        duration: 1,
-                        ease: "easeOutQuart"
-                    }, "<")
-
-                    gsap.to(".section.is--timeline .header-title, .section.is--timeline .header-number", {
-                        autoAlpha: 0
-                    },);
-
-                    gsap.to(".section.is--compare .header-title, .section.is--compare .header-number", {
-                        autoAlpha: 1
-                    },);
 
                 },
 
-            }, "horizontal")
-            .to(".section.is--compare .inscription-rc", {
-                autoAlpha: 0,
-            }, "<")
+                onReverseComplete: function () {
+                    const element = document.querySelector(".line-progress");
+                    console.log(element);
 
-            // we scale the white line to the full width with the scroll
-            .from(".section.is--timeline .white-line", {
-                scaleX: 0,
-                transformOrigin: "left",
-                ease: "none",
-                duration: 35,
-            }, "horizontal")
+                    gsap.to(element, {
+                        autoAlpha: 1
+                    })
+
+                }
+            })
+            // .to({}, {
+            //     duration: 1 // Pause before map
+            // })
+
+            // // we scale the white line to the full width with the scroll
+            // .from(".section.is--timeline .white-line", {
+            //     scaleX: 0,
+            //     transformOrigin: "left",
+            //     ease: "none",
+            //     duration: 35,
+            // }, "horizontal")
 
 
             //we make the different element appear trough the timeline
-            .to({}, {
-                duration: 0.001,
-                onStart: function () {
-                    gsap.to(".panel.is--first .text-wrapper.is--first [data-split='lines'] .lineInner", {
-                        yPercent: 0,
-                        duration: 1,
-                        ease: "power2.out"
-                    },)
-                },
-                onReverseComplete: function () {
-                    // gsap.to(".panel.is--first .text-wrapper.is--first [data-split='lines'] .lineInner", {
-                    //     yPercent: 100,
-                    //     duration: 1,
-                    //     ease: "power2.out"
-                    // },)
+            // .to({}, {
+            //     duration: 0.001,
+            //     onStart: function () {
+            //         gsap.to(".panel.is--first .text-wrapper.is--first [data-split='lines'] .lineInner", {
+            //             yPercent: 0,
+            //             duration: 1,
+            //             ease: "power2.out"
+            //         },)
+            //     },
+            //     onReverseComplete: function () {
+            //         // gsap.to(".panel.is--first .text-wrapper.is--first [data-split='lines'] .lineInner", {
+            //         //     yPercent: 100,
+            //         //     duration: 1,
+            //         //     ease: "power2.out"
+            //         // },)
 
-                    gsap.to(".panel.is--first .text-wrapper.is--first [data-split='lines'] .lineInner", {
-                        yPercent: 100,
-                        duration: 1,
-                        ease: "power2.out"
-                    },)
+            //         gsap.to(".panel.is--first .text-wrapper.is--first [data-split='lines'] .lineInner", {
+            //             yPercent: 100,
+            //             duration: 1,
+            //             ease: "power2.out"
+            //         },)
 
-                    gsap.to(".panel.is--second .text-wrapper.is--second [data-split='lines'] .lineInner", {
-                        yPercent: 100,
-                        duration: 1,
-                        ease: "power2.out"
-                    },)
-                }
-            }, "<")
-            .to({}, {
-                duration: 0.001,
-                onStart: function () {
-                    gsap.to(".panel.is--second .text-wrapper.is--second [data-split='lines'] .lineInner", {
-                        yPercent: 0,
-                        duration: 1,
-                        ease: "power2.out"
-                    },)
-                },
-                onReverseComplete: function () {
-                    // gsap.to(".panel.is--second .text-wrapper.is--second [data-split='lines'] .lineInner", {
-                    //     yPercent: 100,
-                    //     duration: 1,
-                    //     ease: "power2.out"
-                    // },)
-                }
-            }, "<+=3")
+            //         gsap.to(".panel.is--second .text-wrapper.is--second [data-split='lines'] .lineInner", {
+            //             yPercent: 100,
+            //             duration: 1,
+            //             ease: "power2.out"
+            //         },)
+            //     }
+            // }, "<")
+            // .to({}, {
+            //     duration: 0.001,
+            //     onStart: function () {
+            //         gsap.to(".panel.is--second .text-wrapper.is--second [data-split='lines'] .lineInner", {
+            //             yPercent: 0,
+            //             duration: 1,
+            //             ease: "power2.out"
+            //         },)
+            //     },
+            //     onReverseComplete: function () {
+            //         // gsap.to(".panel.is--second .text-wrapper.is--second [data-split='lines'] .lineInner", {
+            //         //     yPercent: 100,
+            //         //     duration: 1,
+            //         //     ease: "power2.out"
+            //         // },)
+            //     }
+            // }, "<+=3")
 
-            .to({}, {
-                duration: 0.001,
-                onStart: function () {
-                    gsap.to(".panel.is--third .text-wrapper.is--third [data-split='lines'] .lineInner", {
-                        yPercent: 0,
-                        duration: 1,
-                        ease: "power2.out"
-                    },)
-                    gsap.to(".panel.is--third .text-wrapper.is--third .t-inner-wrapper.is--spec", {
-                        autoAlpha: 1,
-                        yPercent: 0,
-                        duration: 1,
-                        ease: "power2.out"
-                    },)
-                },
-                // onReverseComplete: function () {
-                //     gsap.to(".panel.is--third .text-wrapper.is--third [data-split='lines'] .lineInner", {
-                //         yPercent: 100,
-                //         duration: 1,
-                //         ease: "power2.out"
-                //     },)
-                //     gsap.to(".panel.is--third .text-wrapper.is--third .t-inner-wrapper.is--spec", {
-                //         autoAlpha: 0,
-                //         yPercent: 10,
-                //         duration: 1,
-                //         ease: "power2.out"
-                //     },)
-                // }
-            }, "<+=3")
+            // .to({}, {
+            //     duration: 0.001,
+            //     onStart: function () {
+            //         gsap.to(".panel.is--third .text-wrapper.is--third [data-split='lines'] .lineInner", {
+            //             yPercent: 0,
+            //             duration: 1,
+            //             ease: "power2.out"
+            //         },)
+            //         gsap.to(".panel.is--third .text-wrapper.is--third .t-inner-wrapper.is--spec", {
+            //             autoAlpha: 1,
+            //             yPercent: 0,
+            //             duration: 1,
+            //             ease: "power2.out"
+            //         },)
+            //     },
+            //     // onReverseComplete: function () {
+            //     //     gsap.to(".panel.is--third .text-wrapper.is--third [data-split='lines'] .lineInner", {
+            //     //         yPercent: 100,
+            //     //         duration: 1,
+            //     //         ease: "power2.out"
+            //     //     },)
+            //     //     gsap.to(".panel.is--third .text-wrapper.is--third .t-inner-wrapper.is--spec", {
+            //     //         autoAlpha: 0,
+            //     //         yPercent: 10,
+            //     //         duration: 1,
+            //     //         ease: "power2.out"
+            //     //     },)
+            //     // }
+            // }, "<+=3")
 
-            .to({}, {
-                duration: 0.001,
-                onStart: function () {
-                    gsap.to(".panel.is--third .text-wrapper.is--fourth [data-split='lines'] .lineInner", {
-                        yPercent: 0,
-                        duration: 1,
-                        ease: "power2.out"
-                    },)
-                },
-                // onReverseComplete: function () {
-                //     gsap.to(".panel.is--third .text-wrapper.is--fourth [data-split='lines'] .lineInner", {
-                //         yPercent: 100,
-                //         duration: 1,
-                //         ease: "power2.out"
-                //     },)
-                // }
-            }, "<+=3")
+            // .to({}, {
+            //     duration: 0.001,
+            //     onStart: function () {
+            //         gsap.to(".panel.is--third .text-wrapper.is--fourth [data-split='lines'] .lineInner", {
+            //             yPercent: 0,
+            //             duration: 1,
+            //             ease: "power2.out"
+            //         },)
+            //     },
+            //     // onReverseComplete: function () {
+            //     //     gsap.to(".panel.is--third .text-wrapper.is--fourth [data-split='lines'] .lineInner", {
+            //     //         yPercent: 100,
+            //     //         duration: 1,
+            //     //         ease: "power2.out"
+            //     //     },)
+            //     // }
+            // }, "<+=3")
 
-            .to({}, {
-                duration: 0.001,
-                onStart: function () {
-                    gsap.to(".panel.is--fourth .text-wrapper.is--fifth [data-split='lines'] .lineInner", {
-                        yPercent: 0,
-                        duration: 1,
-                        ease: "power2.out"
-                    },)
-                },
-                // onReverseComplete: function () {
-                //     gsap.to(".panel.is--fourth .text-wrapper.is--fifth [data-split='lines'] .lineInner", {
-                //         yPercent: 100,
-                //         duration: 1,
-                //         ease: "power2.out"
-                //     },)
-                // }
-            }, "<+=3")
-            .to({}, {
-                duration: 0.001,
-                onStart: function () {
-                    gsap.to(".panel.is--fifth .text-wrapper.is--sixth [data-split='lines'] .lineInner", {
-                        yPercent: 0,
-                        duration: 1,
-                        ease: "power2.out"
-                    },)
-                },
+            // .to({}, {
+            //     duration: 0.001,
+            //     onStart: function () {
+            //         gsap.to(".panel.is--fourth .text-wrapper.is--fifth [data-split='lines'] .lineInner", {
+            //             yPercent: 0,
+            //             duration: 1,
+            //             ease: "power2.out"
+            //         },)
+            //     },
+            //     // onReverseComplete: function () {
+            //     //     gsap.to(".panel.is--fourth .text-wrapper.is--fifth [data-split='lines'] .lineInner", {
+            //     //         yPercent: 100,
+            //     //         duration: 1,
+            //     //         ease: "power2.out"
+            //     //     },)
+            //     // }
+            // }, "<+=3")
+            // .to({}, {
+            //     duration: 0.001,
+            //     onStart: function () {
+            //         gsap.to(".panel.is--fifth .text-wrapper.is--sixth [data-split='lines'] .lineInner", {
+            //             yPercent: 0,
+            //             duration: 1,
+            //             ease: "power2.out"
+            //         },)
+            //     },
 
-                // onReverseComplete: function () {
-                //     gsap.to(".panel.is--fifth .text-wrapper.is--sixth [data-split='lines'] .lineInner", {
-                //         yPercent: 100,
-                //         duration: 1,
-                //         ease: "power2.out"
-                //     },)
-                // }
-            }, "<+=3")
+            //     // onReverseComplete: function () {
+            //     //     gsap.to(".panel.is--fifth .text-wrapper.is--sixth [data-split='lines'] .lineInner", {
+            //     //         yPercent: 100,
+            //     //         duration: 1,
+            //     //         ease: "power2.out"
+            //     //     },)
+            //     // }
+            // }, "<+=3")
 
-            .to(".panel.is--fifth .text-wrapper.is--sixth [data-split='lines'] .lineInner", {
-                autoAlpha: 0,
-            },)
-            .to(".timeline-wrapper", {
-                autoAlpha: 0,
+            // .to(".panel.is--fifth .text-wrapper.is--sixth [data-split='lines'] .lineInner", {
+            //     autoAlpha: 0,
+            // },)
+            // .to(".timeline-wrapper", {
+            //     autoAlpha: 0,
 
-                onStart: function () {
-                    gsap.to(".section.is--timeline .header-title, .section.is--timeline .header-number", {
-                        autoAlpha: 0
-                    },);
-                },
-                onReverseComplete: function () {
-                    gsap.to(".section.is--timeline .header-title, .section.is--timeline .header-number", {
-                        autoAlpha: 1
-                    },);
-                }
-            },)
+            //     onStart: function () {
+            //         gsap.to(".section.is--timeline .header-title, .section.is--timeline .header-number", {
+            //             autoAlpha: 0
+            //         },);
+            //     },
+            //     onReverseComplete: function () {
+            //         gsap.to(".section.is--timeline .header-title, .section.is--timeline .header-number", {
+            //             autoAlpha: 1
+            //         },);
+            //     }
+            // },)
             .to(".map-svg path", {
                 drawSVG: "0% 100%", // or "0 100" depending on your preference
                 duration: 5,
@@ -1484,7 +1666,7 @@ function initTreeDiagram() {
                         ease: "power2.out"
                     },)
                 }
-            },) // Adjust the timing if needed
+            }, "-=2")
 
             .to(".tree-right-wrapper .dot-wrapper", {
                 autoAlpha: 0,
@@ -2706,18 +2888,18 @@ document.addEventListener("DOMContentLoaded", () => {
     initAchat();
     document.fonts.ready.then(() => {
         initSplit();
-        initAgeGate();
+        // initAgeGate();
         tlHeroAnimation = initHeroAnimation();
-        initIntro();
+        // initIntro();
         initTrackerCheckboxes();
-        initScrollLock();
+        // initScrollLock();
         initTrackerSection();
         initVideoMap();
 
 
 
         //to remove
-        // initTreeDiagramWrapper(); // on page load
+        initTreeDiagramWrapper(); // on page load
     });
     // initVideoMap();
     document.body.removeAttribute('data-preload');
