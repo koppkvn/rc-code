@@ -1266,8 +1266,23 @@ function initTreeDiagram() {
 
             }, "timeline")
 
+            .to(".line.is--reallywant", {
+                scaleY: .5,
+                scaleX: 1,
+                ease: "power2.inOut",
+                duration: 5,
+                transformOrigin: "left center"
+            }, "<")
+
+            .to(".dot-wrapper", {
+                scale: .5,
+                ease: "power2.inOut",
+                duration: 5,
+                transformOrigin: "left 70%"  // Changed from "bottom left" to "left center"
+            }, "<")
+
             // Fade out animations remain the same
-            .to(".tree-wrapper.is--compare .tree-left-side, .tree-wrapper.is--compare .line.is--vertical, .tree-wrapper.is--compare .line-wrapper-top, .tree-wrapper.is--compare .inscription-rc", {
+            .to(".tree-wrapper.is--compare .tree-left-side, .tree-wrapper.is--compare .line.is--vertical, .tree-wrapper.is--compare .line-wrapper-top", {
                 autoAlpha: 0,
                 duration: 5,
                 ease: "power2.inOut",
@@ -1286,9 +1301,16 @@ function initTreeDiagram() {
                         stagger: 0.05,
                         ease: "expo.out"
                     })
-                }
+                },
+
             }, "<")
 
+
+
+            .to(".tree-container.is--compare .inscription-rc", {
+                autoAlpha: 0,
+                duration: 1,
+            }, "-=0.1")  // Slight overlap for smooth fade
 
 
 
@@ -1335,7 +1357,7 @@ function initTreeDiagram() {
     top: ${grayLineTop}px;  /* Use the exact position of the gray line */
     left: 0;  /* Start from left edge of screen */
     width: 50%;  /* Width to center of screen */
-    height: 4px;  /* Match the gray line height */
+    height: 2px;  /* Match the gray line height */
     background-color: white;
     transform: translateY(-50%) scaleX(0);  /* Center vertically and start scaled to 0 */
     transform-origin: right center;  /* Scale from right edge (at screen center) */
