@@ -1,6 +1,7 @@
 
 import './styles/main.scss'
 import { ElectricBorder } from './electricBorder.js'
+import { SparkSystem } from './sparkSystem.js'
 
 
 function initLenis() {
@@ -1346,6 +1347,7 @@ function initTreeDiagram() {
 
         // Store the electric border instance for later use
         let electricBorderInstance = null;
+        let sparkSystemInstance = null;
 
         // START HORIZONTAL TIMELINE
         // const containerWidth = document.querySelector(".timeline-container").offsetWidth;
@@ -1577,6 +1579,11 @@ function initTreeDiagram() {
                         electricBorderInstance.stop();
                     }
                     
+                    // Stop the spark system
+                    if (sparkSystemInstance) {
+                        sparkSystemInstance.stop();
+                    }
+                    
                     // Remove center dot effects
                     const centerDot = document.querySelector(".dot-wrapper .dot");
                     if (centerDot) {
@@ -1606,6 +1613,11 @@ function initTreeDiagram() {
                     // Restart the electric animation
                     if (electricBorderInstance) {
                         electricBorderInstance.start();
+                    }
+                    
+                    // Restart the spark system
+                    if (sparkSystemInstance) {
+                        sparkSystemInstance.start();
                     }
                     
                     // Re-enable center dot glow
@@ -1650,6 +1662,23 @@ function initTreeDiagram() {
                         });
                     }
                     
+                    // Create and start the spark system
+                    if (!sparkSystemInstance) {
+                        sparkSystemInstance = new SparkSystem({
+                            color: "#ffca1c",  // Golden yellow sparks
+                            secondaryColor: "#ff8c00",  // Orange sparks
+                            particleCount: 30,
+                            minSize: 0.5,  // Much smaller
+                            maxSize: 2,    // Much smaller max size
+                            minSpeed: 2,
+                            maxSpeed: 6,
+                            gravity: 0,  // No gravity so particles go both ways equally
+                            fadeSpeed: 0.02,
+                            emissionRate: 3,  // Slightly fewer sparks
+                            spreadAngle: 90  // Less spread for subtlety
+                        });
+                    }
+                    
                     // Add base effect to the white line
                     const progressLine = document.querySelector(".line-progress");
                     if (progressLine) {
@@ -1660,6 +1689,12 @@ function initTreeDiagram() {
                     
                     // Start the electric animation
                     electricBorderInstance.start();
+                    
+                    // Start the spark system with an initial burst
+                    sparkSystemInstance.start();
+                    setTimeout(() => {
+                        sparkSystemInstance.burst(0.8);  // Smaller, more subtle burst
+                    }, 100);
 
                     // Add pulsing glow to the center dot
                     const centerDot = document.querySelector(".dot-wrapper .dot");
@@ -1687,6 +1722,11 @@ function initTreeDiagram() {
                     // Stop the electric animation
                     if (electricBorderInstance) {
                         electricBorderInstance.stop();
+                    }
+                    
+                    // Stop the spark system
+                    if (sparkSystemInstance) {
+                        sparkSystemInstance.stop();
                     }
 
                     const centerDot = document.querySelector(".dot-wrapper .dot");
