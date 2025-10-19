@@ -359,6 +359,14 @@
     }
 }
 
+// CSS Variables for electric effect
+:root {
+    --electric-border-color: #dd8448;
+    --electric-light-color: #ffaa66;
+    --electric-glow-color: #ffca1c;
+    --gradient-color: rgba(221, 132, 72, 0.3);
+}
+
 // Enhanced line-progress with performance optimizations
 .line-progress {
     will-change: transform, filter;
@@ -378,6 +386,133 @@
             0 0 60px var(--electric-light-color),
             inset 0 0 20px rgba(255, 255, 255, 0.5);
     }
+}
+
+// Super Saiyan Electric Effect Classes
+.electric-container {
+    position: fixed;
+    pointer-events: none;
+    z-index: 50;
+}
+
+.electric-border {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 50%;
+    height: 100%;
+    transform: scaleX(1);
+    transform-origin: right center;
+    background: linear-gradient(90deg, 
+        transparent,
+        var(--electric-border-color) 10%,
+        var(--electric-light-color) 30%,
+        var(--electric-border-color) 50%,
+        var(--electric-light-color) 70%,
+        var(--electric-border-color) 90%,
+        transparent
+    );
+    background-size: 200% 100%;
+    animation: electric-flow 2s linear infinite;
+    box-shadow: 
+        0 0 10px var(--electric-border-color),
+        0 0 20px var(--electric-light-color),
+        inset 0 0 10px rgba(255, 255, 255, 0.5);
+    filter: url(#turbulent-displace);
+    z-index: 52;
+    opacity: 0;
+    box-sizing: border-box;
+    height: 4px;
+    top: calc(50% - 2px);
+}
+
+@keyframes electric-flow {
+    0% {
+        background-position: 200% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.electric-glow-1 {
+    position: absolute;
+    top: -3px;
+    left: 0;
+    width: 50%;
+    height: calc(100% + 6px);
+    transform: scaleX(1);
+    transform-origin: right center;
+    border-top: 3px solid rgba(221, 132, 72, 0.6);
+    border-bottom: 3px solid rgba(221, 132, 72, 0.6);
+    filter: blur(3px);
+    opacity: 0;
+    z-index: 51;
+    box-sizing: border-box;
+}
+
+.electric-glow-2 {
+    position: absolute;
+    top: -6px;
+    left: 0;
+    width: 50%;
+    height: calc(100% + 12px);
+    transform: scaleX(1);
+    transform-origin: right center;
+    border-top: 3px solid var(--electric-light-color);
+    border-bottom: 3px solid var(--electric-light-color);
+    filter: blur(8px);
+    opacity: 0;
+    z-index: 50;
+    box-sizing: border-box;
+}
+
+.electric-overlay-1,
+.electric-overlay-2 {
+    position: absolute;
+    width: 52%;
+    height: 60px;
+    top: calc(50% - 30px);
+    left: -1%;
+    transform: scaleX(1);
+    transform-origin: right center;
+    border-radius: 30px;
+    opacity: 0;
+    mix-blend-mode: screen;
+    filter: blur(15px);
+    background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.8),
+        transparent 20%,
+        transparent 80%,
+        rgba(255, 255, 255, 0.8)
+    );
+    z-index: 53;
+}
+
+.electric-overlay-2 {
+    opacity: 0;
+    filter: blur(25px);
+    mix-blend-mode: overlay;
+}
+
+.electric-background-glow {
+    position: absolute;
+    width: 52%;
+    height: 80px;
+    top: calc(50% - 40px);
+    left: -1%;
+    transform: scaleX(1);
+    transform-origin: right center;
+    filter: blur(30px);
+    opacity: 0;
+    z-index: 49;
+    background: radial-gradient(
+        ellipse at center,
+        var(--electric-light-color) 0%,
+        var(--electric-border-color) 40%,
+        transparent 70%
+    );
 }
 
 @keyframes electric-gradient {

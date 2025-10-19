@@ -1343,6 +1343,217 @@ function initTreeDiagram() {
 
         // we make the long line grow
 
+        // Helper function to create the SVG turbulence filter for electric effect
+        function createElectricSVGFilter() {
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.style.position = 'absolute';
+            svg.style.width = '0';
+            svg.style.height = '0';
+
+            const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+            const filter = document.createElementNS('http://www.w3.org/2000/svg', 'filter');
+            filter.setAttribute('id', 'turbulent-displace');
+            filter.setAttribute('colorInterpolationFilters', 'sRGB');
+            filter.setAttribute('x', '-20%');
+            filter.setAttribute('y', '-20%');
+            filter.setAttribute('width', '140%');
+            filter.setAttribute('height', '140%');
+
+            // Create first turbulence + offset pair (vertical)
+            const turbulence1 = document.createElementNS('http://www.w3.org/2000/svg', 'feTurbulence');
+            turbulence1.setAttribute('type', 'turbulence');
+            turbulence1.setAttribute('baseFrequency', '0.02');
+            turbulence1.setAttribute('numOctaves', '10');
+            turbulence1.setAttribute('result', 'noise1');
+            turbulence1.setAttribute('seed', '1');
+
+            const offset1 = document.createElementNS('http://www.w3.org/2000/svg', 'feOffset');
+            offset1.setAttribute('in', 'noise1');
+            offset1.setAttribute('dx', '0');
+            offset1.setAttribute('dy', '0');
+            offset1.setAttribute('result', 'offsetNoise1');
+
+            const animate1 = document.createElementNS('http://www.w3.org/2000/svg', 'animate');
+            animate1.setAttribute('attributeName', 'dy');
+            animate1.setAttribute('values', '700; 0');
+            animate1.setAttribute('dur', '6s');
+            animate1.setAttribute('repeatCount', 'indefinite');
+            animate1.setAttribute('calcMode', 'linear');
+            offset1.appendChild(animate1);
+
+            // Create second turbulence + offset pair (vertical opposite)
+            const turbulence2 = document.createElementNS('http://www.w3.org/2000/svg', 'feTurbulence');
+            turbulence2.setAttribute('type', 'turbulence');
+            turbulence2.setAttribute('baseFrequency', '0.02');
+            turbulence2.setAttribute('numOctaves', '10');
+            turbulence2.setAttribute('result', 'noise2');
+            turbulence2.setAttribute('seed', '1');
+
+            const offset2 = document.createElementNS('http://www.w3.org/2000/svg', 'feOffset');
+            offset2.setAttribute('in', 'noise2');
+            offset2.setAttribute('dx', '0');
+            offset2.setAttribute('dy', '0');
+            offset2.setAttribute('result', 'offsetNoise2');
+
+            const animate2 = document.createElementNS('http://www.w3.org/2000/svg', 'animate');
+            animate2.setAttribute('attributeName', 'dy');
+            animate2.setAttribute('values', '0; -700');
+            animate2.setAttribute('dur', '6s');
+            animate2.setAttribute('repeatCount', 'indefinite');
+            animate2.setAttribute('calcMode', 'linear');
+            offset2.appendChild(animate2);
+
+            // Create third turbulence + offset pair (horizontal)
+            const turbulence3 = document.createElementNS('http://www.w3.org/2000/svg', 'feTurbulence');
+            turbulence3.setAttribute('type', 'turbulence');
+            turbulence3.setAttribute('baseFrequency', '0.02');
+            turbulence3.setAttribute('numOctaves', '10');
+            turbulence3.setAttribute('result', 'noise3');
+            turbulence3.setAttribute('seed', '2');
+
+            const offset3 = document.createElementNS('http://www.w3.org/2000/svg', 'feOffset');
+            offset3.setAttribute('in', 'noise3');
+            offset3.setAttribute('dx', '0');
+            offset3.setAttribute('dy', '0');
+            offset3.setAttribute('result', 'offsetNoise3');
+
+            const animate3 = document.createElementNS('http://www.w3.org/2000/svg', 'animate');
+            animate3.setAttribute('attributeName', 'dx');
+            animate3.setAttribute('values', '490; 0');
+            animate3.setAttribute('dur', '6s');
+            animate3.setAttribute('repeatCount', 'indefinite');
+            animate3.setAttribute('calcMode', 'linear');
+            offset3.appendChild(animate3);
+
+            // Create fourth turbulence + offset pair (horizontal opposite)
+            const turbulence4 = document.createElementNS('http://www.w3.org/2000/svg', 'feTurbulence');
+            turbulence4.setAttribute('type', 'turbulence');
+            turbulence4.setAttribute('baseFrequency', '0.02');
+            turbulence4.setAttribute('numOctaves', '10');
+            turbulence4.setAttribute('result', 'noise4');
+            turbulence4.setAttribute('seed', '2');
+
+            const offset4 = document.createElementNS('http://www.w3.org/2000/svg', 'feOffset');
+            offset4.setAttribute('in', 'noise4');
+            offset4.setAttribute('dx', '0');
+            offset4.setAttribute('dy', '0');
+            offset4.setAttribute('result', 'offsetNoise4');
+
+            const animate4 = document.createElementNS('http://www.w3.org/2000/svg', 'animate');
+            animate4.setAttribute('attributeName', 'dx');
+            animate4.setAttribute('values', '0; -490');
+            animate4.setAttribute('dur', '6s');
+            animate4.setAttribute('repeatCount', 'indefinite');
+            animate4.setAttribute('calcMode', 'linear');
+            offset4.appendChild(animate4);
+
+            // Composite the noise layers
+            const composite1 = document.createElementNS('http://www.w3.org/2000/svg', 'feComposite');
+            composite1.setAttribute('in', 'offsetNoise1');
+            composite1.setAttribute('in2', 'offsetNoise2');
+            composite1.setAttribute('result', 'part1');
+
+            const composite2 = document.createElementNS('http://www.w3.org/2000/svg', 'feComposite');
+            composite2.setAttribute('in', 'offsetNoise3');
+            composite2.setAttribute('in2', 'offsetNoise4');
+            composite2.setAttribute('result', 'part2');
+
+            // Blend the composites
+            const blend = document.createElementNS('http://www.w3.org/2000/svg', 'feBlend');
+            blend.setAttribute('in', 'part1');
+            blend.setAttribute('in2', 'part2');
+            blend.setAttribute('mode', 'color-dodge');
+            blend.setAttribute('result', 'combinedNoise');
+
+            // Displacement map
+            const displace = document.createElementNS('http://www.w3.org/2000/svg', 'feDisplacementMap');
+            displace.setAttribute('in', 'SourceGraphic');
+            displace.setAttribute('in2', 'combinedNoise');
+            displace.setAttribute('scale', '30');
+            displace.setAttribute('xChannelSelector', 'R');
+            displace.setAttribute('yChannelSelector', 'B');
+
+            // Append all elements
+            filter.appendChild(turbulence1);
+            filter.appendChild(offset1);
+            filter.appendChild(turbulence2);
+            filter.appendChild(offset2);
+            filter.appendChild(turbulence3);
+            filter.appendChild(offset3);
+            filter.appendChild(turbulence4);
+            filter.appendChild(offset4);
+            filter.appendChild(composite1);
+            filter.appendChild(composite2);
+            filter.appendChild(blend);
+            filter.appendChild(displace);
+
+            defs.appendChild(filter);
+            svg.appendChild(defs);
+            document.body.appendChild(svg);
+        }
+
+        // Helper function to create electric effect elements
+        function createElectricEffects() {
+            const container = document.createElement('div');
+            container.className = 'electric-container';
+            
+            // Get the position of the progress line
+            const progressLine = document.querySelector(".line-progress");
+            const grayLine = document.querySelector(".tree-wrapper.is--compare .line.is--reallywant");
+            if (progressLine) {
+                const rect = progressLine.getBoundingClientRect();
+                container.style.top = rect.top + 'px';
+                container.style.left = '0';
+                container.style.width = '100%';
+                container.style.height = rect.height + 'px';
+            } else if (grayLine) {
+                const rect = grayLine.getBoundingClientRect();
+                container.style.top = (rect.top + rect.height / 2) + 'px';
+                container.style.left = '0';
+                container.style.width = '100%';
+                container.style.height = '2px';
+            }
+            
+            // Create electric border (with turbulence filter)
+            const electricBorder = document.createElement('div');
+            electricBorder.className = 'electric-border';
+            
+            // Create glow layers
+            const glow1 = document.createElement('div');
+            glow1.className = 'electric-glow-1';
+            
+            const glow2 = document.createElement('div');
+            glow2.className = 'electric-glow-2';
+            
+            // Create overlay effects
+            const overlay1 = document.createElement('div');
+            overlay1.className = 'electric-overlay-1';
+            
+            const overlay2 = document.createElement('div');
+            overlay2.className = 'electric-overlay-2';
+            
+            // Create background glow
+            const backgroundGlow = document.createElement('div');
+            backgroundGlow.className = 'electric-background-glow';
+            
+            // Append all elements to container
+            container.appendChild(backgroundGlow);
+            container.appendChild(glow2);
+            container.appendChild(glow1);
+            container.appendChild(electricBorder);
+            container.appendChild(overlay1);
+            container.appendChild(overlay2);
+            
+            // Append container to body
+            document.body.appendChild(container);
+            
+            console.log('Electric elements created:', {
+                container: container,
+                border: electricBorder,
+                filter: document.querySelector('#turbulent-displace')
+            });
+        }
+
         // START HORIZONTAL TIMELINE
         // const containerWidth = document.querySelector(".timeline-container").offsetWidth;
         // const containerMovement = containerWidth * 0.5; // 50% of container width
@@ -1465,6 +1676,49 @@ function initTreeDiagram() {
                         gsap.set(progressLine, {
                             transform: `translateY(-50%) scaleX(${whiteLineProgress})`
                         });
+
+                        // Update electric container position if it exists
+                        const electricContainer = document.querySelector('.electric-container');
+                        if (electricContainer && whiteLineProgress > 0) {
+                            // Update the scaleX of all electric elements to match the progress line
+                            const electricBorder = electricContainer.querySelector('.electric-border');
+                            const electricGlow1 = electricContainer.querySelector('.electric-glow-1');
+                            const electricGlow2 = electricContainer.querySelector('.electric-glow-2');
+                            const electricOverlay1 = electricContainer.querySelector('.electric-overlay-1');
+                            const electricOverlay2 = electricContainer.querySelector('.electric-overlay-2');
+                            const electricBg = electricContainer.querySelector('.electric-background-glow');
+                            
+                            if (electricBorder && electricBorder.style.opacity !== '0') {
+                                gsap.set(electricBorder, {
+                                    transform: `scaleX(${whiteLineProgress})`
+                                });
+                            }
+                            if (electricGlow1 && electricGlow1.style.opacity !== '0') {
+                                gsap.set(electricGlow1, {
+                                    transform: `scaleX(${whiteLineProgress})`
+                                });
+                            }
+                            if (electricGlow2 && electricGlow2.style.opacity !== '0') {
+                                gsap.set(electricGlow2, {
+                                    transform: `scaleX(${whiteLineProgress})`
+                                });
+                            }
+                            if (electricOverlay1) {
+                                gsap.set(electricOverlay1, {
+                                    transform: `scaleX(${whiteLineProgress})`
+                                });
+                            }
+                            if (electricOverlay2) {
+                                gsap.set(electricOverlay2, {
+                                    transform: `scaleX(${whiteLineProgress})`
+                                });
+                            }
+                            if (electricBg) {
+                                gsap.set(electricBg, {
+                                    transform: `scaleX(${whiteLineProgress})`
+                                });
+                            }
+                        }
                     }
 
                     // Move the gray line at the end
@@ -1571,15 +1825,99 @@ function initTreeDiagram() {
             .to(".timeline-panel.is--fixed.is--2", { autoAlpha: 1 }, "horizontalStart+=4")
             .to(".timeline-panel.is--fixed.is--2", { autoAlpha: 0 }, "horizontalStart+=9")
             .to(".timeline-panel.is--fixed.is--4", { autoAlpha: 1 }, "horizontalStart+=10")
-            // When showing panel 4, add simple effect
+            // When showing panel 4, SUPER SAIYAN MODE!
             .to(".timeline-panel.is--fixed.is--4", {
                 autoAlpha: 1,
                 onStart: function () {
-                    // Add simple effect to the white line
+                    console.log('Super Saiyan Mode Activating!');
+                    
+                    // Create SVG filter if it doesn't exist
+                    if (!document.querySelector('#turbulent-displace')) {
+                        console.log('Creating SVG filter...');
+                        createElectricSVGFilter();
+                        console.log('SVG filter created:', document.querySelector('#turbulent-displace'));
+                    }
+                    
+                    // Create electric effect container if it doesn't exist
+                    if (!document.querySelector('.electric-container')) {
+                        console.log('Creating electric container...');
+                        createElectricEffects();
+                        console.log('Electric container created:', document.querySelector('.electric-container'));
+                    }
+                    
+                    // Add base effect to the white line
                     const progressLine = document.querySelector(".line-progress");
                     if (progressLine) {
+                        console.log('Adding base effects to progress line');
                         progressLine.style.boxShadow = "0 0 20px #dd8448, 0 0 40px #dd8448";
                         progressLine.style.backgroundColor = "#dd8448";
+                    }
+
+                    // Activate Super Saiyan electric effects
+                    const electricContainer = document.querySelector('.electric-container');
+                    if (electricContainer) {
+                        // Position the container based on progress line
+                        const progressLine = document.querySelector(".line-progress");
+                        if (progressLine) {
+                            const rect = progressLine.getBoundingClientRect();
+                            electricContainer.style.top = (rect.top - 2) + 'px'; // Adjust for border
+                            electricContainer.style.height = (rect.height + 4) + 'px';
+                        }
+                        
+                        // Get the current scale of the progress line and apply to electric elements
+                        const progressLineTransform = progressLine ? window.getComputedStyle(progressLine).transform : '';
+                        const electricBorder = document.querySelector('.electric-border');
+                        if (electricBorder && progressLineTransform && progressLineTransform !== 'none') {
+                            // Extract scaleX value from the transform matrix
+                            const matrix = new DOMMatrix(progressLineTransform);
+                            const scaleX = matrix.a; // 'a' is the scaleX component
+                            electricBorder.style.transform = `scaleX(${scaleX})`;
+                        }
+                        
+                        // Animate electric elements in
+                        gsap.to('.electric-border', {
+                            opacity: 1,
+                            duration: 0.3,
+                            ease: "power2.out",
+                            onComplete: function() {
+                                console.log('Electric border animated in:', document.querySelector('.electric-border'));
+                            }
+                        });
+
+                        gsap.to('.electric-glow-1', {
+                            opacity: 0.8,
+                            duration: 0.4,
+                            delay: 0.1,
+                            ease: "power2.out"
+                        });
+
+                        gsap.to('.electric-glow-2', {
+                            opacity: 0.6,
+                            duration: 0.4,
+                            delay: 0.15,
+                            ease: "power2.out"
+                        });
+
+                        gsap.to('.electric-overlay-1', {
+                            opacity: 0.4,
+                            duration: 0.5,
+                            delay: 0.2,
+                            ease: "power2.out"
+                        });
+
+                        gsap.to('.electric-overlay-2', {
+                            opacity: 0.3,
+                            duration: 0.5,
+                            delay: 0.25,
+                            ease: "power2.out"
+                        });
+
+                        gsap.to('.electric-background-glow', {
+                            opacity: 0.3,
+                            duration: 0.6,
+                            delay: 0.3,
+                            ease: "power2.out"
+                        });
                     }
 
                     // Add pulsing glow to the center dot
@@ -1598,12 +1936,19 @@ function initTreeDiagram() {
                     }
                 },
                 onReverseComplete: function () {
-                    // Remove effects when scrolling back
+                    // Remove Super Saiyan effects when scrolling back
                     const progressLine = document.querySelector(".line-progress");
                     if (progressLine) {
                         progressLine.style.boxShadow = "";
                         progressLine.style.backgroundColor = "white";
                     }
+
+                    // Animate electric elements out
+                    gsap.to('.electric-border, .electric-glow-1, .electric-glow-2, .electric-overlay-1, .electric-overlay-2, .electric-background-glow', {
+                        opacity: 0,
+                        duration: 0.3,
+                        ease: "power2.in"
+                    });
 
                     const centerDot = document.querySelector(".dot-wrapper .dot");
                     if (centerDot) {
