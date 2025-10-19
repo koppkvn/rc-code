@@ -2,7 +2,9 @@
 
     --ease-out-quart: cubic-bezier(.165, .84, .44, 1);
 
-
+    --electric-border-color: #dd8448;
+    --electric-light-color: #ffca1c;
+    --electric-glow-color: rgba(221, 132, 72, 0.8);
 }
 
 .tracker-wrapper-mobile {
@@ -267,4 +269,149 @@
     mask-image: linear-gradient(to bottom, black 30%, transparent 44%);
     mask-repeat: no-repeat;
     mask-size: 100% 100%;
+}
+
+
+
+// Electric effect classes
+.electric-wrapper {
+    position: relative;
+
+    .electric-glow-layer-1 {
+        position: absolute;
+        top: -4px;
+        left: 0;
+        right: 0;
+        height: 10px;
+        background: var(--electric-border-color);
+        filter: blur(2px);
+        opacity: 0.8;
+        animation: electric-pulse 2s ease-in-out infinite;
+    }
+
+    .electric-glow-layer-2 {
+        position: absolute;
+        top: -8px;
+        left: 0;
+        right: 0;
+        height: 18px;
+        background: linear-gradient(90deg,
+                transparent,
+                var(--electric-light-color),
+                transparent);
+        filter: blur(8px);
+        opacity: 0.6;
+        animation: electric-wave 3s linear infinite;
+    }
+
+    .electric-overlay {
+        position: absolute;
+        top: -20px;
+        left: -10%;
+        right: -10%;
+        height: 40px;
+        background: linear-gradient(90deg,
+                rgba(255, 255, 255, 0),
+                rgba(255, 255, 255, 0.3) 30%,
+                rgba(255, 255, 255, 0.3) 70%,
+                rgba(255, 255, 255, 0));
+        mix-blend-mode: overlay;
+        filter: blur(16px);
+        animation: electric-shimmer 2s ease-in-out infinite;
+    }
+}
+
+@keyframes electric-pulse {
+
+    0%,
+    100% {
+        opacity: 0.6;
+        transform: scaleY(1);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scaleY(1.5);
+    }
+}
+
+@keyframes electric-wave {
+    0% {
+        transform: translateX(-100%);
+    }
+
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+@keyframes electric-shimmer {
+
+    0%,
+    100% {
+        opacity: 0.3;
+        transform: translateX(-50px);
+    }
+
+    50% {
+        opacity: 0.7;
+        transform: translateX(50px);
+    }
+}
+
+// Enhanced line-progress with performance optimizations
+.line-progress {
+    will-change: transform, filter;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+
+    &.is--electric {
+        background: linear-gradient(90deg,
+                var(--electric-border-color),
+                var(--electric-light-color),
+                var(--electric-border-color));
+        background-size: 200% 100%;
+        animation: electric-gradient 2s linear infinite;
+        box-shadow:
+            0 0 20px var(--electric-border-color),
+            0 0 40px var(--electric-border-color),
+            0 0 60px var(--electric-light-color),
+            inset 0 0 20px rgba(255, 255, 255, 0.5);
+    }
+}
+
+@keyframes electric-gradient {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    100% {
+        background-position: 200% 50%;
+    }
+}
+
+// Enhanced center dot
+.timeline-center-dot.is--electric {
+    background: radial-gradient(circle,
+            var(--electric-light-color) 0%,
+            var(--electric-border-color) 50%,
+            transparent 100%);
+    box-shadow:
+        0 0 30px var(--electric-light-color),
+        0 0 60px var(--electric-border-color),
+        0 0 90px var(--electric-glow-color),
+        inset 0 0 20px rgba(255, 255, 255, 0.8);
+    animation: electric-dot-pulse 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes electric-dot-pulse {
+    0% {
+        transform: scale(1) rotate(0deg);
+        filter: brightness(1) hue-rotate(0deg);
+    }
+
+    100% {
+        transform: scale(1.3) rotate(5deg);
+        filter: brightness(1.5) hue-rotate(10deg);
+    }
 }

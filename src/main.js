@@ -1,5 +1,5 @@
 
-// import "./styles/main.scss";
+import "./styles/main.scss";
 
 
 function initLenis() {
@@ -716,6 +716,13 @@ function initTreeDiagram() {
         right: 0
     })
 
+    gsap.set(".timeline-panel.is--fixed", {
+        position: "fixed",
+        left: 0,
+        top: 0,
+
+    })
+
 
     treeTlOne.set(".tree-header-wrapper .label", {
         autoAlpha: 0,
@@ -1214,8 +1221,12 @@ function initTreeDiagram() {
             }
         })
         .to({}, {
-            duration: 2
+            duration: 2,
         })
+        .to(".tree-container.is--three .label", {
+            autoAlpha: 0,
+            duration: 0.1,
+        }, "<")
 
         .addLabel("timeline", "+=1")
 
@@ -1333,8 +1344,53 @@ function initTreeDiagram() {
         // we make the long line grow
 
         // START HORIZONTAL TIMELINE
+        // const containerWidth = document.querySelector(".timeline-container").offsetWidth;
+        // const containerMovement = containerWidth * 0.5; // 50% of container width
+        // Get all panels and calculate total width
+        const panels = gsap.utils.toArray(".timeline-panel");
+        const containerEl = document.querySelector(".timeline-container");
+        const panelsWrapper = document.querySelector(".timeline-panels-wrapper");
+
+        // Calculate total panels width
+        let totalPanelsWidth = 0;
+        panels.forEach(panel => {
+            totalPanelsWidth += panel.offsetWidth;
+        });
+
+        // Set container width to match content
+        gsap.set(containerEl, {
+            width: totalPanelsWidth + "px"
+        });
+
+        // Calculate how much to move (total width minus viewport width)
+        const scrollDistance = totalPanelsWidth - window.innerWidth;
+        const scrollPercentage = (scrollDistance / totalPanelsWidth) * 100;
+
+
+        gsap.set(".timeline-panel.is--fixed", { autoAlpha: 0 })
+
+        gsap.set(".timeline-panel.is--1", { minWidth: "150vw" })
+
+
+
+        document.querySelectorAll('[data-target]').forEach(el => {
+            const valueSpan = el.querySelector('.stat-value');
+            if (valueSpan) {
+                // Temporarily set to target value to measure width
+                const target = el.dataset.target;
+                valueSpan.textContent = target;
+                const maxWidth = valueSpan.offsetWidth;
+
+                // Set fixed width and reset to 0
+                valueSpan.style.display = 'inline-block';
+                valueSpan.style.width = maxWidth + 'px';
+                valueSpan.style.textAlign = 'right'; // Align numbers to the right
+                valueSpan.textContent = '0';
+            }
+        });
 
         treeTlOne
+            .addLabel("horizontalStart")
             // First, create the white progress line before the animation starts
             .to({}, {
                 duration: 0.001,
@@ -1378,11 +1434,11 @@ function initTreeDiagram() {
                         x: 0
                     });
                 }
-            }, "=+0")
+            }, "horizontalStart")
 
             // Now animate the timeline container with the progress updates
             .to(".section.is--timeline .timeline-container", {
-                xPercent: -50,  // Container is 200vw wide, so -50 moves it fully
+                x: -scrollDistance,
                 ease: "none",
                 duration: 35,
 
@@ -1396,7 +1452,7 @@ function initTreeDiagram() {
                     let whiteLineProgress;
                     if (progress < 0.2) {
                         // In the first 20% of scroll, white line grows to full size
-                        whiteLineProgress = progress / 0.2;  // Goes from 0 to 1
+                        whiteLineProgress = progress / 0.1;  // Goes from 0 to 1
                     } else {
                         // After that, white line stays at full size
                         whiteLineProgress = 1;
@@ -1478,7 +1534,12 @@ function initTreeDiagram() {
 
             }, "<")  // Slight delay to ensure white line is created first
 
-
+            // ADD THIS: Counter-animation for fixed panels
+            .to(".timeline-panel.is--fixed", {
+                x: scrollDistance, // Exact opposite of -50
+                ease: "none",
+                duration: 35, // Same duration as container
+            }, "<") // Use same label to sync perfectly
 
             // Now you can animate it properly
             .to(".section.is--timeline, .section.is--compare", {
@@ -1506,6 +1567,81 @@ function initTreeDiagram() {
 
                 }
             })
+
+            .to(".timeline-panel.is--fixed.is--2", { autoAlpha: 1 }, "horizontalStart+=4")
+            .to(".timeline-panel.is--fixed.is--2", { autoAlpha: 0 }, "horizontalStart+=9")
+            .to(".timeline-panel.is--fixed.is--4", { autoAlpha: 1 }, "horizontalStart+=10")
+            // When showing panel 4, add simple effect
+            .to(".timeline-panel.is--fixed.is--4", {
+                autoAlpha: 1,
+                onStart: function () {
+                    // Add simple effect to the white line
+                    const progressLine = document.querySelector(".line-progress");
+                    if (progressLine) {
+                        progressLine.style.boxShadow = "0 0 20px #dd8448, 0 0 40px #dd8448";
+                        progressLine.style.backgroundColor = "#dd8448";
+                    }
+
+                    // Add pulsing glow to the center dot
+                    const centerDot = document.querySelector(".dot-wrapper .dot");
+                    if (centerDot) {
+                        gsap.to(centerDot, {
+                            boxShadow: "0 0 30px rgb(255, 202, 28), 0 0 60px rgb(255, 201, 5)",
+                            scale: 1.2,
+                            duration: 0.5,
+                            repeat: -1,
+                            yoyo: true,
+                            ease: "power2.inOut",
+                            zIndex: 100
+                        });
+                        centerDot.style.backgroundColor = "rgb(255, 196, 0)";
+                    }
+                },
+                onReverseComplete: function () {
+                    // Remove effects when scrolling back
+                    const progressLine = document.querySelector(".line-progress");
+                    if (progressLine) {
+                        progressLine.style.boxShadow = "";
+                        progressLine.style.backgroundColor = "white";
+                    }
+
+                    const centerDot = document.querySelector(".dot-wrapper .dot");
+                    if (centerDot) {
+                        gsap.killTweensOf(centerDot);
+                        centerDot.style.boxShadow = "";
+                        centerDot.style.backgroundColor = "";
+                        gsap.set(centerDot, { scale: 1 });
+                    }
+                }
+            }, "horizontalStart+=10")
+            .to({}, {
+                duration: 25,
+                onUpdate: function () {
+                    const progress = this.progress();
+
+                    // Update each stat based on progress
+                    document.querySelectorAll('[data-target]').forEach(el => {
+                        const target = parseFloat(el.dataset.target);
+                        const currentValue = Math.round(target * progress);
+                        const valueSpan = el.querySelector('.stat-value');
+
+                        if (valueSpan) {
+                            // Determine how many digits the target has
+                            const targetLength = Math.abs(target).toString().length;
+
+                            // Pad the current value with leading zeros
+                            let paddedValue = Math.abs(currentValue).toString().padStart(targetLength, '0');
+
+                            // Add negative sign back if needed
+                            if (target < 0) {
+                                paddedValue = '-' + paddedValue;
+                            }
+
+                            valueSpan.textContent = paddedValue;
+                        }
+                    });
+                }
+            }, "horizontalStart+=10")
             // .to({}, {
             //     duration: 1 // Pause before map
             // })
@@ -2912,20 +3048,20 @@ document.addEventListener("DOMContentLoaded", () => {
         initSplit();
 
         // TO COMMENT
-        initAgeGate();
+        // initAgeGate();
         tlHeroAnimation = initHeroAnimation();
         // TO COMMENT
-        initIntro();
+        // initIntro();
         initTrackerCheckboxes();
         // TO COMMENT
-        initScrollLock();
+        // initScrollLock();
         initTrackerSection();
         initVideoMap();
 
 
 
         //to remove
-        // initTreeDiagramWrapper(); // on page load
+        initTreeDiagramWrapper(); // on page load
     });
     // initVideoMap();
     document.body.removeAttribute('data-preload');
