@@ -1557,23 +1557,71 @@ function initTreeDiagram() {
                 ease: "power2.inOut",
 
                 onStart: function () {
+                    // Fade out the progress line
                     const element = document.querySelector(".line-progress");
                     console.log(element);
 
                     gsap.to(element, {
                         autoAlpha: 0
                     })
-
+                    
+                    // Also fade out Super Saiyan effects when reaching the end
+                    const progressLine = document.querySelector(".line-progress");
+                    if (progressLine) {
+                        progressLine.style.boxShadow = "";
+                        progressLine.style.backgroundColor = "white";
+                    }
+                    
+                    // Stop the electric animation
+                    if (electricBorderInstance) {
+                        electricBorderInstance.stop();
+                    }
+                    
+                    // Remove center dot effects
+                    const centerDot = document.querySelector(".dot-wrapper .dot");
+                    if (centerDot) {
+                        gsap.killTweensOf(centerDot);
+                        centerDot.style.boxShadow = "";
+                        centerDot.style.backgroundColor = "";
+                        gsap.set(centerDot, { scale: 1 });
+                    }
                 },
 
                 onReverseComplete: function () {
+                    // When scrolling back, restore the progress line
                     const element = document.querySelector(".line-progress");
                     console.log(element);
 
                     gsap.to(element, {
                         autoAlpha: 1
                     })
-
+                    
+                    // Re-enable Super Saiyan effects when scrolling back into the timeline
+                    const progressLine = document.querySelector(".line-progress");
+                    if (progressLine) {
+                        progressLine.style.boxShadow = "0 0 20px #dd8448, 0 0 40px #dd8448";
+                        progressLine.style.backgroundColor = "#dd8448";
+                    }
+                    
+                    // Restart the electric animation
+                    if (electricBorderInstance) {
+                        electricBorderInstance.start();
+                    }
+                    
+                    // Re-enable center dot glow
+                    const centerDot = document.querySelector(".dot-wrapper .dot");
+                    if (centerDot) {
+                        gsap.to(centerDot, {
+                            boxShadow: "0 0 30px rgb(255, 202, 28), 0 0 60px rgb(255, 201, 5)",
+                            scale: 1.2,
+                            duration: 0.5,
+                            repeat: -1,
+                            yoyo: true,
+                            ease: "power2.inOut",
+                            zIndex: 100
+                        });
+                        centerDot.style.backgroundColor = "rgb(255, 196, 0)";
+                    }
                 }
             })
 
@@ -1591,14 +1639,14 @@ function initTreeDiagram() {
                         electricBorderInstance = new ElectricBorder({
                             color: "#dd8448",
                             lineWidth: 2,
-                            displacement: 10,
+                            displacement: 20,  // Increased from 10 for more pronounced effect
                             octaves: 8,
                             lacunarity: 1.8,
-                            gain: 0.6,
-                            amplitude: 0.1,
-                            frequency: 10,
-                            speed: 2,
-                            baseFlatness: 0.05
+                            gain: 0.65,  // Slightly increased for more turbulence
+                            amplitude: 0.18,  // Increased from 0.1
+                            frequency: 12,  // Slightly increased frequency
+                            speed: 2.5,  // Slightly faster animation
+                            baseFlatness: 0.02  // Less flat = more turbulent
                         });
                     }
                     
