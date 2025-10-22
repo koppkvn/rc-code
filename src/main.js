@@ -1750,43 +1750,116 @@ function initTreeDiagram() {
             }, "horizontalStart+=9")
             // .to(".timeline-panel.is--fixed.is--2", { autoAlpha: 1 }, "horizontalStart+=4")
             // .to(".timeline-panel.is--fixed.is--2", { autoAlpha: 0 }, "horizontalStart+=9")
-            .to(".timeline-panel.is--fixed.is--4", { autoAlpha: 1 }, "horizontalStart+=10")
-            // When showing panel 4, SUPER SAIYAN MODE!
+            // .to(".timeline-panel.is--fixed.is--4", { autoAlpha: 1 }, "horizontalStart+=10")
             .to(".timeline-panel.is--fixed.is--4", {
                 autoAlpha: 1,
                 onStart: function () {
+                    console.log('Panel 4 Animation Starting');
+                    const panel = document.querySelector(".timeline-panel.is--fixed.is--4");
+
+                    // Set initial states for all text
+                    gsap.set(panel.querySelectorAll("[data-split='lines'] .lineInner"), {
+                        yPercent: 100
+                    });
+
+                    // Hide structure wrappers initially
+                    gsap.set(panel.querySelectorAll(".structure-wrapper"), {
+                        autoAlpha: 0,
+                        x: -30
+                    });
+
+                    // Hide stats initially
+                    gsap.set(panel.querySelectorAll(".stat"), {
+                        autoAlpha: 0,
+                        y: 20
+                    });
+
+                    // Reset stat values for counting animation
+                    panel.querySelectorAll(".stat-value").forEach(el => {
+                        el.setAttribute('data-original', el.textContent);
+                        el.textContent = '0000'.slice(-el.textContent.length);
+                    });
+
+                    // Animate structure wrappers in sequence
+                    gsap.to(panel.querySelectorAll(".structure-wrapper"), {
+                        autoAlpha: 1,
+                        x: 0,
+                        duration: 0.6,
+                        stagger: 0.15,
+                        ease: "power2.out",
+                        delay: 0.1
+                    });
+
+                    // Animate all text lines with stagger
+                    gsap.to(panel.querySelectorAll("[data-split='lines'] .lineInner"), {
+                        yPercent: 0,
+                        duration: 0.7,
+                        stagger: 0.03,
+                        ease: "power2.out",
+                        delay: 0.2
+                    });
+
+                    // Animate stats in with stagger
+                    gsap.to(panel.querySelectorAll(".stat"), {
+                        autoAlpha: 1,
+                        y: 0,
+                        duration: 0.5,
+                        stagger: 0.08,
+                        ease: "power2.out",
+                        delay: 0.5,
+                        onComplete: function () {
+                            // Animate stat counters
+                            panel.querySelectorAll(".stat").forEach((stat, index) => {
+                                const valueEl = stat.querySelector(".stat-value");
+                                const target = parseInt(stat.getAttribute("data-target")) || parseInt(valueEl.getAttribute('data-original'));
+
+                                gsap.to({}, {
+                                    duration: 1.5,
+                                    delay: index * 0.1,
+                                    onUpdate: function () {
+                                        const progress = this.progress();
+                                        const currentValue = Math.floor(target * progress);
+                                        valueEl.textContent = String(currentValue).padStart(valueEl.getAttribute('data-original').length, '0');
+                                    },
+                                    ease: "power2.out"
+                                });
+                            });
+                        }
+                    });
+
+                    // SUPER SAIYAN MODE code continues here...
                     console.log('Super Saiyan Mode Activating!');
 
                     // Create and start the canvas-based electric effect
                     if (!electricBorderInstance) {
                         electricBorderInstance = new ElectricBorder({
-                            color: "#ffcc00",  // Golden yellow instead of orange
+                            color: "#ffcc00",
                             lineWidth: 2,
-                            displacement: 20,  // Increased from 10 for more pronounced effect
+                            displacement: 20,
                             octaves: 8,
                             lacunarity: 1.8,
-                            gain: 0.65,  // Slightly increased for more turbulence
-                            amplitude: 0.18,  // Increased from 0.1
-                            frequency: 12,  // Slightly increased frequency
-                            speed: 2.5,  // Slightly faster animation
-                            baseFlatness: 0.02  // Less flat = more turbulent
+                            gain: 0.65,
+                            amplitude: 0.18,
+                            frequency: 12,
+                            speed: 2.5,
+                            baseFlatness: 0.02
                         });
                     }
 
                     // Create and start the spark system
                     if (!sparkSystemInstance) {
                         sparkSystemInstance = new SparkSystem({
-                            color: "#ffcc00",  // Golden yellow sparks
-                            secondaryColor: "#ffdd44",  // Lighter golden yellow
+                            color: "#ffcc00",
+                            secondaryColor: "#ffdd44",
                             particleCount: 30,
-                            minSize: 0.5,  // Much smaller
-                            maxSize: 2,    // Much smaller max size
+                            minSize: 0.5,
+                            maxSize: 2,
                             minSpeed: 2,
                             maxSpeed: 6,
-                            gravity: 0,  // No gravity so particles go both ways equally
+                            gravity: 0,
                             fadeSpeed: 0.02,
-                            emissionRate: 3,  // Slightly fewer sparks
-                            spreadAngle: 90  // Less spread for subtlety
+                            emissionRate: 3,
+                            spreadAngle: 90
                         });
                     }
 
@@ -1804,7 +1877,7 @@ function initTreeDiagram() {
                     // Start the spark system with an initial burst
                     sparkSystemInstance.start();
                     setTimeout(() => {
-                        sparkSystemInstance.burst(0.8);  // Smaller, more subtle burst
+                        sparkSystemInstance.burst(0.8);
                     }, 100);
 
                     // Add pulsing glow to the center dot
@@ -1823,6 +1896,34 @@ function initTreeDiagram() {
                     }
                 },
                 onReverseComplete: function () {
+                    const panel = document.querySelector(".timeline-panel.is--fixed.is--4");
+
+                    // Animate text lines out
+                    gsap.to(panel.querySelectorAll("[data-split='lines'] .lineInner"), {
+                        yPercent: -100,
+                        duration: 0.4,
+                        stagger: 0.02,
+                        ease: "power2.in"
+                    });
+
+                    // Animate structure wrappers out
+                    gsap.to(panel.querySelectorAll(".structure-wrapper"), {
+                        autoAlpha: 0,
+                        x: 30,
+                        duration: 0.4,
+                        stagger: 0.05,
+                        ease: "power2.in"
+                    });
+
+                    // Animate stats out
+                    gsap.to(panel.querySelectorAll(".stat"), {
+                        autoAlpha: 0,
+                        y: -20,
+                        duration: 0.3,
+                        stagger: 0.03,
+                        ease: "power2.in"
+                    });
+
                     // Remove Super Saiyan effects when scrolling back
                     const progressLine = document.querySelector(".line-progress");
                     if (progressLine) {
@@ -1849,6 +1950,104 @@ function initTreeDiagram() {
                     }
                 }
             }, "horizontalStart+=10")
+            // When showing panel 4, SUPER SAIYAN MODE!
+            // .to(".timeline-panel.is--fixed.is--4", {
+            //     autoAlpha: 1,
+            //     onStart: function () {
+            //         console.log('Super Saiyan Mode Activating!');
+
+            //         // Create and start the canvas-based electric effect
+            //         if (!electricBorderInstance) {
+            //             electricBorderInstance = new ElectricBorder({
+            //                 color: "#ffcc00",  // Golden yellow instead of orange
+            //                 lineWidth: 2,
+            //                 displacement: 20,  // Increased from 10 for more pronounced effect
+            //                 octaves: 8,
+            //                 lacunarity: 1.8,
+            //                 gain: 0.65,  // Slightly increased for more turbulence
+            //                 amplitude: 0.18,  // Increased from 0.1
+            //                 frequency: 12,  // Slightly increased frequency
+            //                 speed: 2.5,  // Slightly faster animation
+            //                 baseFlatness: 0.02  // Less flat = more turbulent
+            //             });
+            //         }
+
+            //         // Create and start the spark system
+            //         if (!sparkSystemInstance) {
+            //             sparkSystemInstance = new SparkSystem({
+            //                 color: "#ffcc00",  // Golden yellow sparks
+            //                 secondaryColor: "#ffdd44",  // Lighter golden yellow
+            //                 particleCount: 30,
+            //                 minSize: 0.5,  // Much smaller
+            //                 maxSize: 2,    // Much smaller max size
+            //                 minSpeed: 2,
+            //                 maxSpeed: 6,
+            //                 gravity: 0,  // No gravity so particles go both ways equally
+            //                 fadeSpeed: 0.02,
+            //                 emissionRate: 3,  // Slightly fewer sparks
+            //                 spreadAngle: 90  // Less spread for subtlety
+            //             });
+            //         }
+
+            //         // Add base effect to the white line
+            //         const progressLine = document.querySelector(".line-progress");
+            //         if (progressLine) {
+            //             console.log('Adding base effects to progress line');
+            //             progressLine.style.boxShadow = "0 0 20px #ffcc00, 0 0 40px #ffcc00";
+            //             progressLine.style.backgroundColor = "#ffcc00";
+            //         }
+
+            //         // Start the electric animation
+            //         electricBorderInstance.start();
+
+            //         // Start the spark system with an initial burst
+            //         sparkSystemInstance.start();
+            //         setTimeout(() => {
+            //             sparkSystemInstance.burst(0.8);  // Smaller, more subtle burst
+            //         }, 100);
+
+            //         // Add pulsing glow to the center dot
+            //         const centerDot = document.querySelector(".dot-wrapper .dot");
+            //         if (centerDot) {
+            //             gsap.to(centerDot, {
+            //                 boxShadow: "0 0 30px #ffcc00, 0 0 60px #ffcc00",
+            //                 scale: 1.2,
+            //                 duration: 0.5,
+            //                 repeat: -1,
+            //                 yoyo: true,
+            //                 ease: "power2.inOut",
+            //                 zIndex: 100
+            //             });
+            //             centerDot.style.backgroundColor = "#ffcc00";
+            //         }
+            //     },
+            //     onReverseComplete: function () {
+            //         // Remove Super Saiyan effects when scrolling back
+            //         const progressLine = document.querySelector(".line-progress");
+            //         if (progressLine) {
+            //             progressLine.style.boxShadow = "";
+            //             progressLine.style.backgroundColor = "white";
+            //         }
+
+            //         // Stop the electric animation
+            //         if (electricBorderInstance) {
+            //             electricBorderInstance.stop();
+            //         }
+
+            //         // Stop the spark system
+            //         if (sparkSystemInstance) {
+            //             sparkSystemInstance.stop();
+            //         }
+
+            //         const centerDot = document.querySelector(".dot-wrapper .dot");
+            //         if (centerDot) {
+            //             gsap.killTweensOf(centerDot);
+            //             centerDot.style.boxShadow = "";
+            //             centerDot.style.backgroundColor = "";
+            //             gsap.set(centerDot, { scale: 1 });
+            //         }
+            //     }
+            // }, "horizontalStart+=10")
             .to({}, {
                 duration: 28,
                 onUpdate: function () {
