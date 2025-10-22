@@ -1717,6 +1717,86 @@ function initTreeDiagram() {
                 }
             }, "horizontalStart+=4")
             .to(".timeline-panel.is--fixed.is--2", {
+                autoAlpha: 1,
+                onStart: function () {
+                    const panel = document.querySelector(".timeline-panel.is--fixed.is--2");
+
+                    // Set initial states for text animations
+                    gsap.set(panel.querySelectorAll("[data-split='lines'] .lineInner"), {
+                        yPercent: 100
+                    });
+
+                    // Hide separator lines initially
+                    gsap.set(panel.querySelectorAll(".separator-line"), {
+                        scaleX: 0,
+                        transformOrigin: "left center"
+                    });
+
+                    // Hide and prepare image/gif
+                    gsap.set(panel.querySelector(".gif-container"), {
+                        autoAlpha: 0,
+                        scale: 0.8,
+                        rotation: -5
+                    });
+
+                    // Animate image/gif in with bounce
+                    gsap.to(panel.querySelector(".gif-container"), {
+                        autoAlpha: 1,
+                        scale: 1,
+                        rotation: 0,
+                        duration: 0.8,
+                        ease: "back.out(1.7)"
+                    });
+
+                    // Animate all text lines with stagger
+                    gsap.to(panel.querySelectorAll("[data-split='lines'] .lineInner"), {
+                        yPercent: 0,
+                        duration: 0.6,
+                        stagger: 0.05,
+                        ease: "power2.out",
+                        delay: 0.2
+                    });
+
+                    // Animate separator lines with stagger
+                    gsap.to(panel.querySelectorAll(".separator-line"), {
+                        scaleX: 1,
+                        duration: 0.6,
+                        stagger: 0.08,
+                        ease: "power3.inOut",
+                        delay: 0.4
+                    });
+                },
+                onReverseComplete: function () {
+                    const panel = document.querySelector(".timeline-panel.is--fixed.is--2");
+
+                    // Animate out image/gif with slight rotation
+                    gsap.to(panel.querySelector(".gif-container"), {
+                        autoAlpha: 0,
+                        scale: 0.9,
+                        rotation: 5,
+                        duration: 0.4,
+                        ease: "power2.in"
+                    });
+
+                    // Animate text lines out upward
+                    gsap.to(panel.querySelectorAll("[data-split='lines'] .lineInner"), {
+                        yPercent: -100,
+                        duration: 0.4,
+                        stagger: 0.03,
+                        ease: "power2.in"
+                    });
+
+                    // Animate separator lines out from right
+                    gsap.to(panel.querySelectorAll(".separator-line"), {
+                        scaleX: 0,
+                        transformOrigin: "right center",
+                        duration: 0.3,
+                        stagger: 0.03,
+                        ease: "power2.in"
+                    });
+                }
+            }, "horizontalStart+=4")
+            .to(".timeline-panel.is--fixed.is--2", {
                 autoAlpha: 0,
                 onStart: function () {
                     const panel = document.querySelector(".timeline-panel.is--fixed.is--2");
@@ -1734,7 +1814,7 @@ function initTreeDiagram() {
                     gsap.to(panel.querySelectorAll("[data-split='lines'] .lineInner"), {
                         yPercent: -100,
                         duration: 0.4,
-                        stagger: -0.03, // Reverse stagger
+                        stagger: -0.03,
                         ease: "power2.in"
                     });
 
@@ -1745,6 +1825,51 @@ function initTreeDiagram() {
                         duration: 0.3,
                         stagger: -0.03,
                         ease: "power2.in"
+                    });
+                },
+                onReverseComplete: function () {
+                    // THIS IS THE KEY PART - Re-animate when scrolling back
+                    const panel = document.querySelector(".timeline-panel.is--fixed.is--2");
+
+                    // Reset and re-animate everything when scrolling back
+                    gsap.set(panel.querySelectorAll("[data-split='lines'] .lineInner"), {
+                        yPercent: 100
+                    });
+
+                    gsap.set(panel.querySelectorAll(".separator-line"), {
+                        scaleX: 0,
+                        transformOrigin: "left center"
+                    });
+
+                    gsap.set(panel.querySelector(".gif-container"), {
+                        autoAlpha: 0,
+                        scale: 0.8,
+                        rotation: -5
+                    });
+
+                    // Re-animate everything in
+                    gsap.to(panel.querySelector(".gif-container"), {
+                        autoAlpha: 1,
+                        scale: 1,
+                        rotation: 0,
+                        duration: 0.8,
+                        ease: "back.out(1.7)"
+                    });
+
+                    gsap.to(panel.querySelectorAll("[data-split='lines'] .lineInner"), {
+                        yPercent: 0,
+                        duration: 0.6,
+                        stagger: 0.05,
+                        ease: "power2.out",
+                        delay: 0.2
+                    });
+
+                    gsap.to(panel.querySelectorAll(".separator-line"), {
+                        scaleX: 1,
+                        duration: 0.6,
+                        stagger: 0.08,
+                        ease: "power3.inOut",
+                        delay: 0.4
                     });
                 }
             }, "horizontalStart+=9")
