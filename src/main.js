@@ -1375,7 +1375,8 @@ function initTreeDiagram() {
 
         gsap.set(".timeline-panel.is--fixed", { autoAlpha: 0 })
 
-        gsap.set(".timeline-panel.is--1", { minWidth: "150vw" })
+        gsap.set(".timeline-panel.is--1", { marginLeft: "100vw" })
+        gsap.set(".timeline-panel.is--3", { marginLeft: "100vw" })
 
 
 
@@ -1715,87 +1716,8 @@ function initTreeDiagram() {
                         ease: "power2.in"
                     });
                 }
-            }, "horizontalStart+=4")
-            .to(".timeline-panel.is--fixed.is--2", {
-                autoAlpha: 1,
-                onStart: function () {
-                    const panel = document.querySelector(".timeline-panel.is--fixed.is--2");
+            }, "horizontalStart+=6")
 
-                    // Set initial states for text animations
-                    gsap.set(panel.querySelectorAll("[data-split='lines'] .lineInner"), {
-                        yPercent: 100
-                    });
-
-                    // Hide separator lines initially
-                    gsap.set(panel.querySelectorAll(".separator-line"), {
-                        scaleX: 0,
-                        transformOrigin: "left center"
-                    });
-
-                    // Hide and prepare image/gif
-                    gsap.set(panel.querySelector(".gif-container"), {
-                        autoAlpha: 0,
-                        scale: 0.8,
-                        rotation: -5
-                    });
-
-                    // Animate image/gif in with bounce
-                    gsap.to(panel.querySelector(".gif-container"), {
-                        autoAlpha: 1,
-                        scale: 1,
-                        rotation: 0,
-                        duration: 0.8,
-                        ease: "back.out(1.7)"
-                    });
-
-                    // Animate all text lines with stagger
-                    gsap.to(panel.querySelectorAll("[data-split='lines'] .lineInner"), {
-                        yPercent: 0,
-                        duration: 0.6,
-                        stagger: 0.05,
-                        ease: "power2.out",
-                        delay: 0.2
-                    });
-
-                    // Animate separator lines with stagger
-                    gsap.to(panel.querySelectorAll(".separator-line"), {
-                        scaleX: 1,
-                        duration: 0.6,
-                        stagger: 0.08,
-                        ease: "power3.inOut",
-                        delay: 0.4
-                    });
-                },
-                onReverseComplete: function () {
-                    const panel = document.querySelector(".timeline-panel.is--fixed.is--2");
-
-                    // Animate out image/gif with slight rotation
-                    gsap.to(panel.querySelector(".gif-container"), {
-                        autoAlpha: 0,
-                        scale: 0.9,
-                        rotation: 5,
-                        duration: 0.4,
-                        ease: "power2.in"
-                    });
-
-                    // Animate text lines out upward
-                    gsap.to(panel.querySelectorAll("[data-split='lines'] .lineInner"), {
-                        yPercent: -100,
-                        duration: 0.4,
-                        stagger: 0.03,
-                        ease: "power2.in"
-                    });
-
-                    // Animate separator lines out from right
-                    gsap.to(panel.querySelectorAll(".separator-line"), {
-                        scaleX: 0,
-                        transformOrigin: "right center",
-                        duration: 0.3,
-                        stagger: 0.03,
-                        ease: "power2.in"
-                    });
-                }
-            }, "horizontalStart+=4")
             .to(".timeline-panel.is--fixed.is--2", {
                 autoAlpha: 0,
                 onStart: function () {
@@ -1872,7 +1794,7 @@ function initTreeDiagram() {
                         delay: 0.4
                     });
                 }
-            }, "horizontalStart+=9")
+            }, "horizontalStart+=12")
             // .to(".timeline-panel.is--fixed.is--2", { autoAlpha: 1 }, "horizontalStart+=4")
             // .to(".timeline-panel.is--fixed.is--2", { autoAlpha: 0 }, "horizontalStart+=9")
             // .to(".timeline-panel.is--fixed.is--4", { autoAlpha: 1 }, "horizontalStart+=10")
@@ -2074,105 +1996,8 @@ function initTreeDiagram() {
                         gsap.set(centerDot, { scale: 1 });
                     }
                 }
-            }, "horizontalStart+=10")
-            // When showing panel 4, SUPER SAIYAN MODE!
-            // .to(".timeline-panel.is--fixed.is--4", {
-            //     autoAlpha: 1,
-            //     onStart: function () {
-            //         console.log('Super Saiyan Mode Activating!');
+            }, "horizontalStart+=18")
 
-            //         // Create and start the canvas-based electric effect
-            //         if (!electricBorderInstance) {
-            //             electricBorderInstance = new ElectricBorder({
-            //                 color: "#ffcc00",  // Golden yellow instead of orange
-            //                 lineWidth: 2,
-            //                 displacement: 20,  // Increased from 10 for more pronounced effect
-            //                 octaves: 8,
-            //                 lacunarity: 1.8,
-            //                 gain: 0.65,  // Slightly increased for more turbulence
-            //                 amplitude: 0.18,  // Increased from 0.1
-            //                 frequency: 12,  // Slightly increased frequency
-            //                 speed: 2.5,  // Slightly faster animation
-            //                 baseFlatness: 0.02  // Less flat = more turbulent
-            //             });
-            //         }
-
-            //         // Create and start the spark system
-            //         if (!sparkSystemInstance) {
-            //             sparkSystemInstance = new SparkSystem({
-            //                 color: "#ffcc00",  // Golden yellow sparks
-            //                 secondaryColor: "#ffdd44",  // Lighter golden yellow
-            //                 particleCount: 30,
-            //                 minSize: 0.5,  // Much smaller
-            //                 maxSize: 2,    // Much smaller max size
-            //                 minSpeed: 2,
-            //                 maxSpeed: 6,
-            //                 gravity: 0,  // No gravity so particles go both ways equally
-            //                 fadeSpeed: 0.02,
-            //                 emissionRate: 3,  // Slightly fewer sparks
-            //                 spreadAngle: 90  // Less spread for subtlety
-            //             });
-            //         }
-
-            //         // Add base effect to the white line
-            //         const progressLine = document.querySelector(".line-progress");
-            //         if (progressLine) {
-            //             console.log('Adding base effects to progress line');
-            //             progressLine.style.boxShadow = "0 0 20px #ffcc00, 0 0 40px #ffcc00";
-            //             progressLine.style.backgroundColor = "#ffcc00";
-            //         }
-
-            //         // Start the electric animation
-            //         electricBorderInstance.start();
-
-            //         // Start the spark system with an initial burst
-            //         sparkSystemInstance.start();
-            //         setTimeout(() => {
-            //             sparkSystemInstance.burst(0.8);  // Smaller, more subtle burst
-            //         }, 100);
-
-            //         // Add pulsing glow to the center dot
-            //         const centerDot = document.querySelector(".dot-wrapper .dot");
-            //         if (centerDot) {
-            //             gsap.to(centerDot, {
-            //                 boxShadow: "0 0 30px #ffcc00, 0 0 60px #ffcc00",
-            //                 scale: 1.2,
-            //                 duration: 0.5,
-            //                 repeat: -1,
-            //                 yoyo: true,
-            //                 ease: "power2.inOut",
-            //                 zIndex: 100
-            //             });
-            //             centerDot.style.backgroundColor = "#ffcc00";
-            //         }
-            //     },
-            //     onReverseComplete: function () {
-            //         // Remove Super Saiyan effects when scrolling back
-            //         const progressLine = document.querySelector(".line-progress");
-            //         if (progressLine) {
-            //             progressLine.style.boxShadow = "";
-            //             progressLine.style.backgroundColor = "white";
-            //         }
-
-            //         // Stop the electric animation
-            //         if (electricBorderInstance) {
-            //             electricBorderInstance.stop();
-            //         }
-
-            //         // Stop the spark system
-            //         if (sparkSystemInstance) {
-            //             sparkSystemInstance.stop();
-            //         }
-
-            //         const centerDot = document.querySelector(".dot-wrapper .dot");
-            //         if (centerDot) {
-            //             gsap.killTweensOf(centerDot);
-            //             centerDot.style.boxShadow = "";
-            //             centerDot.style.backgroundColor = "";
-            //             gsap.set(centerDot, { scale: 1 });
-            //         }
-            //     }
-            // }, "horizontalStart+=10")
             .to({}, {
                 duration: 28,
                 onUpdate: function () {
@@ -2200,7 +2025,7 @@ function initTreeDiagram() {
                         }
                     });
                 }
-            }, "horizontalStart+=10")
+            }, "horizontalStart+=18")
             // .to({}, {
             //     duration: 1 // Pause before map
             // })
