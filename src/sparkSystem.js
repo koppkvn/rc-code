@@ -82,11 +82,22 @@ export class SparkSystem {
     }
     
     createParticle(x, y) {
-        // Random direction - both up and down
-        const isUpward = Math.random() > 0.5;
-        const baseAngle = isUpward ? -Math.PI/2 : Math.PI/2; // Up or down
-        const angleRange = this.spreadAngle * Math.PI / 180;
-        const angle = baseAngle + (Math.random() - 0.5) * angleRange;
+        // Calculate direction from dot center
+        const centerDot = document.querySelector(".dot-wrapper .dot");
+        let angle = Math.random() * Math.PI * 2; // Default random angle
+        
+        if (centerDot) {
+            const rect = centerDot.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2 + 5; // Add 5px offset to match emission center
+            const centerY = rect.top + rect.height / 2;
+            
+            // Calculate angle from center to particle position
+            angle = Math.atan2(y - centerY, x - centerX);
+            
+            // Add some randomness to the angle for spread
+            const angleVariation = (this.spreadAngle * Math.PI / 180) * 0.2; // Use 20% of spread angle
+            angle += (Math.random() - 0.5) * angleVariation;
+        }
         
         // Random speed
         const speed = this.minSpeed + Math.random() * (this.maxSpeed - this.minSpeed);
@@ -106,19 +117,29 @@ export class SparkSystem {
     emitSparks() {
         if (!this.isAnimating) return;
         
-        this.updateEmissionZone();
+        // Only emit based on emission rate (can be less than 1 for slower emission)
+        this.emissionCounter = (this.emissionCounter || 0) + this.emissionRate;
+        if (this.emissionCounter < 1) return;
+        this.emissionCounter -= Math.floor(this.emissionCounter);
         
-        // Emit sparks along the progress line
-        for (let i = 0; i < this.emissionRate; i++) {
-            // Random position along the line
-            const x = this.emissionZone.x + Math.random() * this.emissionZone.width;
-            const y = this.emissionZone.y + (Math.random() - 0.5) * 10; // Small vertical variation
+        // Focus emission on the center dot instead of the whole line
+        const centerDot = document.querySelector(".dot-wrapper .dot");
+        if (centerDot) {
+            const rect = centerDot.getBoundingClientRect();
+            const x = rect.left + rect.width / 2 + 5; // Add 5px offset to the right to center properly
+            const y = rect.top + rect.height / 2;
             
-            this.particles.push(this.createParticle(x, y));
+            // Emit spark from dot edge in a random direction
+            const dotRadius = rect.width / 2 + 5; // Slightly outside the dot
+            const angle = Math.random() * Math.PI * 2; // Random angle around the dot
+            const startX = x + Math.cos(angle) * dotRadius;
+            const startY = y + Math.sin(angle) * dotRadius;
+            
+            this.particles.push(this.createParticle(startX, startY));
         }
         
         // Limit particle count
-        if (this.particles.length > this.particleCount * 2) {
+        if (this.particles.length > this.particleCount) {
             this.particles = this.particles.slice(-this.particleCount);
         }
     }

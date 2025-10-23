@@ -1473,10 +1473,7 @@ function initTreeDiagram() {
                             transform: `translateY(-50%) scaleX(${whiteLineProgress})`
                         });
 
-                        // Update electric border animation if it exists
-                        if (electricBorderInstance && whiteLineProgress > 0) {
-                            electricBorderInstance.syncWithProgressLine();
-                        }
+                        // No electric border to update anymore
                     }
 
                     // Move the gray line at the end
@@ -1568,16 +1565,11 @@ function initTreeDiagram() {
                         autoAlpha: 0
                     })
 
-                    // Also fade out Super Saiyan effects when reaching the end
+                    // Fade out the subtle effects when reaching the end
                     const progressLine = document.querySelector(".line-progress");
                     if (progressLine) {
                         progressLine.style.boxShadow = "";
                         progressLine.style.backgroundColor = "white";
-                    }
-
-                    // Stop the electric animation
-                    if (electricBorderInstance) {
-                        electricBorderInstance.stop();
                     }
 
                     // Stop the spark system
@@ -1604,16 +1596,12 @@ function initTreeDiagram() {
                         autoAlpha: 1
                     })
 
-                    // Re-enable Super Saiyan effects when scrolling back into the timeline
+                    // Re-enable subtle effects when scrolling back into the timeline
                     const progressLine = document.querySelector(".line-progress");
                     if (progressLine) {
-                        progressLine.style.boxShadow = "0 0 20px #ffcc00, 0 0 40px #ffcc00";
-                        progressLine.style.backgroundColor = "#ffcc00";
-                    }
-
-                    // Restart the electric animation
-                    if (electricBorderInstance) {
-                        electricBorderInstance.start();
+                        // Keep subtle white glow
+                        progressLine.style.boxShadow = "0 0 8px rgba(255,255,255,0.6)";
+                        progressLine.style.backgroundColor = "white";
                     }
 
                     // Restart the spark system
@@ -1621,13 +1609,13 @@ function initTreeDiagram() {
                         sparkSystemInstance.start();
                     }
 
-                    // Re-enable center dot glow
+                    // Re-enable center dot glow (subtle)
                     const centerDot = document.querySelector(".dot-wrapper .dot");
                     if (centerDot) {
                         gsap.to(centerDot, {
-                            boxShadow: "0 0 30px #ffcc00, 0 0 60px #ffcc00",
-                            scale: 1.2,
-                            duration: 0.5,
+                            boxShadow: "0 0 10px #ffcc00, 0 0 20px #ffcc00",  // Reduced glow
+                            scale: 1.1,  // Smaller scale
+                            duration: 0.8,  // Slower pulse
                             repeat: -1,
                             yoyo: true,
                             ease: "power2.inOut",
@@ -1877,63 +1865,46 @@ function initTreeDiagram() {
                     // SUPER SAIYAN MODE code continues here...
                     console.log('Super Saiyan Mode Activating!');
 
-                    // Create and start the canvas-based electric effect
-                    if (!electricBorderInstance) {
-                        electricBorderInstance = new ElectricBorder({
-                            color: "#ffcc00",
-                            lineWidth: 2,
-                            displacement: 20,
-                            octaves: 8,
-                            lacunarity: 1.8,
-                            gain: 0.65,
-                            amplitude: 0.18,
-                            frequency: 12,
-                            speed: 2.5,
-                            baseFlatness: 0.02
-                        });
-                    }
+                    // Don't create the electric border - we want it more subtle
+                    // Just keep the sparks on the dot
 
-                    // Create and start the spark system
+                    // Create and start a more subtle spark system
                     if (!sparkSystemInstance) {
                         sparkSystemInstance = new SparkSystem({
                             color: "#ffcc00",
                             secondaryColor: "#ffdd44",
-                            particleCount: 30,
-                            minSize: 0.5,
-                            maxSize: 2,
-                            minSpeed: 2,
-                            maxSpeed: 6,
-                            gravity: 0,
-                            fadeSpeed: 0.02,
-                            emissionRate: 3,
-                            spreadAngle: 90
+                            particleCount: 4,  // Even fewer particles
+                            minSize: 0.4,      // Slightly bigger minimum
+                            maxSize: 0.8,      // Smaller max size
+                            minSpeed: 0.3,     // Much slower speed
+                            maxSpeed: 0.8,     // Much slower max speed
+                            gravity: 0.02,     // Very light gravity
+                            fadeSpeed: 0.015,  // Even slower fade for longer lasting particles
+                            emissionRate: 0.5, // Emit every other frame
+                            spreadAngle: 360   // Full circle around dot
                         });
                     }
 
-                    // Add base effect to the white line
+                    // Keep the line white, don't make it yellow
                     const progressLine = document.querySelector(".line-progress");
                     if (progressLine) {
-                        console.log('Adding base effects to progress line');
-                        progressLine.style.boxShadow = "0 0 20px #ffcc00, 0 0 40px #ffcc00";
-                        progressLine.style.backgroundColor = "#ffcc00";
+                        console.log('Keeping progress line white with subtle glow');
+                        // Just a subtle white glow, no yellow
+                        progressLine.style.boxShadow = "0 0 8px rgba(255,255,255,0.6)";
+                        // Keep it white
+                        progressLine.style.backgroundColor = "white";
                     }
 
-                    // Start the electric animation
-                    electricBorderInstance.start();
-
-                    // Start the spark system with an initial burst
+                    // Start the spark system
                     sparkSystemInstance.start();
-                    setTimeout(() => {
-                        sparkSystemInstance.burst(0.8);
-                    }, 100);
 
-                    // Add pulsing glow to the center dot
+                    // Add subtle pulsing glow to the center dot
                     const centerDot = document.querySelector(".dot-wrapper .dot");
                     if (centerDot) {
                         gsap.to(centerDot, {
-                            boxShadow: "0 0 30px #ffcc00, 0 0 60px #ffcc00",
-                            scale: 1.2,
-                            duration: 0.5,
+                            boxShadow: "0 0 10px #ffcc00, 0 0 20px #ffcc00",  // Reduced glow
+                            scale: 1.1,  // Smaller scale
+                            duration: 0.8,  // Slower pulse
                             repeat: -1,
                             yoyo: true,
                             ease: "power2.inOut",
@@ -1971,16 +1942,11 @@ function initTreeDiagram() {
                         ease: "power2.in"
                     });
 
-                    // Remove Super Saiyan effects when scrolling back
+                    // Remove subtle effects when scrolling back
                     const progressLine = document.querySelector(".line-progress");
                     if (progressLine) {
                         progressLine.style.boxShadow = "";
                         progressLine.style.backgroundColor = "white";
-                    }
-
-                    // Stop the electric animation
-                    if (electricBorderInstance) {
-                        electricBorderInstance.stop();
                     }
 
                     // Stop the spark system
