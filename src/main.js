@@ -1999,7 +1999,7 @@ function initTreeDiagram() {
             }, "horizontalStart+=18")
 
             .to({}, {
-                duration: 28,
+                duration: 24,
                 onUpdate: function () {
                     const progress = this.progress();
 
@@ -2026,168 +2026,7 @@ function initTreeDiagram() {
                     });
                 }
             }, "horizontalStart+=18")
-            // .to({}, {
-            //     duration: 1 // Pause before map
-            // })
 
-            // // we scale the white line to the full width with the scroll
-            // .from(".section.is--timeline .white-line", {
-            //     scaleX: 0,
-            //     transformOrigin: "left",
-            //     ease: "none",
-            //     duration: 35,
-            // }, "horizontal")
-
-
-            //we make the different element appear trough the timeline
-            // .to({}, {
-            //     duration: 0.001,
-            //     onStart: function () {
-            //         gsap.to(".panel.is--first .text-wrapper.is--first [data-split='lines'] .lineInner", {
-            //             yPercent: 0,
-            //             duration: 1,
-            //             ease: "power2.out"
-            //         },)
-            //     },
-            //     onReverseComplete: function () {
-            //         // gsap.to(".panel.is--first .text-wrapper.is--first [data-split='lines'] .lineInner", {
-            //         //     yPercent: 100,
-            //         //     duration: 1,
-            //         //     ease: "power2.out"
-            //         // },)
-
-            //         gsap.to(".panel.is--first .text-wrapper.is--first [data-split='lines'] .lineInner", {
-            //             yPercent: 100,
-            //             duration: 1,
-            //             ease: "power2.out"
-            //         },)
-
-            //         gsap.to(".panel.is--second .text-wrapper.is--second [data-split='lines'] .lineInner", {
-            //             yPercent: 100,
-            //             duration: 1,
-            //             ease: "power2.out"
-            //         },)
-            //     }
-            // }, "<")
-            // .to({}, {
-            //     duration: 0.001,
-            //     onStart: function () {
-            //         gsap.to(".panel.is--second .text-wrapper.is--second [data-split='lines'] .lineInner", {
-            //             yPercent: 0,
-            //             duration: 1,
-            //             ease: "power2.out"
-            //         },)
-            //     },
-            //     onReverseComplete: function () {
-            //         // gsap.to(".panel.is--second .text-wrapper.is--second [data-split='lines'] .lineInner", {
-            //         //     yPercent: 100,
-            //         //     duration: 1,
-            //         //     ease: "power2.out"
-            //         // },)
-            //     }
-            // }, "<+=3")
-
-            // .to({}, {
-            //     duration: 0.001,
-            //     onStart: function () {
-            //         gsap.to(".panel.is--third .text-wrapper.is--third [data-split='lines'] .lineInner", {
-            //             yPercent: 0,
-            //             duration: 1,
-            //             ease: "power2.out"
-            //         },)
-            //         gsap.to(".panel.is--third .text-wrapper.is--third .t-inner-wrapper.is--spec", {
-            //             autoAlpha: 1,
-            //             yPercent: 0,
-            //             duration: 1,
-            //             ease: "power2.out"
-            //         },)
-            //     },
-            //     // onReverseComplete: function () {
-            //     //     gsap.to(".panel.is--third .text-wrapper.is--third [data-split='lines'] .lineInner", {
-            //     //         yPercent: 100,
-            //     //         duration: 1,
-            //     //         ease: "power2.out"
-            //     //     },)
-            //     //     gsap.to(".panel.is--third .text-wrapper.is--third .t-inner-wrapper.is--spec", {
-            //     //         autoAlpha: 0,
-            //     //         yPercent: 10,
-            //     //         duration: 1,
-            //     //         ease: "power2.out"
-            //     //     },)
-            //     // }
-            // }, "<+=3")
-
-            // .to({}, {
-            //     duration: 0.001,
-            //     onStart: function () {
-            //         gsap.to(".panel.is--third .text-wrapper.is--fourth [data-split='lines'] .lineInner", {
-            //             yPercent: 0,
-            //             duration: 1,
-            //             ease: "power2.out"
-            //         },)
-            //     },
-            //     // onReverseComplete: function () {
-            //     //     gsap.to(".panel.is--third .text-wrapper.is--fourth [data-split='lines'] .lineInner", {
-            //     //         yPercent: 100,
-            //     //         duration: 1,
-            //     //         ease: "power2.out"
-            //     //     },)
-            //     // }
-            // }, "<+=3")
-
-            // .to({}, {
-            //     duration: 0.001,
-            //     onStart: function () {
-            //         gsap.to(".panel.is--fourth .text-wrapper.is--fifth [data-split='lines'] .lineInner", {
-            //             yPercent: 0,
-            //             duration: 1,
-            //             ease: "power2.out"
-            //         },)
-            //     },
-            //     // onReverseComplete: function () {
-            //     //     gsap.to(".panel.is--fourth .text-wrapper.is--fifth [data-split='lines'] .lineInner", {
-            //     //         yPercent: 100,
-            //     //         duration: 1,
-            //     //         ease: "power2.out"
-            //     //     },)
-            //     // }
-            // }, "<+=3")
-            // .to({}, {
-            //     duration: 0.001,
-            //     onStart: function () {
-            //         gsap.to(".panel.is--fifth .text-wrapper.is--sixth [data-split='lines'] .lineInner", {
-            //             yPercent: 0,
-            //             duration: 1,
-            //             ease: "power2.out"
-            //         },)
-            //     },
-
-            //     // onReverseComplete: function () {
-            //     //     gsap.to(".panel.is--fifth .text-wrapper.is--sixth [data-split='lines'] .lineInner", {
-            //     //         yPercent: 100,
-            //     //         duration: 1,
-            //     //         ease: "power2.out"
-            //     //     },)
-            //     // }
-            // }, "<+=3")
-
-            // .to(".panel.is--fifth .text-wrapper.is--sixth [data-split='lines'] .lineInner", {
-            //     autoAlpha: 0,
-            // },)
-            // .to(".timeline-wrapper", {
-            //     autoAlpha: 0,
-
-            //     onStart: function () {
-            //         gsap.to(".section.is--timeline .header-title, .section.is--timeline .header-number", {
-            //             autoAlpha: 0
-            //         },);
-            //     },
-            //     onReverseComplete: function () {
-            //         gsap.to(".section.is--timeline .header-title, .section.is--timeline .header-number", {
-            //             autoAlpha: 1
-            //         },);
-            //     }
-            // },)
             .to(".map-svg path", {
                 drawSVG: "0% 100%", // or "0 100" depending on your preference
                 duration: 5,
@@ -2208,7 +2047,7 @@ function initTreeDiagram() {
                         ease: "power2.out"
                     },)
                 }
-            }, "-=2")
+            }, "-=0.5")
 
             .to(".tree-right-wrapper .dot-wrapper", {
                 autoAlpha: 0,
