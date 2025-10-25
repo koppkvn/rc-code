@@ -403,18 +403,17 @@
     height: 100%;
     transform: scaleX(1);
     transform-origin: right center;
-    background: linear-gradient(90deg, 
-        transparent,
-        var(--electric-border-color) 10%,
-        var(--electric-light-color) 30%,
-        var(--electric-border-color) 50%,
-        var(--electric-light-color) 70%,
-        var(--electric-border-color) 90%,
-        transparent
-    );
+    background: linear-gradient(90deg,
+            transparent,
+            var(--electric-border-color) 10%,
+            var(--electric-light-color) 30%,
+            var(--electric-border-color) 50%,
+            var(--electric-light-color) 70%,
+            var(--electric-border-color) 90%,
+            transparent);
     background-size: 200% 100%;
     animation: electric-flow 2s linear infinite;
-    box-shadow: 
+    box-shadow:
         0 0 10px var(--electric-border-color),
         0 0 20px var(--electric-light-color),
         inset 0 0 10px rgba(255, 255, 255, 0.5);
@@ -430,6 +429,7 @@
     0% {
         background-position: 200% 50%;
     }
+
     100% {
         background-position: 0% 50%;
     }
@@ -480,13 +480,11 @@
     opacity: 0;
     mix-blend-mode: screen;
     filter: blur(15px);
-    background: linear-gradient(
-        90deg,
-        rgba(255, 255, 255, 0.8),
-        transparent 20%,
-        transparent 80%,
-        rgba(255, 255, 255, 0.8)
-    );
+    background: linear-gradient(90deg,
+            rgba(255, 255, 255, 0.8),
+            transparent 20%,
+            transparent 80%,
+            rgba(255, 255, 255, 0.8));
     z-index: 53;
 }
 
@@ -507,12 +505,10 @@
     filter: blur(30px);
     opacity: 0;
     z-index: 49;
-    background: radial-gradient(
-        ellipse at center,
-        var(--electric-light-color) 0%,
-        var(--electric-border-color) 40%,
-        transparent 70%
-    );
+    background: radial-gradient(ellipse at center,
+            var(--electric-light-color) 0%,
+            var(--electric-border-color) 40%,
+            transparent 70%);
 }
 
 @keyframes electric-gradient {
@@ -550,3 +546,36 @@
         filter: brightness(1.5) hue-rotate(10deg);
     }
 }
+
+
+
+
+html.lenis,
+html.lenis body {
+    height: auto;
+}
+
+.lenis:not(.lenis-autoToggle).lenis-stopped {
+    overflow: clip;
+}
+
+.lenis [data-lenis-prevent],
+.lenis [data-lenis-prevent-wheel],
+.lenis [data-lenis-prevent-touch] {
+    overscroll-behavior: contain;
+}
+
+.lenis.lenis-smooth iframe {
+    pointer-events: none;
+}
+
+.lenis.lenis-autoToggle {
+    transition-property: overflow;
+    transition-duration: 1ms;
+    transition-behavior: allow-discrete;
+}
+
+
+// .pin-spacer {
+//     height: unset !important;
+// }

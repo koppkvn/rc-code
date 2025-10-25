@@ -23,8 +23,8 @@ export default defineConfig({
     server: {
         host: "0.0.0.0",
         https: {
-            key: fs.readFileSync(path.resolve(__dirname, '172.20.10.2+3-key.pem')),
-            cert: fs.readFileSync(path.resolve(__dirname, '172.20.10.2+3.pem')),
+            key: fs.readFileSync(path.resolve(__dirname, 'localhost+1-key.pem')),
+            cert: fs.readFileSync(path.resolve(__dirname, 'localhost+1.pem')),
         },
         cors: true,
         watch: {
