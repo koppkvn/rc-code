@@ -490,6 +490,8 @@ function initScrollLock() {
         // initTreeDiagram();
 
         initTreeDiagramWrapper(); // on page load
+        // Hide all panels initially
+
         // initVideoMap();
         // initSectionTwo();
         // initSectionThree();
@@ -1327,6 +1329,8 @@ function initTreeDiagram() {
     // desktop only
     mm.add("(min-width: 768px)", () => {
 
+
+
         treeTlOne
             .to(".tree-wrapper.is--compare", {
                 // Set transform origin with the offset
@@ -1441,6 +1445,15 @@ function initTreeDiagram() {
         let electricBorderInstance = null;
         let sparkSystemInstance = null;
 
+
+
+        gsap.set(".timeline-panel.is--fixed", { autoAlpha: 0 })
+
+        gsap.set(".timeline-panel.is--1", { marginLeft: "85vw" })
+        gsap.set(".timeline-panel.is--3", { marginLeft: "0vw" })
+
+        gsap.set(".timeline-panel.is--1, .timeline-panel.is--3, .timeline-panel.is--5, .timeline-panel.is--6, .timeline-panel.is--7, .timeline-panel.is--8, .timeline-panel.is--9", { minWidth: "80vw", width: "80vw" })
+
         // START HORIZONTAL TIMELINE
         // const containerWidth = document.querySelector(".timeline-container").offsetWidth;
         // const containerMovement = containerWidth * 0.5; // 50% of container width
@@ -1454,22 +1467,22 @@ function initTreeDiagram() {
         panels.forEach(panel => {
             totalPanelsWidth += panel.offsetWidth;
         });
-
         // Set container width to match content
         gsap.set(containerEl, {
             width: totalPanelsWidth + "px"
         });
 
+
+
+
+
+
         // Calculate how much to move (total width minus viewport width)
-        const scrollDistance = totalPanelsWidth - window.innerWidth;
+        // const scrollDistance = totalPanelsWidth - window.innerWidth;
+        // Add extra scroll distance (e.g., 30vw) to see more of the last panel
+
+        const scrollDistance = totalPanelsWidth - (window.innerWidth * 1.4);
         const scrollPercentage = (scrollDistance / totalPanelsWidth) * 100;
-
-
-        gsap.set(".timeline-panel.is--fixed", { autoAlpha: 0 })
-
-        gsap.set(".timeline-panel.is--1", { marginLeft: "100vw" })
-        gsap.set(".timeline-panel.is--3", { marginLeft: "100vw" })
-
 
 
         document.querySelectorAll('[data-target]').forEach(el => {
@@ -1796,7 +1809,7 @@ function initTreeDiagram() {
                         ease: "power2.in"
                     });
                 }
-            }, "horizontalStart+=6")
+            }, "horizontalStart+=4")
 
             .to(".timeline-panel.is--fixed.is--2", {
                 autoAlpha: 0,
@@ -1874,7 +1887,7 @@ function initTreeDiagram() {
                         delay: 0.4
                     });
                 }
-            }, "horizontalStart+=12")
+            }, "horizontalStart+=10")
             // .to(".timeline-panel.is--fixed.is--2", { autoAlpha: 1 }, "horizontalStart+=4")
             // .to(".timeline-panel.is--fixed.is--2", { autoAlpha: 0 }, "horizontalStart+=9")
             // .to(".timeline-panel.is--fixed.is--4", { autoAlpha: 1 }, "horizontalStart+=10")
@@ -2054,7 +2067,7 @@ function initTreeDiagram() {
                         gsap.set(centerDot, { scale: 1 });
                     }
                 }
-            }, "horizontalStart+=17")
+            }, "horizontalStart+=10")
 
             .to({}, {
                 duration: 24,
@@ -2083,7 +2096,7 @@ function initTreeDiagram() {
                         }
                     });
                 }
-            }, "horizontalStart+=17")
+            }, "horizontalStart+=10")
 
             .to(".map-svg path", {
                 drawSVG: "0% 100%", // or "0 100" depending on your preference
@@ -2211,8 +2224,66 @@ function initTreeDiagram() {
     // same as above but on mobile
     mm.add("(max-width: 767px)", () => {
         gsap.set(".section.is--groupe p.is--second", {
-            marginTop: 50
+            marginTop: 50,
+            right: "unset",
+            left: 0,
+            // paddingLeft: 0
         })
+
+
+        gsap.set(".timeline-panel", {
+            autoAlpha: 0
+        });
+
+        // Reveal each panel when it reaches the center
+        gsap.utils.toArray(".timeline-panel").forEach(panel => {
+            console.log(panel);
+            gsap.to(panel, {
+                autoAlpha: 1,
+                duration: 0.5,
+                scrollTrigger: {
+                    trigger: panel,
+                    start: "top 60%",
+                    toggleActions: "play none none none",
+                    // markers: true,
+                    pinnedContainer: ".parent-section",
+                    onEnter: panel.classList.contains('is--4') ? () => {
+                        // Animate all stat values
+                        document.querySelectorAll('[data-target]').forEach(el => {
+                            const target = parseFloat(el.dataset.target);
+                            const valueSpan = el.querySelector('.stat-value');
+
+                            if (valueSpan) {
+                                const targetLength = Math.abs(target).toString().length;
+                                const obj = { value: 0 };
+
+                                // Animate from 0 to target
+                                gsap.to(obj, {
+                                    value: target,
+                                    duration: 5,
+                                    ease: "power2.out",
+                                    onUpdate: function () {
+                                        const currentValue = Math.round(obj.value);
+                                        let paddedValue = Math.abs(currentValue).toString().padStart(targetLength, '0');
+
+                                        if (target < 0) {
+                                            paddedValue = '-' + paddedValue;
+                                        }
+
+                                        valueSpan.textContent = paddedValue;
+                                    }
+                                });
+                            }
+                        });
+                    } : null
+                }
+            });
+        });
+
+        gsap.set(".section.is--groupe p.is--first", {
+            paddingLeft: 0
+        })
+
 
         gsap.set(".parent-section .section.is--timeline", {
             position: "relative",
@@ -2280,12 +2351,18 @@ function initTreeDiagram() {
             .to(".section.is--compare .line-wrapper-top, .section.is--compare .line.is--vertical, .section.is--compare .tree-left-side", {
                 autoAlpha: 0,
                 // scale: .5
+                onComplete: function () {
+                    //HELP I wanna pin ".line-wrapper-bottom" at this moment
+
+                }
             }, "<")
+            .addLabel("timelineStart")
             .to(".section.is--compare .inscription-rc",
                 {
                     autoAlpha: 0,
 
-                },)
+                }, "timelineStart")
+
 
             .to(".section.is--timeline .timeline-container", {
                 autoAlpha: 1,
@@ -2335,13 +2412,59 @@ function initTreeDiagram() {
 
                 },
 
-            })
+            }, "timelineStart")
+
+            .to(".section.is--compare .line-wrapper-bottom", {
+                autoAlpha: 0,
+                duration: 1,
+                ease: "none"
+            }, "timelineStart")
 
 
 
+        gsap.set(".line-container .line-new", {
+            scaleY: 0,
+            transformOrigin: "bottom",
+        })
+        ScrollTrigger.create({
+            trigger: ".section.is--compare",
+            start: "bottom bottom-=1%",
+            endTrigger: ".section.is--timeline",
+            end: "bottom top+=38%",
+            pin: ".section.is--timeline .line-container",
+            pinSpacing: true,
+            pinReparent: true,
+            pinnedContainer: ".parent-section",
+            markers: false,
+            animation: gsap.to(".line-container .line-new", {
+                scaleY: 1,
+                duration: 3,
+                ease: "expo.out"
+            }),
 
 
+            // onLeave: function () {
+            //     gsap.to(".line-container .line-new", {
+            //         scaleY: 0,
+            //         duration: .5,
+            //         ease: "expo.out"
+            //     })
+            // }
 
+        })
+
+        // gsap.to(".line-container .line-new", {
+        //     // scaleY: 0,
+        //     // transformOrigin: "top",
+        //     scrollTrigger: {
+        //         trigger: ".section.is--timeline",
+        //         start: "bottom bottom",
+        //         end: `bottom top+=50%`,
+        //         scrub: true,
+
+        //         pinnedContainer: ".parent-section",
+        //     }
+        // })
 
         // const pinDuration = window.innerHeight * 7; // because +=300%
 
@@ -2357,6 +2480,7 @@ function initTreeDiagram() {
                     start: "top top",
                     end: `+=1000%`,
                     pin: true,
+
                     pinnedContainer: ".parent-section",
                     pinReparent: true,
                     scrub: true,
@@ -3633,20 +3757,20 @@ document.addEventListener("DOMContentLoaded", () => {
         initSplit();
 
         // TO COMMENT
-        // initAgeGate();
+        initAgeGate();
         tlHeroAnimation = initHeroAnimation();
         // TO COMMENT
         initIntro();
         initTrackerCheckboxes();
         // TO COMMENT
-        // initScrollLock();
+        initScrollLock();
         initTrackerSection();
         initVideoMap();
 
 
 
         //to remove
-        initTreeDiagramWrapper(); // on page load
+        // initTreeDiagramWrapper(); // on page load
     });
     // initVideoMap();
     document.body.removeAttribute('data-preload');
