@@ -50,8 +50,9 @@ function initIntro() {
 
     gsap.set(bars, { autoAlpha: 0, scaleY: 0, transformOrigin: "bottom" });
 
-    gsap.set(".title-intro .lineInner", {
-        yPercent: 100,
+    gsap.set(".title-intro", {
+        opacity: 0,
+        filter: "blur(10px)",
     });
 
     // Create a master ScrollTrigger for pinning
@@ -70,7 +71,7 @@ function initIntro() {
         scrollTrigger: {
             trigger: ".section.is--intro",
             start: "top top",
-            end: "+=130%", // Just for the bar animations
+            end: "+=300%", // Just for the bar animations
             scrub: true,
             // markers: { startColor: "blue", endColor: "blue" },
             id: "barsScrub",
@@ -80,40 +81,42 @@ function initIntro() {
 
     const durationPerBar = 1 / bars.length;
     bars.forEach((bar, index) => {
+        const isLastSeven = index >= bars.length - 7;
+        const duration = isLastSeven ? durationPerBar * 7 : durationPerBar;
+        const delay = index === 0 ? 0 :
+            index <= bars.length - 7 ?
+                index * durationPerBar :
+                (bars.length - 7) * durationPerBar + (index - (bars.length - 7)) * durationPerBar * 7;
+
         barsTl.to(bar, {
             autoAlpha: 1,
             scaleY: 1,
-            duration: durationPerBar + 0.1,
+            duration: duration,
             ease: "power1.out"
-        }, index * durationPerBar);
+        }, delay);
     });
 
-    barsTl.to({}, {
-        onStart: function () {
-            flashAndScrambleTl.play(0);
-        },
-        onReverseComplete: function () {
-            flashAndScrambleTl.reverse();
-        },
-    }, ".5")
+    barsTl
+        .to(".title-intro", {
+
+            opacity: 1,
+            filter: "blur(0px)",
+            duration: 1,
+            stagger: 0.1,
+            ease: "easeOutQuart",
+        }, "-=.2")
         .to({}, {
             onStart: function () {
-                gsap.to(".title-intro .lineInner", {
-                    yPercent: 0,
-                    duration: 1,
-                    stagger: 0.1,
-                    ease: "easeOutQuart",
-                })
+                flashAndScrambleTl.play(0);
             },
             onReverseComplete: function () {
-                gsap.to(".title-intro .lineInner", {
-                    yPercent: 100,
-                    duration: 1,
-                    stagger: 0.1,
-                    ease: "easeOutQuart",
-                })
+                flashAndScrambleTl.reverse();
             },
-        }, "-=.2")
+        }, "-=.8")
+        .to({}, {
+            duration: 3,
+            ease: "none"
+        })
 
     const flashAndScrambleTl = gsap.timeline({
         paused: true,
@@ -147,7 +150,7 @@ function initIntro() {
             speed: 1,
             tweenLength: false,
         }
-    }, "label");
+    });
 }
 
 function initTrackerSection() {
@@ -3757,20 +3760,20 @@ document.addEventListener("DOMContentLoaded", () => {
         initSplit();
 
         // TO COMMENT
-        initAgeGate();
+        // initAgeGate();
         tlHeroAnimation = initHeroAnimation();
         // TO COMMENT
-        initIntro();
+        // initIntro();
         initTrackerCheckboxes();
         // TO COMMENT
-        initScrollLock();
+        // initScrollLock();
         initTrackerSection();
         initVideoMap();
 
 
 
         //to remove
-        // initTreeDiagramWrapper(); // on page load
+        initTreeDiagramWrapper(); // on page load
     });
     // initVideoMap();
     document.body.removeAttribute('data-preload');
