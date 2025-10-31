@@ -647,7 +647,7 @@ function initTreeDiagram() {
             scrollTrigger: {
                 trigger: ".parent-section",
                 start: "top top",
-                end: "+=1500%",
+                end: "+=2000%",
                 pin: true,
                 pinSpacing: "margin",
                 scrub: true,
@@ -1180,7 +1180,7 @@ function initTreeDiagram() {
         })
         .to(".tree-container.is--three .tree-horizontal-line", {
             scaleX: 1,
-            duration: 2,
+
         })
         .to(".tree-container.is--three .tree-child-wrapper .line", {
             scaleY: 1,
@@ -1289,26 +1289,13 @@ function initTreeDiagram() {
     // we move "toi" to the top on mobile only
     mm.add("(max-width: 767px)", () => {
         console.log("mobile");
-
+        treeTlOne.to({}, {
+            duration: 1,
+        })
         treeTlOne.to(".tree-container.is--three .tree-child-wrapper.is--one", {
             yPercent: -730, // adjust as needed
-            duration: 4,
-            onStart: function () {
-                gsap.to(".section.is--personnes [data-split='lines'] .lineInner", {
-                    yPercent: -100,
-                    duration: .6,
-                    stagger: 0.05,
-                    ease: "power1.out"
-                })
-            },
-            onReverseComplete: function () {
-                gsap.to(".section.is--personnes [data-split='lines'] .lineInner", {
-                    yPercent: 0,
-                    duration: .6,
-                    stagger: 0.05,
-                    ease: "power1.out"
-                })
-            }
+            duration: 3,
+
         },);
 
     })
@@ -1320,6 +1307,7 @@ function initTreeDiagram() {
     treeTlOne.from(".tree-left-side .line", {
         scaleX: window.innerWidth <= 767 ? 1 : 0,
         scaleY: window.innerWidth <= 767 ? 0 : 1,
+        duration: 1.5,
         transformOrigin: window.innerWidth <= 767 ? "top" : "left",
         onStart: function () {
 
@@ -1360,14 +1348,16 @@ function initTreeDiagram() {
             //         // tweenLength: false,
             //     }
             // },);
-            mm.add("(min-width: 768px)", () => {
-                gsap.to(".section.is--personnes [data-split='lines'] .lineInner", {
-                    yPercent: -100,
-                    duration: .6,
-                    stagger: 0.05,
-                    ease: "power1.out"
-                })
+
+
+            // mm.add("(min-width: 768px)", () => {
+            gsap.to(".section.is--personnes [data-split='lines'] .lineInner", {
+                yPercent: -100,
+                duration: .6,
+                stagger: 0.05,
+                ease: "power1.out"
             })
+            // })
 
         },
         onReverseComplete: function () {
@@ -1387,13 +1377,13 @@ function initTreeDiagram() {
             //     autoAlpha: 1,
             // })
 
-            mm.add("(min-width: 768px)", () => {
-                gsap.to(".section.is--personnes [data-split='lines'] .lineInner", {
-                    yPercent: 0,
-                    duration: .6,
-                    stagger: 0.05,
-                    ease: "power1.out"
-                })
+            // mm.add("(min-width: 768px)", () => {
+            gsap.to(".section.is--personnes [data-split='lines'] .lineInner", {
+                yPercent: 0,
+                duration: .6,
+                stagger: 0.05,
+                ease: "power1.out"
+                // })
             })
 
             // gsap.to(".section.is--section .header-title, .section.is--section .header-number", {
@@ -1411,20 +1401,20 @@ function initTreeDiagram() {
             scaleX: window.innerWidth <= 767 ? 0 : 1,
             scaleY: window.innerWidth <= 767 ? 1 : 0,
             transformOrigin: window.innerWidth <= 767 ? "right" : "bottom",
-
+            duration: 1.5,
         })
         .from(".tree-container.is--compare .line.is--vertical.is--bottom", {
             scaleX: window.innerWidth <= 767 ? 0 : 1,
             scaleY: window.innerWidth <= 767 ? 1 : 0,
             transformOrigin: window.innerWidth <= 767 ? "left" : "top",
-
+            duration: 1.5,
         }, "<")
 
         .from(".tree-container.is--compare .tree-right-wrapper .line", {
             scaleX: window.innerWidth <= 767 ? 1 : 0,
             scaleY: window.innerWidth <= 767 ? 0 : 1,
             transformOrigin: window.innerWidth <= 767 ? "top" : "left",
-            duration: 1.2,
+            duration: 1.5,
         })
 
 
@@ -1522,7 +1512,7 @@ function initTreeDiagram() {
             scaleX: window.innerWidth <= 767 ? 1 : 0,
             scaleY: window.innerWidth <= 767 ? 0 : 1,
             transformOrigin: window.innerWidth <= 767 ? "top" : "left",
-            duration: 1.2,
+            duration: 1.5,
             ease: "linear",
         }, "focusSection")
 
@@ -1531,7 +1521,7 @@ function initTreeDiagram() {
             scaleX: window.innerWidth <= 767 ? 0 : 1,
             scaleY: window.innerWidth <= 767 ? 1 : 0,
             transformOrigin: window.innerWidth <= 767 ? "right" : "top",
-            duration: 1.2,
+            duration: 1.5,
             ease: "linear",
 
             onStart: function () {
@@ -2514,37 +2504,40 @@ function initTreeDiagram() {
         //     });
         // });
 
-        gsap.to(".timeline-panel.is--4.is--fixed", {
+        // gsap.to(".timeline-panel.is--4.is--fixed", {
+        //     autoAlpha: 0,
+        //     // filter: "blur(10px)",
+        //     // scale: 0,
+        //     duration: 0.5,
+        //     scrollTrigger: {
+        //         trigger: ".timeline-panel.is--4.is--fixed",
+        //         start: "top 20%",
+        //         toggleActions: "play reverse play reverse",
+        //         // markers: true,
+        //         pinnedContainer: ".parent-section",
+
+        //     }
+        // });
+
+        // gsap.set(".timeline-panel .stats-container", {
+        //     opacity: 0,
+        // });
+
+        gsap.from(".timeline-panel .stats-container .stats-wrapper", {
             autoAlpha: 0,
-            // filter: "blur(10px)",
-            // scale: 0,
-            duration: 0.5,
-            scrollTrigger: {
-                trigger: ".timeline-panel.is--4.is--fixed",
-                start: "top 20%",
-                toggleActions: "play reverse play reverse",
-                // markers: true,
-                pinnedContainer: ".parent-section",
-
-            }
-        });
-
-        gsap.set(".timeline-panel .stats-container", {
-            opacity: 0,
-        });
-
-        gsap.to(".timeline-panel .stats-container", {
-            opacity: 1,
             duration: .5,
             scrollTrigger: {
                 trigger: ".timeline-panel.is--5",
                 start: "top 40%",
-                toggleActions: "play reverse play reverse",
-                // markers: true,
+                endTrigger: ".timeline-panel.is--4.is--fixed",
+                end: "bottom top+=38%",
+                toggleActions: "play none none reverse",
                 pinnedContainer: ".parent-section",
+                clearProps: "autoAlpha",
 
             }
         });
+
 
         gsap.set(".section.is--groupe p.is--first", {
             paddingLeft: 0
@@ -2679,7 +2672,7 @@ function initTreeDiagram() {
 
                 },
 
-            }, "<+=1")
+            }, "<+=.2")
 
             .to(".section.is--compare .line-wrapper-bottom", {
                 autoAlpha: 0,
@@ -2723,20 +2716,28 @@ function initTreeDiagram() {
             endTrigger: ".section.is--timeline",
             end: "bottom top+=38%",
             pin: ".timeline-panel .stats-container",
-            pinSpacing: true,
+            pinSpacing: "margin",
+            markers: true,
             pinReparent: true,
-            anticipatePin: 1,
+            zIndex: 100,
             pinnedContainer: ".parent-section",
             markers: false,
+
 
             onUpdate: function (self) {
                 const progress = self.progress;
 
-                // Update each stat based on progress
+                // Only start animating values after 40% scroll progress
+                // This aligns with when the stats container opacity animates to 1
+                const threshold = 0.35;
+                const adjustedProgress = progress < threshold ? 0 : (progress - threshold) / (1 - threshold);
+
+                // Update each stat based on adjusted progress
                 document.querySelectorAll('[data-target]').forEach(el => {
                     const target = parseFloat(el.dataset.target);
-                    const currentValue = Math.round(target * progress);
+                    const currentValue = Math.round(target * adjustedProgress);
                     const valueSpan = el.querySelector('.stat-value');
+
 
                     if (valueSpan) {
                         // Determine how many digits the target has
