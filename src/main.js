@@ -1,5 +1,5 @@
 
-// import './styles/main.scss'
+import './styles/main.scss'
 import { ElectricBorder } from './electricBorder.js'
 import { SparkSystem } from './sparkSystem.js'
 
@@ -71,7 +71,7 @@ function initIntro() {
         scrollTrigger: {
             trigger: ".section.is--intro",
             start: "top top",
-            end: "+=300%", // Just for the bar animations
+            end: "+=400%", // Just for the bar animations
             scrub: true,
             // markers: { startColor: "blue", endColor: "blue" },
             id: "barsScrub",
@@ -114,7 +114,7 @@ function initIntro() {
             },
         }, "-=.8")
         .to({}, {
-            duration: 3,
+            duration: window.innerWidth > 767 ? 6 : 9,
             ease: "none"
         })
 
@@ -647,7 +647,7 @@ function initTreeDiagram() {
             scrollTrigger: {
                 trigger: ".parent-section",
                 start: "top top",
-                end: "+=4000%",
+                end: "+=1500%",
                 pin: true,
                 pinSpacing: "margin",
                 scrub: true,
@@ -1073,7 +1073,7 @@ function initTreeDiagram() {
         }, "focusSection")
         .to(".tree-container.is--second .tree-child-wrapper.is--three", {
             yPercent: -302,
-            duration: 2,
+            duration: 1.5,
 
         }, "focusSection")
         .to(".tree-container.is--second .tree-child-wrapper.is--three .line", {
@@ -1289,9 +1289,10 @@ function initTreeDiagram() {
     // we move "toi" to the top on mobile only
     mm.add("(max-width: 767px)", () => {
         console.log("mobile");
+
         treeTlOne.to(".tree-container.is--three .tree-child-wrapper.is--one", {
             yPercent: -730, // adjust as needed
-            duration: 3,
+            duration: 4,
             onStart: function () {
                 gsap.to(".section.is--personnes [data-split='lines'] .lineInner", {
                     yPercent: -100,
@@ -1308,7 +1309,7 @@ function initTreeDiagram() {
                     ease: "power1.out"
                 })
             }
-        }, "focusSection");
+        },);
 
     })
 
@@ -1532,6 +1533,21 @@ function initTreeDiagram() {
             transformOrigin: window.innerWidth <= 767 ? "right" : "top",
             duration: 1.2,
             ease: "linear",
+
+            onStart: function () {
+                mm.add("(max-width: 767px)", () => {
+                    gsap.to(".section.is--compare [data-split='lines'] .lineInner", {
+                        yPercent: -100,
+                    })
+                })
+            },
+            onReverseComplete: function () {
+                mm.add("(max-width: 767px)", () => {
+                    gsap.to(".section.is--compare [data-split='lines'] .lineInner", {
+                        yPercent: 0,
+                    })
+                })
+            }
         })
 
         //dot is coming in
@@ -2471,7 +2487,9 @@ function initTreeDiagram() {
                 // paddingLeft: 0
             })
         }
-
+        gsap.set(".section.is--timeline .timeline-container", {
+            autoAlpha: 0,
+        })
 
         gsap.set(".timeline-panel", {
             autoAlpha: 1
@@ -2511,6 +2529,23 @@ function initTreeDiagram() {
             }
         });
 
+        gsap.set(".timeline-panel .stats-container", {
+            opacity: 0,
+        });
+
+        gsap.to(".timeline-panel .stats-container", {
+            opacity: 1,
+            duration: .5,
+            scrollTrigger: {
+                trigger: ".timeline-panel.is--5",
+                start: "top 40%",
+                toggleActions: "play reverse play reverse",
+                // markers: true,
+                pinnedContainer: ".parent-section",
+
+            }
+        });
+
         gsap.set(".section.is--groupe p.is--first", {
             paddingLeft: 0
         })
@@ -2534,26 +2569,29 @@ function initTreeDiagram() {
 
         // let mapTl = null;
 
-
+        treeTlOne.to({}, {
+            duration: 2,
+            ease: "linear",
+        })
         treeTlOne.to({}, {
             ease: "none",
-            // duration: 2,
+            // duration: 1,
             onStart: function () {
                 console.log("start");
                 gsap.set(".parent-section", {
                     overflow: "visible",
                 })
-                gsap.to(".section.is--compare [data-split='lines'] .lineInner", {
-                    yPercent: -100,
-                })
+                // gsap.to(".section.is--compare [data-split='lines'] .lineInner", {
+                //     yPercent: -100,
+                // })
             },
 
 
 
             onReverseComplete: function () {
-                gsap.to(".section.is--compare [data-split='lines'] .lineInner", {
-                    yPercent: 0,
-                })
+                // gsap.to(".section.is--compare [data-split='lines'] .lineInner", {
+                //     yPercent: 0,
+                // })
             }
         },)
 
@@ -2566,14 +2604,15 @@ function initTreeDiagram() {
 
 
             .to(".line.is--reallywant", {
-                scaleY: 3,
-
+                scaleY: 2,
+                duration: 2,
                 transformOrigin: "top left"
 
             }, "<+=.5")
             .to(".section.is--compare .label.is--compare3", {
 
-                y: "+=100vh",
+                y: "+=70dvh",
+                duration: 3,
                 transformOrigin: "top",
                 ease: "none"
             }, "<")
@@ -2640,7 +2679,7 @@ function initTreeDiagram() {
 
                 },
 
-            }, "<")
+            }, "<+=1")
 
             .to(".section.is--compare .line-wrapper-bottom", {
                 autoAlpha: 0,
@@ -2663,7 +2702,7 @@ function initTreeDiagram() {
             pinReparent: true,
             pinnedContainer: ".parent-section",
             markers: false,
-
+            anticipatePin: 1,
 
 
             // onLeave: function () {
@@ -2686,6 +2725,7 @@ function initTreeDiagram() {
             pin: ".timeline-panel .stats-container",
             pinSpacing: true,
             pinReparent: true,
+            anticipatePin: 1,
             pinnedContainer: ".parent-section",
             markers: false,
 
@@ -4069,20 +4109,20 @@ document.addEventListener("DOMContentLoaded", () => {
         initSplit();
 
         // TO COMMENT
-        initAgeGate();
+        // initAgeGate();
         tlHeroAnimation = initHeroAnimation();
         // TO COMMENT
-        initIntro();
+        // initIntro();
         initTrackerCheckboxes();
         // TO COMMENT
-        initScrollLock();
+        // initScrollLock();
         initTrackerSection();
         initVideoMap();
 
 
 
         //to remove
-        // initTreeDiagramWrapper(); // on page load
+        initTreeDiagramWrapper(); // on page load
     });
     // initVideoMap();
     document.body.removeAttribute('data-preload');
