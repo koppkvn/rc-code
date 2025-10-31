@@ -517,6 +517,10 @@ function initTreeDiagram() {
 
     let mm = gsap.matchMedia();
 
+    // Check if the second text animation should be disabled
+    const secondTextElement = document.querySelector(".section.is--groupe p[data-split='lines'].is--second");
+    const shouldAnimateSecond = !secondTextElement || secondTextElement.dataset.showAnimation !== "false";
+
     // set the height of the parent section to 100vh
     gsap.set(".parent-section", {
         height: "100vh"
@@ -973,50 +977,58 @@ function initTreeDiagram() {
         .to({}, {
             duration: 0.01, // Minimal duration
             onStart: function () {
-                gsap.to(".section.is--groupe p[data-split='lines'].is--second .lineInner", {
-                    yPercent: 0,
-                    duration: .6,
-                    stagger: 0.05,
-                    ease: "power1.out",
-                })
+                if (shouldAnimateSecond) {
+                    // Normal behavior: hide first, show second
+                    gsap.to(".section.is--groupe p[data-split='lines'].is--second .lineInner", {
+                        yPercent: 0,
+                        duration: .6,
+                        stagger: 0.05,
+                        ease: "power1.out",
+                    })
 
-                gsap.to(".section.is--groupe p[data-split='lines'].is--second", {
-                    autoAlpha: 1,
-                    duration: .6,
-                    ease: "power1.out",
-                })
-                gsap.to(".section.is--groupe p[data-split='lines'].is--first .lineInner", {
-                    yPercent: 100,
-                    duration: .6,
-                    stagger: 0.05,
-                    ease: "power1.out",
-                })
+                    gsap.to(".section.is--groupe p[data-split='lines'].is--second", {
+                        autoAlpha: 1,
+                        duration: .6,
+                        ease: "power1.out",
+                    })
+
+                    gsap.to(".section.is--groupe p[data-split='lines'].is--first .lineInner", {
+                        yPercent: 100,
+                        duration: .6,
+                        stagger: 0.05,
+                        ease: "power1.out",
+                    })
+                }
+                // If second is disabled, first text stays visible - no animation needed
             },
             onReverseComplete: function () {
-                gsap.to(".section.is--groupe p[data-split='lines'].is--second .lineInner", {
-                    yPercent: 100,
-                    duration: .6,
-                    stagger: 0.05,
-                    ease: "power1.out"
-                })
+                if (shouldAnimateSecond) {
+                    // Normal behavior: hide second, show first
+                    gsap.to(".section.is--groupe p[data-split='lines'].is--second .lineInner", {
+                        yPercent: 100,
+                        duration: .6,
+                        stagger: 0.05,
+                        ease: "power1.out"
+                    })
 
+                    gsap.to(".section.is--groupe p[data-split='lines'].is--second", {
+                        autoAlpha: 0,
+                        duration: .6,
+                        ease: "power1.out",
+                    })
 
-                gsap.to(".section.is--groupe p[data-split='lines'].is--second", {
-                    autoAlpha: 0,
-                    duration: .6,
-                    ease: "power1.out",
-                })
-
-                gsap.to(".section.is--groupe p[data-split='lines'].is--first .lineInner", {
-                    yPercent: 0,
-                    duration: .6,
-                    stagger: 0.05,
-                    ease: "power1.out"
-                })
+                    gsap.to(".section.is--groupe p[data-split='lines'].is--first .lineInner", {
+                        yPercent: 0,
+                        duration: .6,
+                        stagger: 0.05,
+                        ease: "power1.out"
+                    })
+                }
+                // If second is disabled, first text stays visible - no animation needed
             }
         })
         .to({}, {
-            duration: 3, // Adjust this: 3 = more scroll distance to read
+            duration: 2, // Adjust this: 3 = more scroll distance to read
             ease: "none"
         })
         // .to({}, {
@@ -1077,6 +1089,91 @@ function initTreeDiagram() {
         })
         .to(".tree-container.is--three .tree-header-wrapper .label", {
             autoAlpha: 1,
+            onStart: function () {
+                scrambleChildLabelThree.play(0);
+
+                if (shouldAnimateSecond) {
+                    // Normal behavior: animate out second text
+                    gsap.to(".section.is--groupe [data-split='lines'].is--second .lineInner", {
+                        yPercent: -100,
+                        duration: .6,
+                        stagger: 0.05,
+                        ease: "power1.out"
+                    })
+
+                    gsap.to(".section.is--groupe p[data-split='lines'].is--second", {
+                        autoAlpha: 0,
+                        duration: .6,
+                        ease: "power1.out",
+                    })
+                } else {
+                    // If second is disabled, animate out first text instead
+                    gsap.to(".section.is--groupe [data-split='lines'].is--first .lineInner", {
+                        yPercent: -100,
+                        duration: .6,
+                        stagger: 0.05,
+                        ease: "power1.out"
+                    })
+                }
+
+                // Always animate h2
+                gsap.to(".section.is--groupe h2[data-split='lines'] .lineInner", {
+                    yPercent: -100,
+                    duration: .6,
+                    stagger: 0.05,
+                    ease: "power1.out"
+                })
+
+                // gsap.to(".section.is--personnes [data-split='lines'] .lineInner", {
+                //     yPercent: 0,
+                //     duration: .6,
+                //     stagger: 0.05,
+                //     ease: "power1.out"
+                // })
+
+
+
+            },
+            onReverseComplete: function () {
+                if (shouldAnimateSecond) {
+                    // Normal behavior: bring back second text
+                    gsap.to(".section.is--groupe [data-split='lines'].is--second .lineInner", {
+                        yPercent: 0,
+                        duration: .6,
+                        stagger: 0.05,
+                        ease: "power1.out"
+                    })
+
+                    gsap.to(".section.is--groupe p[data-split='lines'].is--second", {
+                        autoAlpha: 1,
+                        duration: .6,
+                        ease: "power1.out",
+                    })
+                } else {
+                    // If second is disabled, bring back first text
+                    gsap.to(".section.is--groupe [data-split='lines'].is--first .lineInner", {
+                        yPercent: 0,
+                        duration: .6,
+                        stagger: 0.05,
+                        ease: "power1.out"
+                    })
+                }
+
+                // Always animate h2
+                gsap.to(".section.is--groupe h2[data-split='lines'] .lineInner", {
+                    yPercent: 0,
+                    duration: .6,
+                    stagger: 0.05,
+                    ease: "power1.out"
+                })
+
+                gsap.to(".section.is--personnes [data-split='lines'] .lineInner", {
+                    yPercent: 100,
+                    duration: .6,
+                    stagger: 0.05,
+                    ease: "power1.out"
+                })
+            }
         }, "<")
         .to(".tree-container.is--three .tree-header-wrapper .line", {
             scaleY: 1,
@@ -1090,20 +1187,39 @@ function initTreeDiagram() {
         })
         .to(".tree-container.is--three .tree-child-wrapper .label", {
             autoAlpha: 1,
-
             onStart: function () {
                 scrambleChildLabelThree.play(0);
 
-                gsap.to(".section.is--groupe [data-split='lines'].is--second .lineInner, .section.is--groupe h2[data-split='lines'] .lineInner", {
+                if (shouldAnimateSecond) {
+                    // Normal behavior: animate out second text
+                    gsap.to(".section.is--groupe [data-split='lines'].is--second .lineInner", {
+                        yPercent: -100,
+                        duration: .6,
+                        stagger: 0.05,
+                        ease: "power1.out"
+                    })
+
+                    gsap.to(".section.is--groupe p[data-split='lines'].is--second", {
+                        autoAlpha: 0,
+                        duration: .6,
+                        ease: "power1.out",
+                    })
+                } else {
+                    // If second is disabled, animate out first text instead
+                    gsap.to(".section.is--groupe [data-split='lines'].is--first .lineInner", {
+                        yPercent: -100,
+                        duration: .6,
+                        stagger: 0.05,
+                        ease: "power1.out"
+                    })
+                }
+
+                // Always animate h2
+                gsap.to(".section.is--groupe h2[data-split='lines'] .lineInner", {
                     yPercent: -100,
                     duration: .6,
                     stagger: 0.05,
                     ease: "power1.out"
-                })
-                gsap.to(".section.is--groupe p[data-split='lines'].is--second", {
-                    autoAlpha: 0,
-                    duration: .6,
-                    ease: "power1.out",
                 })
 
                 gsap.to(".section.is--personnes [data-split='lines'] .lineInner", {
@@ -1117,19 +1233,38 @@ function initTreeDiagram() {
 
             },
             onReverseComplete: function () {
-                gsap.to(".section.is--groupe [data-split='lines'].is--second .lineInner, .section.is--groupe h2[data-split='lines'] .lineInner", {
-                    yPercent: 0,
-                    duration: .6,
-                    stagger: 0.05,
-                    ease: "power1.out"
-                })
+                if (shouldAnimateSecond) {
+                    // Normal behavior: bring back second text
+                    // gsap.to(".section.is--groupe [data-split='lines'].is--second .lineInner", {
+                    //     yPercent: 0,
+                    //     duration: .6,
+                    //     stagger: 0.05,
+                    //     ease: "power1.out"
+                    // })
 
+                    // gsap.to(".section.is--groupe p[data-split='lines'].is--second", {
+                    //     autoAlpha: 1,
+                    //     duration: .6,
+                    //     ease: "power1.out",
+                    // })
+                } else {
+                    // If second is disabled, bring back first text
+                    // gsap.to(".section.is--groupe [data-split='lines'].is--first .lineInner", {
+                    //     yPercent: 0,
+                    //     duration: .6,
+                    //     stagger: 0.05,
+                    //     ease: "power1.out"
+                    // })
+                }
 
-                gsap.to(".section.is--groupe p[data-split='lines'].is--second", {
-                    autoAlpha: 1,
-                    duration: .6,
-                    ease: "power1.out",
-                })
+                // // Always animate h2
+                // gsap.to(".section.is--groupe h2[data-split='lines'] .lineInner", {
+                //     yPercent: 0,
+                //     duration: .6,
+                //     stagger: 0.05,
+                //     ease: "power1.out"
+                // })
+
                 gsap.to(".section.is--personnes [data-split='lines'] .lineInner", {
                     yPercent: 100,
                     duration: .6,
@@ -1137,6 +1272,7 @@ function initTreeDiagram() {
                     ease: "power1.out"
                 })
             }
+
         })
         .addLabel("focusSection", "+=1")
 
@@ -1156,6 +1292,22 @@ function initTreeDiagram() {
         treeTlOne.to(".tree-container.is--three .tree-child-wrapper.is--one", {
             yPercent: -730, // adjust as needed
             duration: 3,
+            onStart: function () {
+                gsap.to(".section.is--personnes [data-split='lines'] .lineInner", {
+                    yPercent: -100,
+                    duration: .6,
+                    stagger: 0.05,
+                    ease: "power1.out"
+                })
+            },
+            onReverseComplete: function () {
+                gsap.to(".section.is--personnes [data-split='lines'] .lineInner", {
+                    yPercent: 0,
+                    duration: .6,
+                    stagger: 0.05,
+                    ease: "power1.out"
+                })
+            }
         }, "focusSection");
 
     })
@@ -1168,16 +1320,104 @@ function initTreeDiagram() {
         scaleX: window.innerWidth <= 767 ? 1 : 0,
         scaleY: window.innerWidth <= 767 ? 0 : 1,
         transformOrigin: window.innerWidth <= 767 ? "top" : "left",
+        onStart: function () {
 
+            // scrambleChildLabelCompare.play(0);
+            // gsap.to(".section.is--compare [data-split='lines'] .lineInner", {
+            //     yPercent: 0,
+            //     duration: .6,
+            //     stagger: 0.05,
+            //     ease: "power1.out"
+            // })
+
+            // gsap.set(".label.color.is--compare", {
+            //     autoAlpha: 1,
+            // })
+            // gsap.set(".tree-child-wrapper.is--one.is--toi .label", {
+            //     autoAlpha: 0,
+            // })
+            // gsap.to(".header-section.is--groupe, .header-section", {
+            //     autoAlpha: 0,
+            // })
+
+            // gsap.to(".section.is--section .header-title, .section.is--section .header-number", {
+            //     autoAlpha: 0
+            // },);
+
+            // gsap.to(".section.is--compare .header-title, .section.is--compare .header-number", {
+            //     duration: 1,
+            //     onStart: function () {
+            //         gsap.set(".section.is--compare .header-title, .section.is--compare .header-number", {
+            //             autoAlpha: 1
+            //         });
+            //     },
+
+            //     scrambleText: {
+            //         text: "{original}",
+            //         chars: 'upperCase',
+            //         speed: 1,
+            //         // tweenLength: false,
+            //     }
+            // },);
+            mm.add("(min-width: 768px)", () => {
+                gsap.to(".section.is--personnes [data-split='lines'] .lineInner", {
+                    yPercent: -100,
+                    duration: .6,
+                    stagger: 0.05,
+                    ease: "power1.out"
+                })
+            })
+
+        },
+        onReverseComplete: function () {
+            // gsap.set(".label.color.is--compare", {
+            //     autoAlpha: 0,
+            // })
+            // gsap.set(".tree-child-wrapper.is--one.is--toi .label", {
+            //     autoAlpha: 1,
+            // })
+            // gsap.to(".section.is--compare [data-split='lines'] .lineInner", {
+            //     yPercent: 100,
+            //     duration: .6,
+            //     stagger: 0.05,
+            //     ease: "power1.out"
+            // })
+            // gsap.to(".header-section.is--groupe, .header-section", {
+            //     autoAlpha: 1,
+            // })
+
+            mm.add("(min-width: 768px)", () => {
+                gsap.to(".section.is--personnes [data-split='lines'] .lineInner", {
+                    yPercent: 0,
+                    duration: .6,
+                    stagger: 0.05,
+                    ease: "power1.out"
+                })
+            })
+
+            // gsap.to(".section.is--section .header-title, .section.is--section .header-number", {
+            //     autoAlpha: 1
+            // },);
+
+            // gsap.to(".section.is--compare .header-title, .section.is--compare .header-number", {
+            //     autoAlpha: 0
+            // },);
+        }
     }, "focusSection")
 
 
-        .from(".tree-container.is--compare .line.is--vertical", {
+        .from(".tree-container.is--compare .line.is--vertical.is--top", {
             scaleX: window.innerWidth <= 767 ? 0 : 1,
             scaleY: window.innerWidth <= 767 ? 1 : 0,
-            transformOrigin: "center",
+            transformOrigin: window.innerWidth <= 767 ? "right" : "bottom",
 
         })
+        .from(".tree-container.is--compare .line.is--vertical.is--bottom", {
+            scaleX: window.innerWidth <= 767 ? 0 : 1,
+            scaleY: window.innerWidth <= 767 ? 1 : 0,
+            transformOrigin: window.innerWidth <= 767 ? "left" : "top",
+
+        }, "<")
 
         .from(".tree-container.is--compare .tree-right-wrapper .line", {
             scaleX: window.innerWidth <= 767 ? 1 : 0,
@@ -1256,13 +1496,14 @@ function initTreeDiagram() {
                     autoAlpha: 1,
                 })
 
-                gsap.to(".section.is--personnes [data-split='lines'] .lineInner", {
-                    yPercent: 0,
-                    duration: .6,
-                    stagger: 0.05,
-                    ease: "power1.out"
+                mm.add("(min-width: 768px)", () => {
+                    gsap.to(".section.is--personnes [data-split='lines'] .lineInner", {
+                        yPercent: 0,
+                        duration: .6,
+                        stagger: 0.05,
+                        ease: "power1.out"
+                    })
                 })
-
                 gsap.to(".section.is--section .header-title, .section.is--section .header-number", {
                     autoAlpha: 1
                 },);
@@ -1319,9 +1560,9 @@ function initTreeDiagram() {
                 scrambleInscriptionRc.play(0);
             }
         })
-        .to({}, {
-            duration: 2,
-        })
+        // .to({}, {
+        //     duration: 2,
+        // })
         .to(".tree-container.is--three .label", {
             autoAlpha: 0,
             duration: 0.1,
@@ -1752,15 +1993,14 @@ function initTreeDiagram() {
                     // Hide and prepare image/gif
                     gsap.set(panel.querySelector(".gif-container"), {
                         autoAlpha: 0,
-                        scale: 0.8,
-                        rotation: -2
+                        filter: "blur(10px)",
                     });
 
                     // Animate image/gif in with bounce
                     gsap.to(panel.querySelector(".gif-container"), {
                         autoAlpha: 1,
-                        scale: 1,
-                        rotation: 0,
+                        filter: "blur(0px)",
+
                         duration: 0.8,
                         ease: "back.out(1.7)"
                     });
@@ -1789,8 +2029,7 @@ function initTreeDiagram() {
                     // Animate out image/gif with slight rotation
                     gsap.to(panel.querySelector(".gif-container"), {
                         autoAlpha: 0,
-                        scale: 0.9,
-                        rotation: 2,
+                        filter: "blur(10px)",
                         duration: 0.4,
                         ease: "power2.in"
                     });
@@ -1822,8 +2061,7 @@ function initTreeDiagram() {
                     // Exit animation when panel fades out
                     gsap.to(panel.querySelector(".gif-container"), {
                         autoAlpha: 0,
-                        scale: 1.1,
-                        rotation: -5,
+                        filter: "blur(10px)",
                         duration: 0.5,
                         ease: "power2.in"
                     });
@@ -1861,15 +2099,13 @@ function initTreeDiagram() {
 
                     gsap.set(panel.querySelector(".gif-container"), {
                         autoAlpha: 0,
-                        scale: 0.8,
-                        rotation: -2
+                        filter: "blur(10px)",
                     });
 
                     // Re-animate everything in
                     gsap.to(panel.querySelector(".gif-container"), {
                         autoAlpha: 1,
-                        scale: 1,
-                        rotation: 0,
+                        filter: "blur(0px)",
                         duration: 0.8,
                         ease: "back.out(1.7)"
                     });
@@ -2226,62 +2462,65 @@ function initTreeDiagram() {
 
     // same as above but on mobile
     mm.add("(max-width: 767px)", () => {
-        gsap.set(".section.is--groupe p.is--second", {
-            marginTop: 50,
-            right: "unset",
-            left: 0,
-            // paddingLeft: 0
-        })
+        // Only set styles for second text if enabled
+        if (shouldAnimateSecond) {
+            gsap.set(".section.is--groupe p.is--second", {
+                marginTop: 50,
+                right: "unset",
+                left: 0,
+                // paddingLeft: 0
+            })
+        }
 
 
         gsap.set(".timeline-panel", {
-            autoAlpha: 0
+            autoAlpha: 1
         });
 
-        // Reveal each panel when it reaches the center
-        gsap.utils.toArray(".timeline-panel").forEach(panel => {
-            console.log(panel);
-            gsap.to(panel, {
-                autoAlpha: 1,
-                duration: 0.5,
-                scrollTrigger: {
-                    trigger: panel,
-                    start: "top 60%",
-                    toggleActions: "play none none none",
-                    // markers: true,
-                    pinnedContainer: ".parent-section",
-                    onEnter: panel.classList.contains('is--4') ? () => {
-                        // Animate all stat values
-                        document.querySelectorAll('[data-target]').forEach(el => {
-                            const target = parseFloat(el.dataset.target);
-                            const valueSpan = el.querySelector('.stat-value');
+        // // Reveal each panel when it reaches the center
+        // gsap.utils.toArray(".timeline-panel").forEach(panel => {
+        //     console.log(panel);
+        //     gsap.to(panel, {
+        //         autoAlpha: 1,
+        //         duration: 0.5,
+        //         scrollTrigger: {
+        //             trigger: panel,
+        //             start: "top 60%",
+        //             toggleActions: "play none none none",
+        //             // markers: true,
+        //             pinnedContainer: ".parent-section",
+        //             onEnter: panel.classList.contains('is--4') ? () => {
+        //                 // Animate all stat values
+        //                 document.querySelectorAll('[data-target]').forEach(el => {
+        //                     const target = parseFloat(el.dataset.target);
+        //                     const valueSpan = el.querySelector('.stat-value');
 
-                            if (valueSpan) {
-                                const targetLength = Math.abs(target).toString().length;
-                                const obj = { value: 0 };
+        //                     if (valueSpan) {
+        //                         const targetLength = Math.abs(target).toString().length;
+        //                         const obj = { value: 0 };
 
-                                // Animate from 0 to target
-                                gsap.to(obj, {
-                                    value: target,
-                                    duration: 5,
-                                    ease: "power2.out",
-                                    onUpdate: function () {
-                                        const currentValue = Math.round(obj.value);
-                                        let paddedValue = Math.abs(currentValue).toString().padStart(targetLength, '0');
+        //                         // Animate from 0 to target
+        //                         gsap.to(obj, {
+        //                             value: target,
+        //                             duration: 5,
+        //                             ease: "power2.out",
+        //                             onUpdate: function () {
+        //                                 const currentValue = Math.round(obj.value);
+        //                                 let paddedValue = Math.abs(currentValue).toString().padStart(targetLength, '0');
 
-                                        if (target < 0) {
-                                            paddedValue = '-' + paddedValue;
-                                        }
+        //                                 if (target < 0) {
+        //                                     paddedValue = '-' + paddedValue;
+        //                                 }
 
-                                        valueSpan.textContent = paddedValue;
-                                    }
-                                });
-                            }
-                        });
-                    } : null
-                }
-            });
-        });
+        //                                 valueSpan.textContent = paddedValue;
+        //                             }
+        //                         });
+        //                     }
+        //                 });
+        //             } : null
+        //         }
+        //     });
+        // });
 
         gsap.set(".section.is--groupe p.is--first", {
             paddingLeft: 0
@@ -2304,12 +2543,11 @@ function initTreeDiagram() {
             scale: .5,
         })
 
-        let mapTl = null;
+        // let mapTl = null;
 
 
         treeTlOne.to({}, {
             ease: "none",
-            duration: 1,
             // duration: 2,
             onStart: function () {
                 console.log("start");
@@ -2343,12 +2581,11 @@ function initTreeDiagram() {
 
                 transformOrigin: "top left"
 
-            },)
+            }, "<+=.5")
             .to(".section.is--compare .label.is--compare3", {
 
                 y: "+=100vh",
                 transformOrigin: "top",
-                duration: 1,
                 ease: "none"
             }, "<")
             .to(".section.is--compare .line-wrapper-top, .section.is--compare .line.is--vertical, .section.is--compare .tree-left-side", {
@@ -2359,17 +2596,16 @@ function initTreeDiagram() {
 
                 }
             }, "<")
-            .addLabel("timelineStart")
+            // .addLabel("timelineStart")
             .to(".section.is--compare .inscription-rc",
                 {
                     autoAlpha: 0,
 
-                }, "timelineStart")
+                }, "<")
 
 
             .to(".section.is--timeline .timeline-container", {
                 autoAlpha: 1,
-                duration: 1,
 
 
                 onStart: function () {
@@ -2415,13 +2651,12 @@ function initTreeDiagram() {
 
                 },
 
-            }, "timelineStart")
+            }, "<")
 
             .to(".section.is--compare .line-wrapper-bottom", {
                 autoAlpha: 0,
-                duration: 1,
                 ease: "none"
-            }, "timelineStart")
+            }, "<")
 
 
 
@@ -2439,11 +2674,7 @@ function initTreeDiagram() {
             pinReparent: true,
             pinnedContainer: ".parent-section",
             markers: false,
-            animation: gsap.to(".line-container .line-new", {
-                scaleY: 1,
-                duration: 3,
-                ease: "expo.out"
-            }),
+
 
 
             // onLeave: function () {
@@ -2455,6 +2686,71 @@ function initTreeDiagram() {
             // }
 
         })
+
+
+
+        ScrollTrigger.create({
+            trigger: ".section.is--compare",
+            start: "bottom bottom-=1%",
+            endTrigger: ".section.is--timeline",
+            end: "bottom top+=38%",
+            pin: ".timeline-panel .stats-container",
+            pinSpacing: true,
+            pinReparent: true,
+            pinnedContainer: ".parent-section",
+            markers: false,
+
+            onUpdate: function (self) {
+                const progress = self.progress;
+
+                // Update each stat based on progress
+                document.querySelectorAll('[data-target]').forEach(el => {
+                    const target = parseFloat(el.dataset.target);
+                    const currentValue = Math.round(target * progress);
+                    const valueSpan = el.querySelector('.stat-value');
+
+                    if (valueSpan) {
+                        // Determine how many digits the target has
+                        const targetLength = Math.abs(target).toString().length;
+
+                        // Pad the current value with leading zeros
+                        let paddedValue = Math.abs(currentValue).toString().padStart(targetLength, '0');
+
+                        // Add negative sign back if needed
+                        if (target < 0) {
+                            paddedValue = '-' + paddedValue;
+                        }
+
+                        valueSpan.textContent = paddedValue;
+                    }
+                });
+            }
+
+
+
+        })
+
+        // Separate trigger for the line animation
+
+        ScrollTrigger.create({
+            trigger: ".grey-line-new",
+            start: "top 37%",
+            end: "top top",
+            pinnedContainer: ".parent-section",
+            pin: true,
+            pinSpacing: true,
+            pinReparent: true,
+            invalidateOnRefresh: true,
+            // markers: true,
+            scrub: true,
+            animation: gsap.to(".line-container .line-new", {
+                scaleY: 1,
+                duration: .3,
+                ease: "none"
+            }),
+
+        })
+
 
         // gsap.to(".line-container .line-new", {
         //     // scaleY: 0,
@@ -2472,10 +2768,10 @@ function initTreeDiagram() {
         // const pinDuration = window.innerHeight * 7; // because +=300%
 
         // document.querySelector(".map-spacer").style.height = `${pinDuration}px`;
-
+        let mapTl = null;
         function createMapTimeline() {
             if (mapTl) {
-                mapTl.kill();
+                return
             }
             mapTl = gsap.timeline({
                 scrollTrigger: {
@@ -2495,6 +2791,7 @@ function initTreeDiagram() {
 
 
             });
+
             mapTl.to(".map-svg path", {
                 drawSVG: "0% 100%",
 

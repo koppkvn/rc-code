@@ -7,6 +7,8 @@
     --electric-glow-color: rgba(221, 132, 72, 0.8);
 }
 
+
+
 .tracker-wrapper-mobile {
     /* Standard syntax */
     mask-image: linear-gradient(to right, transparent 0%, black 100%, black 100%);
@@ -579,3 +581,37 @@ html.lenis body {
 // .pin-spacer {
 //     height: unset !important;
 // }
+
+/** CUSOTM CODE */
+.veil {
+    display: none;
+}
+
+@supports (-webkit-touch-callout: none) {
+    .veil {
+        position: sticky;
+        top: 0;
+        z-index: 10000;
+        display: block;
+        pointer-events: none;
+    }
+
+    .veil-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        backdrop-filter: blur(1px);
+    }
+}
+
+.stats-container {
+
+    background: linear-gradient(to bottom,
+            #0d0d0d 0%,
+            #0d0d0d 70%,
+            rgba(13, 13, 13, 0) 100%) !important;
+
+}
