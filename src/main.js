@@ -1,5 +1,5 @@
 
-import './styles/main.scss'
+// import './styles/main.scss'
 import { ElectricBorder } from './electricBorder.js'
 import { SparkSystem } from './sparkSystem.js'
 
@@ -2477,50 +2477,39 @@ function initTreeDiagram() {
             autoAlpha: 1
         });
 
-        // // Reveal each panel when it reaches the center
+        // Reveal each panel when it reaches the center
         // gsap.utils.toArray(".timeline-panel").forEach(panel => {
         //     console.log(panel);
         //     gsap.to(panel, {
-        //         autoAlpha: 1,
+        //         autoAlpha: 0,
+        //         // filter: "blur(10px)",
+        //         // scale: 0,
         //         duration: 0.5,
         //         scrollTrigger: {
         //             trigger: panel,
-        //             start: "top 60%",
+        //             start: "top 30%",
         //             toggleActions: "play none none none",
         //             // markers: true,
         //             pinnedContainer: ".parent-section",
-        //             onEnter: panel.classList.contains('is--4') ? () => {
-        //                 // Animate all stat values
-        //                 document.querySelectorAll('[data-target]').forEach(el => {
-        //                     const target = parseFloat(el.dataset.target);
-        //                     const valueSpan = el.querySelector('.stat-value');
 
-        //                     if (valueSpan) {
-        //                         const targetLength = Math.abs(target).toString().length;
-        //                         const obj = { value: 0 };
-
-        //                         // Animate from 0 to target
-        //                         gsap.to(obj, {
-        //                             value: target,
-        //                             duration: 5,
-        //                             ease: "power2.out",
-        //                             onUpdate: function () {
-        //                                 const currentValue = Math.round(obj.value);
-        //                                 let paddedValue = Math.abs(currentValue).toString().padStart(targetLength, '0');
-
-        //                                 if (target < 0) {
-        //                                     paddedValue = '-' + paddedValue;
-        //                                 }
-
-        //                                 valueSpan.textContent = paddedValue;
-        //                             }
-        //                         });
-        //                     }
-        //                 });
-        //             } : null
         //         }
         //     });
         // });
+
+        gsap.to(".timeline-panel.is--4.is--fixed", {
+            autoAlpha: 0,
+            // filter: "blur(10px)",
+            // scale: 0,
+            duration: 0.5,
+            scrollTrigger: {
+                trigger: ".timeline-panel.is--4.is--fixed",
+                start: "top 20%",
+                toggleActions: "play reverse play reverse",
+                // markers: true,
+                pinnedContainer: ".parent-section",
+
+            }
+        });
 
         gsap.set(".section.is--groupe p.is--first", {
             paddingLeft: 0
@@ -2724,6 +2713,24 @@ function initTreeDiagram() {
                         valueSpan.textContent = paddedValue;
                     }
                 });
+
+                // // Fade out the timeline section during the last 20% of progress
+                // const fadeThreshold = 0.88; // Start fading at 80% progress
+                // let opacity = 1;
+
+                // if (progress > fadeThreshold) {
+                //     // Calculate opacity: goes from 1 to 0 between 80% and 100% progress
+                //     // (progress - 0.8) gives us 0 to 0.2
+                //     // Multiply by 5 to get 0 to 1
+                //     // Subtract from 1 to get 1 to 0
+                //     opacity = Math.max(0, 1 - ((progress - fadeThreshold) * 5));
+                // }
+
+                // // Apply the opacity to the timeline section
+                // const timelineSection = document.querySelector('.timeline-panel.is--4.is--fixed');
+                // if (timelineSection) {
+                //     timelineSection.style.opacity = opacity;
+                // }
             }
 
 
@@ -3772,6 +3779,11 @@ function initHeroAnimation() {
             }
 
         }, "<")
+        .from(".header .shop", {
+            autoAlpha: 0,
+            duration: 1,
+            ease: "easeOutQuart"
+        }, "<")
 
         .fromTo(".container.is--hero .scroll-circle", {
             drawSVG: "0% 0%"
@@ -4057,20 +4069,20 @@ document.addEventListener("DOMContentLoaded", () => {
         initSplit();
 
         // TO COMMENT
-        // initAgeGate();
+        initAgeGate();
         tlHeroAnimation = initHeroAnimation();
         // TO COMMENT
-        // initIntro();
+        initIntro();
         initTrackerCheckboxes();
         // TO COMMENT
-        // initScrollLock();
+        initScrollLock();
         initTrackerSection();
         initVideoMap();
 
 
 
         //to remove
-        initTreeDiagramWrapper(); // on page load
+        // initTreeDiagramWrapper(); // on page load
     });
     // initVideoMap();
     document.body.removeAttribute('data-preload');
