@@ -721,7 +721,15 @@ function initTreeDiagram() {
         paused: true
     });
 
-    const scrambleChildLabelCompare = gsap.to(".tree-container.is--compare .tree-right-wrapper .label", {
+    const scrambleChildLabelCompareOne = gsap.to(".tree-container.is--compare .tree-right-wrapper .line-wrapper-top .label", {
+        duration: 1,
+        scrambleText: {
+            text: "{original}",
+            speed: 0.65,
+        },
+        paused: true
+    });
+    const scrambleChildLabelCompareTwo = gsap.to(".tree-container.is--compare .tree-right-wrapper .line-wrapper-bottom .label", {
         duration: 1,
         scrambleText: {
             text: "{original}",
@@ -936,6 +944,17 @@ function initTreeDiagram() {
             autoAlpha: 1,
             onStart: function () {
                 scrambleChildLabelTwo.play(0);
+            }
+        })
+        .to({}, {
+            duration: 1, // Adjust this: 3 = more scroll distance to read
+            ease: "none",
+        })
+        .to({}, {
+            duration: 2, // Adjust this: 3 = more scroll distance to read
+            ease: "none",
+            onStart: function () {
+
                 gsap.to(".section.is--section [data-split='lines'] .lineInner", {
                     yPercent: -100,
                     duration: .6,
@@ -966,11 +985,6 @@ function initTreeDiagram() {
                 })
 
             }
-        })
-
-        .to({}, {
-            duration: 3, // Adjust this: 3 = more scroll distance to read
-            ease: "none"
         })
 
         .addLabel("focusSection", "+=1")
@@ -1189,6 +1203,21 @@ function initTreeDiagram() {
             autoAlpha: 1,
             onStart: function () {
                 scrambleChildLabelThree.play(0);
+            }
+
+
+        })
+        .addLabel("focusSection", "+=1")
+        .to({}, {
+            duration: 1,
+            ease: "none",
+
+        })
+        .to({}, {
+            duration: 2,
+            ease: "none",
+
+            onStart: function () {
 
                 if (shouldAnimateSecond) {
                     // Normal behavior: animate out second text
@@ -1272,16 +1301,14 @@ function initTreeDiagram() {
                     ease: "power1.out"
                 })
             }
-
         })
-        .addLabel("focusSection", "+=1")
 
         // hiding of third tree container
         .to(".tree-container.is--three .tree-child-wrapper:not(.is--one), .tree-container.is--three .tree-horizontal-line, .tree-container.is--three .tree-header-wrapper, .tree-container.is--three .tree-child-wrapper.is--one .line", {
             autoAlpha: 0,
             duration: 1.2,
 
-        }, "focusSection")
+        })
 
 
 
@@ -1311,43 +1338,7 @@ function initTreeDiagram() {
         transformOrigin: window.innerWidth <= 767 ? "top" : "left",
         onStart: function () {
 
-            // scrambleChildLabelCompare.play(0);
-            // gsap.to(".section.is--compare [data-split='lines'] .lineInner", {
-            //     yPercent: 0,
-            //     duration: .6,
-            //     stagger: 0.05,
-            //     ease: "power1.out"
-            // })
 
-            // gsap.set(".label.color.is--compare", {
-            //     autoAlpha: 1,
-            // })
-            // gsap.set(".tree-child-wrapper.is--one.is--toi .label", {
-            //     autoAlpha: 0,
-            // })
-            // gsap.to(".header-section.is--groupe, .header-section", {
-            //     autoAlpha: 0,
-            // })
-
-            // gsap.to(".section.is--section .header-title, .section.is--section .header-number", {
-            //     autoAlpha: 0
-            // },);
-
-            // gsap.to(".section.is--compare .header-title, .section.is--compare .header-number", {
-            //     duration: 1,
-            //     onStart: function () {
-            //         gsap.set(".section.is--compare .header-title, .section.is--compare .header-number", {
-            //             autoAlpha: 1
-            //         });
-            //     },
-
-            //     scrambleText: {
-            //         text: "{original}",
-            //         chars: 'upperCase',
-            //         speed: 1,
-            //         // tweenLength: false,
-            //     }
-            // },);
 
 
             // mm.add("(min-width: 768px)", () => {
@@ -1361,21 +1352,7 @@ function initTreeDiagram() {
 
         },
         onReverseComplete: function () {
-            // gsap.set(".label.color.is--compare", {
-            //     autoAlpha: 0,
-            // })
-            // gsap.set(".tree-child-wrapper.is--one.is--toi .label", {
-            //     autoAlpha: 1,
-            // })
-            // gsap.to(".section.is--compare [data-split='lines'] .lineInner", {
-            //     yPercent: 100,
-            //     duration: .6,
-            //     stagger: 0.05,
-            //     ease: "power1.out"
-            // })
-            // gsap.to(".header-section.is--groupe, .header-section", {
-            //     autoAlpha: 1,
-            // })
+
 
             // mm.add("(min-width: 768px)", () => {
             gsap.to(".section.is--personnes [data-split='lines'] .lineInner", {
@@ -1386,13 +1363,7 @@ function initTreeDiagram() {
                 // })
             })
 
-            // gsap.to(".section.is--section .header-title, .section.is--section .header-number", {
-            //     autoAlpha: 1
-            // },);
 
-            // gsap.to(".section.is--compare .header-title, .section.is--compare .header-number", {
-            //     autoAlpha: 0
-            // },);
         }
     }, "focusSection")
 
@@ -1410,21 +1381,104 @@ function initTreeDiagram() {
             duration: 1.5,
         }, "<")
 
-        .from(".tree-container.is--compare .tree-right-wrapper .line", {
+        .addLabel("equal")
+        .from(".tree-container.is--compare .tree-right-wrapper .line-wrapper-top .line", {
+            scaleX: window.innerWidth <= 767 ? 1 : 0,
+            scaleY: window.innerWidth <= 767 ? 0 : 1,
+            transformOrigin: window.innerWidth <= 767 ? "top" : "left",
+            duration: .3,
+            onComplete: function () {
+                // scrambleChildLabelCompareOne.play(0);
+                gsap.set(".label.color.is--compare", {
+                    autoAlpha: 1,
+                })
+                gsap.set(".tree-child-wrapper.is--one.is--toi .label", {
+                    autoAlpha: 0,
+                })
+
+                // gsap.to(".tree-container.is--compare .tree-right-wrapper .line-wrapper-top .label", {
+                //     autoAlpha: 1,
+                // })
+            },
+
+            onReverseComplete: function () {
+                gsap.set(".label.color.is--compare", {
+                    autoAlpha: 0,
+                })
+                gsap.set(".tree-child-wrapper.is--one.is--toi .label", {
+                    autoAlpha: 1,
+                })
+
+                // gsap.to(".tree-container.is--compare .tree-right-wrapper .line-wrapper-top .label", {
+                //     autoAlpha: 0,
+                // })
+
+            }
+        }, "equal")
+        .to({}, {
+            duration: .1,
+            onStart: function () {
+                scrambleChildLabelCompareOne.play(0);
+
+                gsap.to(".tree-container.is--compare .tree-right-wrapper .line-wrapper-top .label", {
+                    autoAlpha: 1,
+                })
+            },
+            onReverseComplete: function () {
+                gsap.to(".tree-container.is--compare .tree-right-wrapper .line-wrapper-top .label", {
+                    autoAlpha: 0,
+                })
+            }
+        })
+        .from(".tree-container.is--compare .tree-right-wrapper .line-wrapper-bottom .line", {
             scaleX: window.innerWidth <= 767 ? 1 : 0,
             scaleY: window.innerWidth <= 767 ? 0 : 1,
             transformOrigin: window.innerWidth <= 767 ? "top" : "left",
             duration: 1.5,
+            onComplete: function () {
+                scrambleChildLabelCompareTwo.play(0);
+                gsap.set(".label.color.is--compare", {
+                    autoAlpha: 1,
+                })
+                gsap.set(".tree-child-wrapper.is--one.is--toi .label", {
+                    autoAlpha: 0,
+                })
+
+                gsap.to(".tree-container.is--compare .tree-right-wrapper .line-wrapper-bottom .label", {
+                    autoAlpha: 1,
+                })
+            },
+
+            onReverseComplete: function () {
+                gsap.set(".label.color.is--compare", {
+                    autoAlpha: 0,
+                })
+                gsap.set(".tree-child-wrapper.is--one.is--toi .label", {
+                    autoAlpha: 1,
+                })
+
+                // gsap.to(".tree-container.is--compare .tree-right-wrapper .line-wrapper-bottom .label", {
+                //     autoAlpha: 0,
+                // })
+            }
+        }, "equal")
+
+        .to({}, {
+            duration: 1,
+            onReverseComplete: function () {
+
+                gsap.to(".tree-container.is--compare .tree-right-wrapper .line-wrapper-bottom .label", {
+                    autoAlpha: 0,
+                })
+            }
         })
 
-
-        .to(".tree-container.is--compare .tree-right-wrapper .label", {
-            autoAlpha: 1,
-
+        .to({}, {
+            duration: 1,
 
             onStart: function () {
 
-                scrambleChildLabelCompare.play(0);
+                // scrambleChildLabelCompare.play(0);
                 gsap.to(".section.is--compare [data-split='lines'] .lineInner", {
                     yPercent: 0,
                     duration: .6,
@@ -1487,21 +1541,21 @@ function initTreeDiagram() {
                     autoAlpha: 1,
                 })
 
-                mm.add("(min-width: 768px)", () => {
-                    gsap.to(".section.is--personnes [data-split='lines'] .lineInner", {
-                        yPercent: 0,
-                        duration: .6,
-                        stagger: 0.05,
-                        ease: "power1.out"
-                    })
-                })
-                gsap.to(".section.is--section .header-title, .section.is--section .header-number", {
-                    autoAlpha: 1
-                },);
+                // mm.add("(min-width: 768px)", () => {
+                //     gsap.to(".section.is--personnes [data-split='lines'] .lineInner", {
+                //         yPercent: 0,
+                //         duration: .6,
+                //         stagger: 0.05,
+                //         ease: "power1.out"
+                //     })
+                // })
+                // gsap.to(".section.is--section .header-title, .section.is--section .header-number", {
+                //     autoAlpha: 1
+                // },);
 
-                gsap.to(".section.is--compare .header-title, .section.is--compare .header-number", {
-                    autoAlpha: 0
-                },);
+                // gsap.to(".section.is--compare .header-title, .section.is--compare .header-number", {
+                //     autoAlpha: 0
+                // },);
             }
         })
 
@@ -1565,7 +1619,7 @@ function initTreeDiagram() {
             onStart: function () {
                 scrambleInscriptionRc.play(0);
             }
-        })
+        }, "<")
         // .to({}, {
         //     duration: 2,
         // })
@@ -2132,7 +2186,7 @@ function initTreeDiagram() {
                         delay: 0.4
                     });
                 }
-            }, "horizontalStart+=10")
+            }, "horizontalStart+=11")
             // .to(".timeline-panel.is--fixed.is--2", { autoAlpha: 1 }, "horizontalStart+=4")
             // .to(".timeline-panel.is--fixed.is--2", { autoAlpha: 0 }, "horizontalStart+=9")
             // .to(".timeline-panel.is--fixed.is--4", { autoAlpha: 1 }, "horizontalStart+=10")
@@ -2312,7 +2366,7 @@ function initTreeDiagram() {
                         gsap.set(centerDot, { scale: 1 });
                     }
                 }
-            }, "horizontalStart+=10")
+            }, "horizontalStart+=13.7")
 
             .to({}, {
                 duration: 24,
@@ -2597,7 +2651,7 @@ function initTreeDiagram() {
 
 
             .to(".line.is--reallywant", {
-                scaleY: 2,
+                scaleY: 2.35,
                 duration: 2,
                 transformOrigin: "top left"
 
@@ -2672,7 +2726,7 @@ function initTreeDiagram() {
 
                 },
 
-            }, "<+=.2")
+            }, "<+=1")
 
             .to(".section.is--compare .line-wrapper-bottom", {
                 autoAlpha: 0,
@@ -4110,20 +4164,20 @@ document.addEventListener("DOMContentLoaded", () => {
         initSplit();
 
         // TO COMMENT
-        initAgeGate();
+        // initAgeGate();
         tlHeroAnimation = initHeroAnimation();
         // TO COMMENT
-        initIntro();
+        // initIntro();
         initTrackerCheckboxes();
         // TO COMMENT
-        initScrollLock();
+        // initScrollLock();
         initTrackerSection();
         initVideoMap();
 
 
 
         //to remove
-        // initTreeDiagramWrapper(); // on page load
+        initTreeDiagramWrapper(); // on page load
     });
     // initVideoMap();
     document.body.removeAttribute('data-preload');
