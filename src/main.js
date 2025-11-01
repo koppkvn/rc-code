@@ -1,5 +1,5 @@
 
-// import './styles/main.scss'
+import './styles/main.scss'
 import { ElectricBorder } from './electricBorder.js'
 import { SparkSystem } from './sparkSystem.js'
 
@@ -1785,7 +1785,7 @@ function initTreeDiagram() {
         // const scrollDistance = totalPanelsWidth - window.innerWidth;
         // Add extra scroll distance (e.g., 30vw) to see more of the last panel
 
-        const scrollDistance = totalPanelsWidth - (window.innerWidth * 1.4);
+        const scrollDistance = totalPanelsWidth - (window.innerWidth * 1.3);
         const scrollPercentage = (scrollDistance / totalPanelsWidth) * 100;
 
 
@@ -1886,21 +1886,24 @@ function initTreeDiagram() {
                     }
 
                     // Move the gray line at the end
+                    // Move the gray line at the end
+                    // Move the gray line at the end
                     const grayLine = document.querySelector(".tree-wrapper.is--compare .line.is--reallywant");
                     if (grayLine) {
-                        if (progress > 0.8) {
-                            // In the last 20% of scroll, start moving the gray line
-                            const endProgress = (progress - 0.8) / 0.2; // 0 to 1 for the last 20%
+                        // Start at 90%, finish at 100% (last 10% of scroll)
+                        if (progress > 0.9) {
+                            // Animation happens in 10% of scroll (1.0 - 0.9 = 0.1)
+                            const endProgress = (progress - 0.9) / 0.1; // 0 to 1 for 0.9 to 1.0
 
                             // Calculate how much to move the gray line
                             const grayLineWidth = grayLine.getBoundingClientRect().width;
-                            const moveDistance = (grayLineWidth / 2); // Half the width to get right edge to center
+                            const moveDistance = (grayLineWidth / 2);
 
                             gsap.set(grayLine, {
                                 x: -endProgress * moveDistance
                             });
                         } else {
-                            // Keep gray line in place
+                            // Keep gray line in place before 90%
                             gsap.set(grayLine, {
                                 x: 0
                             });
@@ -2201,6 +2204,10 @@ function initTreeDiagram() {
                         yPercent: 100
                     });
 
+                    gsap.set(".stat-title", {
+                        borderBottomColor: "#0d0d0d",
+                    })
+
                     // Hide structure wrappers initially
                     gsap.set(panel.querySelectorAll(".structure-wrapper"), {
                         autoAlpha: 0,
@@ -2227,6 +2234,12 @@ function initTreeDiagram() {
                         stagger: 0.15,
                         ease: "power2.out",
                         delay: 0.1
+                    });
+
+                    gsap.to(".stat-title", {
+                        borderBottomColor: "#2e2e2e",
+                        ease: "power2.out",
+                        delay: 1,
                     });
 
                     // Animate all text lines with stagger
@@ -2369,7 +2382,7 @@ function initTreeDiagram() {
             }, "horizontalStart+=13.7")
 
             .to({}, {
-                duration: 24,
+                duration: 25,
                 onUpdate: function () {
                     const progress = this.progress();
 
@@ -2392,11 +2405,17 @@ function initTreeDiagram() {
                             }
 
                             valueSpan.textContent = paddedValue;
+
+                            // Interpolate color from default to #fc0
+                            const colorInterpolate = gsap.utils.interpolate("white", "#fc0", progress);
+                            valueSpan.style.color = colorInterpolate;
                         }
                     });
                 }
-            }, "horizontalStart+=10")
-
+            }, "horizontalStart+=13.7")
+            .to(".timeline-panel.is--fixed.is--4", {
+                autoAlpha: 0,
+            }, "horizontalStart+=38")
             .to(".map-svg path", {
                 drawSVG: "0% 100%", // or "0 100" depending on your preference
                 duration: 5,
@@ -2582,7 +2601,7 @@ function initTreeDiagram() {
             duration: .5,
             scrollTrigger: {
                 trigger: ".timeline-panel.is--5",
-                start: "top 40%",
+                start: "top 55%",
                 endTrigger: ".timeline-panel.is--4.is--fixed",
                 end: "bottom top+=38%",
                 toggleActions: "play none none reverse",
@@ -2743,7 +2762,7 @@ function initTreeDiagram() {
             trigger: ".section.is--compare",
             start: "bottom bottom-=1%",
             endTrigger: ".section.is--timeline",
-            end: "bottom top+=38%",
+            end: "bottom top+=90%",
             pin: ".section.is--timeline .line-container",
             pinSpacing: true,
             pinReparent: true,
@@ -2768,7 +2787,7 @@ function initTreeDiagram() {
             trigger: ".section.is--compare",
             start: "bottom bottom-=1%",
             endTrigger: ".section.is--timeline",
-            end: "bottom top+=38%",
+            end: "bottom top+=80%",
             pin: ".timeline-panel .stats-container",
             pinSpacing: "margin",
             markers: true,
@@ -2806,6 +2825,8 @@ function initTreeDiagram() {
                         }
 
                         valueSpan.textContent = paddedValue;
+                        const colorInterpolate = gsap.utils.interpolate("white", "#fc0", progress);
+                        valueSpan.style.color = colorInterpolate;
                     }
                 });
 
