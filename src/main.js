@@ -2541,6 +2541,35 @@ function initTreeDiagram() {
 
     // same as above but on mobile
     mm.add("(max-width: 767px)", () => {
+
+        const childElement = document.querySelector(".tree-wrapper.is--compare .line-vertical-wrapper");
+        const parentElement = document.querySelector(".section.is--compare");
+        let distanceBetween = 0;
+        if (childElement && parentElement) {
+            const childTop = childElement.getBoundingClientRect().top;
+            const parentTop = parentElement.getBoundingClientRect().top;
+
+            distanceBetween = childTop - parentTop;
+
+            console.log(distanceBetween); // Distance in pixels
+        }
+        let panelHeight = document.querySelector(".section.is--timeline .timeline-panel.is--4.is--fixed").offsetHeight;
+
+        let timelineHeight = document.querySelector(".section.is--timeline .timeline-panels-wrapper").offsetHeight;
+        console.log("panelHeight:", panelHeight);
+        console.log("timelineHeight:", timelineHeight);
+        console.log("distanceBetween:", distanceBetween);
+        console.log("calc:", `calc(${timelineHeight / 16}rem - ${distanceBetween / 16}rem - ${panelHeight / 16}rem)`);
+        gsap.set(".grey-line-new", {
+            top: `${distanceBetween}px`,
+            height: `calc(${timelineHeight}px - ${distanceBetween}px - ${panelHeight + 150}px)`,
+        })
+
+        gsap.set(".line-container", {
+            height: `${distanceBetween - 2}px`,
+        })
+
+
         // Only set styles for second text if enabled
         if (shouldAnimateSecond) {
             gsap.set(".section.is--groupe p.is--second", {
@@ -2761,8 +2790,8 @@ function initTreeDiagram() {
         ScrollTrigger.create({
             trigger: ".section.is--compare",
             start: "bottom bottom-=1%",
-            endTrigger: ".section.is--timeline",
-            end: "bottom top+=90%",
+            endTrigger: ".section.is--timeline .timeline-panel.is--4.is--fixed",
+            end: `top ${distanceBetween - 2}px`,
             pin: ".section.is--timeline .line-container",
             pinSpacing: true,
             pinReparent: true,
@@ -2790,7 +2819,7 @@ function initTreeDiagram() {
             end: "bottom top+=80%",
             pin: ".timeline-panel .stats-container",
             pinSpacing: "margin",
-            markers: true,
+            // markers: true,
             pinReparent: true,
             zIndex: 100,
             pinnedContainer: ".parent-section",
@@ -2855,9 +2884,11 @@ function initTreeDiagram() {
 
         // Separate trigger for the line animation
 
+
+
         ScrollTrigger.create({
             trigger: ".grey-line-new",
-            start: "top 37%",
+            start: `top ${distanceBetween}px`,
             end: "top top",
             pinnedContainer: ".parent-section",
             pin: true,
