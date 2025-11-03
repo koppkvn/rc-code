@@ -3879,7 +3879,7 @@ function initVideoMap() {
 }
 
 function initFormAnimaton() {
-    gsap.set(".section.is--fields, .section.is--achat, .section.is--faq, .footer-section", {
+    gsap.set(".section.is--fields, .section.is--achat, .section.is--faq, section.footer-section", {
         display: "none",
     })
 
