@@ -4211,6 +4211,10 @@ function initAgeGate() {
         position: "fixed",
         pointerEvents: "none",
     });
+
+    //WATCH OUT
+    document.body.removeAttribute('data-preload');
+
     const yesBtn = document.querySelector('.button.is--yes');
     const noBtn = document.querySelector('.button.is--no');
 
@@ -5203,7 +5207,6 @@ document.addEventListener("DOMContentLoaded", () => {
         initBasicFormValidation();
     });
     // initVideoMap();
-    document.body.removeAttribute('data-preload');
 
     // to remove top 
 
