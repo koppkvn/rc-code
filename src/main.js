@@ -3953,7 +3953,7 @@ function initFormAnimaton() {
             //EXECUTE CODE AFTER CHECKBOX
 
             gsap.set(".section.is--fields, .section.is--achat, .section.is--faq, .section.is--footerlast", {
-                display: "unset",
+                display: "block",
             })
 
             ScrollTrigger.refresh();
