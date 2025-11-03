@@ -3952,7 +3952,7 @@ function initFormAnimaton() {
 
             //EXECUTE CODE AFTER CHECKBOX
 
-            gsap.set(".section.is--fields, .section.is--achat, .section.is--faq, .footer-section", {
+            gsap.set(".section.is--fields, .section.is--achat, .section.is--faq, .section.is--footerlast", {
                 display: "unset",
             })
 
