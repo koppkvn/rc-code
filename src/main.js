@@ -2495,6 +2495,29 @@ function initTreeDiagram() {
             //SPOTIFY
             .to(".click-me", {
                 autoAlpha: 0,
+                onComplete: function () {
+                    gsap.set(".map-container .dot-video", {
+                        pointerEvents: "none",
+                    })
+
+                    //interrupt the dot-video animation
+                    gsap.killTweensOf(".map-container .dot-video .dot-bg");
+                    gsap.set(".map-container .dot-video .dot-bg", {
+                        autoAlpha: 0,
+                    })
+                },
+                onReverseComplete: function () {
+                    gsap.fromTo(".map-container .dot-video .dot-bg", {
+                        scale: 0,
+                        autoAlpha: 1,
+                    }, {
+                        scale: 1.3,
+                        autoAlpha: 0,
+                        duration: 1,
+                        repeat: -1,
+                        ease: "power1.inOut"
+                    })
+                }
             })
             .to(".text-wrapper-spotify .lower-wrapper > *", {
                 autoAlpha: 1,
@@ -2515,6 +2538,9 @@ function initTreeDiagram() {
                     })
                     gsap.to(".text-wrapper-spotify .lineInner", {
                         yPercent: 100,
+                    })
+                    gsap.set(".map-container .dot-video", {
+                        pointerEvents: "auto",
                     })
                 }
             })
@@ -3079,6 +3105,29 @@ function initTreeDiagram() {
                 //SPOTIFY
                 .to(".click-me", {
                     autoAlpha: 0,
+                    onComplete: function () {
+                        gsap.set(".map-container .dot-video", {
+                            pointerEvents: "none",
+                        })
+
+                        //interrupt the dot-video animation
+                        gsap.killTweensOf(".map-container .dot-video .dot-bg");
+                        gsap.set(".map-container .dot-video .dot-bg", {
+                            autoAlpha: 0,
+                        })
+                    },
+                    onReverseComplete: function () {
+                        gsap.fromTo(".map-container .dot-video .dot-bg", {
+                            scale: 0,
+                            autoAlpha: 1,
+                        }, {
+                            scale: 1.3,
+                            autoAlpha: 0,
+                            duration: 1,
+                            repeat: -1,
+                            ease: "power1.inOut"
+                        })
+                    }
                 })
                 .to(".text-wrapper-spotify .lower-wrapper > *, .text-wrapper-spotify .lower-wrapper", {
                     autoAlpha: 1,
@@ -3099,6 +3148,9 @@ function initTreeDiagram() {
                         })
                         gsap.to(".text-wrapper-spotify .lineInner", {
                             yPercent: 100,
+                        })
+                        gsap.set(".map-container .dot-video", {
+                            pointerEvents: "auto",
                         })
                     }
                 })
@@ -3828,7 +3880,7 @@ function initVideoMap() {
 }
 
 function initFormAnimaton() {
-    gsap.set(".section.is--fields, .section.is--achat, .section.is--faq, .overlay-load", {
+    gsap.set(".section.is--fields, .section.is--achat, .section.is--faq, .footer-section", {
         display: "none",
     })
 
@@ -3897,7 +3949,7 @@ function initFormAnimaton() {
 
             //EXECUTE CODE AFTER CHECKBOX
 
-            gsap.set(".section.is--fields, .section.is--achat, .section.is--faq", {
+            gsap.set(".section.is--fields, .section.is--achat, .section.is--faq, .footer-section", {
                 display: "unset",
             })
 
@@ -4885,6 +4937,7 @@ function initMultiStepForm() {
             // Animate out current step
             gsap.to(currentStep, {
                 opacity: 0,
+                scale: 0.76,
                 filter: "blur(5px)",
                 duration: 0.2,
                 onComplete: () => {
@@ -4895,8 +4948,8 @@ function initMultiStepForm() {
 
                     // Animate in new step
                     gsap.fromTo(newStep,
-                        { opacity: 0, filter: "blur(5px)" },
-                        { opacity: 1, filter: "blur(0px)", duration: 0.2 }
+                        { opacity: 0, filter: "blur(5px)", scale: 0.76 },
+                        { opacity: 1, filter: "blur(0px)", scale: 1, duration: 0.2 }
                     );
 
                     createNavigationButtons();
@@ -5121,25 +5174,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     initLenis();
-    initAchat();
+    // initAchat();
     document.fonts.ready.then(() => {
         initSplit();
 
         // TO COMMENT
-        // initAgeGate();
+        initAgeGate();
         tlHeroAnimation = initHeroAnimation();
         // TO COMMENT
-        // initIntro();
+        initIntro();
         initTrackerCheckboxes();
         // TO COMMENT
-        // initScrollLock();
+        initScrollLock();
         initTrackerSection();
         initVideoMap();
 
 
 
         //to remove
-        initTreeDiagramWrapper(); // on page load
+        // initTreeDiagramWrapper(); // on page load
 
 
         initMultiStepForm();
