@@ -3879,16 +3879,13 @@ function initVideoMap() {
 }
 
 function initFormAnimaton() {
-    gsap.set(".section.is--fields, .section.is--achat, .section.is--faq", {
+    gsap.set(".section.is--fields, .section.is--achat, .section.is--faq, .section.is--footerlast", {
         display: "none",
     })
 
-    const footerSection = document.querySelector(".section.footer-section");
-    console.log(footerSection);
 
-    if (footerSection) {
-        footerSection.style.display = "none";
-    }
+
+
 
     // Add button/checkbox logic
     const textButton = document.querySelector('.text-checkbox.is--button');
