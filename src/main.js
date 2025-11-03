@@ -614,6 +614,27 @@ function initTreeDiagram() {
         yPercent: 100,
     })
 
+    gsap.set(".text-wrapper-spotify .lineInner", {
+        yPercent: 100,
+    })
+
+    gsap.set(".text-wrapper-spotify .lower-wrapper > *", {
+        autoAlpha: 0,
+    })
+
+    // Add this to hide all Spotify images except the first one
+    gsap.set(".img-spotify:not(.is--first)", {
+        autoAlpha: 0,
+    })
+    gsap.set(".img-spotify.is--first", {
+        autoAlpha: 1,
+    })
+
+    gsap.set(".text-wrapper-spotify", {
+        position: "absolute",
+        left: "unset",
+    })
+
     const isMobile = window.matchMedia("(max-width: 767px)").matches;
     let treeTlOne;
     mm.add("(min-width: 768px)", () => {
@@ -988,6 +1009,10 @@ function initTreeDiagram() {
         })
 
         .addLabel("focusSection", "+=1")
+        .to({}, {
+            duration: 1, // Adjust this: 3 = more scroll distance to read
+            ease: "none"
+        })
         .to({}, {
             duration: 0.01, // Minimal duration
             onStart: function () {
@@ -1633,7 +1658,7 @@ function initTreeDiagram() {
     // desktop only
     mm.add("(min-width: 768px)", () => {
 
-
+        initFormAnimaton();
 
         treeTlOne
             .to(".tree-wrapper.is--compare", {
@@ -2382,7 +2407,7 @@ function initTreeDiagram() {
             }, "horizontalStart+=13.7")
 
             .to({}, {
-                duration: 25,
+                duration: 27,
                 onUpdate: function () {
                     const progress = this.progress();
 
@@ -2465,16 +2490,72 @@ function initTreeDiagram() {
             .from(".click-me", {
                 autoAlpha: 0,
             }, "<")
+
+
+            //SPOTIFY
+            .to(".click-me", {
+                autoAlpha: 0,
+            })
+            .to(".text-wrapper-spotify .lower-wrapper > *", {
+                autoAlpha: 1,
+                duration: 1,
+                ease: "power2.out",
+
+                onStart: function () {
+                    gsap.to(".text-wrapper-map .lineInner", {
+                        yPercent: -100,
+                    })
+                    gsap.to(".text-wrapper-spotify .lineInner", {
+                        yPercent: 0,
+                    })
+                },
+                onReverseComplete: function () {
+                    gsap.to(".text-wrapper-map .lineInner", {
+                        yPercent: 0,
+                    })
+                    gsap.to(".text-wrapper-spotify .lineInner", {
+                        yPercent: 100,
+                    })
+                }
+            })
+
+            // Add this NEW animation to sequentially reveal images
+            .to(".img-spotify:not(.is--first)", {
+                autoAlpha: 1,
+                duration: 0.3,
+                stagger: 0.5,  // Delay between each image appearing (adjust as needed)
+                ease: "power2.inOut"
+            }, "+=0.5")  // Start 0.5s after the previous animation
+
+
             .to(".map-container", {
                 yPercent: -50,
                 xPercent: 30,
                 scale: 1.6,
                 duration: 10,
-                ease: "power1.out"
+                ease: "power1.out",
+
+                onStart: function () {
+                    gsap.to(".text-wrapper-spotify .lineInner", {
+                        yPercent: -100,
+                    })
+
+                    gsap.to(".text-wrapper-spotify .lower-wrapper > *", {
+                        autoAlpha: 0,
+                    })
+
+                },
+                onReverseComplete: function () {
+                    gsap.to(".text-wrapper-spotify .lineInner", {
+                        yPercent: 0,
+                    })
+
+                    gsap.to(".text-wrapper-spotify .lower-wrapper > *", {
+                        autoAlpha: 1,
+                    })
+                }
             },)
-            .to(".click-me", {
-                autoAlpha: 0,
-            }, "<")
+
             .to(".map-container mask rect", {
                 xPercent: 10,
                 yPercent: 50,
@@ -2498,9 +2579,9 @@ function initTreeDiagram() {
         treeTlOne.to({}, {
             onStart: function () {
                 console.log("start")
-                gsap.to(".text-wrapper-map .lineInner", {
-                    yPercent: -100,
-                })
+                // gsap.to(".text-wrapper-map .lineInner", {
+                //     yPercent: -100,
+                // })
                 gsap.to(".text-wrapper-barca .lineInner", {
                     yPercent: 0,
                 })
@@ -2517,9 +2598,9 @@ function initTreeDiagram() {
 
             },
             onReverseComplete: function () {
-                gsap.to(".text-wrapper-map .lineInner", {
-                    yPercent: 0,
-                })
+                // gsap.to(".text-wrapper-map .lineInner", {
+                //     yPercent: 0,
+                // })
 
                 gsap.to(".text-wrapper-barca .lineInner", {
                     yPercent: 100,
@@ -2662,6 +2743,10 @@ function initTreeDiagram() {
             scale: .5,
         })
 
+        gsap.set(".text-wrapper-spotify .lower-wrapper", {
+            autoAlpha: 0,
+        })
+
         // let mapTl = null;
 
         treeTlOne.to({}, {
@@ -2744,6 +2829,7 @@ function initTreeDiagram() {
                         ease: "power2.out"
                     })
 
+                    initFormAnimaton();
 
 
 
@@ -2989,12 +3075,68 @@ function initTreeDiagram() {
                     scale: 2,
                     duration: 3,
                 }, "<")
+
+                //SPOTIFY
+                .to(".click-me", {
+                    autoAlpha: 0,
+                })
+                .to(".text-wrapper-spotify .lower-wrapper > *, .text-wrapper-spotify .lower-wrapper", {
+                    autoAlpha: 1,
+                    duration: 1,
+                    ease: "power2.out",
+
+                    onStart: function () {
+                        gsap.to(".text-wrapper-map .lineInner", {
+                            yPercent: -100,
+                        })
+                        gsap.to(".text-wrapper-spotify .lineInner", {
+                            yPercent: 0,
+                        })
+                    },
+                    onReverseComplete: function () {
+                        gsap.to(".text-wrapper-map .lineInner", {
+                            yPercent: 0,
+                        })
+                        gsap.to(".text-wrapper-spotify .lineInner", {
+                            yPercent: 100,
+                        })
+                    }
+                })
+
+                // Add this NEW animation to sequentially reveal images
+                .to(".img-spotify:not(.is--first)", {
+                    autoAlpha: 1,
+                    duration: 0.3,
+                    stagger: 0.5,  // Delay between each image appearing (adjust as needed)
+                    ease: "power2.inOut"
+                }, "+=0.5")  // Start 0.5s after the previous animation
+
+
                 .to(".map-container", {
                     yPercent: -85,
                     xPercent: 45,
                     scale: 2.6,
                     duration: 3,
-                    ease: "power1.out"
+                    ease: "power1.out",
+                    onStart: function () {
+                        gsap.to(".text-wrapper-spotify .lineInner", {
+                            yPercent: -100,
+                        })
+
+                        gsap.to(".text-wrapper-spotify .lower-wrapper > *, .text-wrapper-spotify .lower-wrapper", {
+                            autoAlpha: 0,
+                        })
+
+                    },
+                    onReverseComplete: function () {
+                        gsap.to(".text-wrapper-spotify .lineInner", {
+                            yPercent: 0,
+                        })
+
+                        gsap.to(".text-wrapper-spotify .lower-wrapper > *, .text-wrapper-spotify .lower-wrapper", {
+                            autoAlpha: 1,
+                        })
+                    }
                 },)
                 .to(".click-me", {
                     autoAlpha: 0,
@@ -3021,9 +3163,9 @@ function initTreeDiagram() {
             mapTl.to({}, {
                 onStart: function () {
                     console.log("start")
-                    gsap.to(".text-wrapper-map .lineInner", {
-                        yPercent: -100,
-                    })
+                    // gsap.to(".text-wrapper-map .lineInner", {
+                    //     yPercent: -100,
+                    // })
                     gsap.to(".text-wrapper-barca .lineInner", {
                         yPercent: 0,
                     })
@@ -3039,9 +3181,9 @@ function initTreeDiagram() {
                     })
                 },
                 onReverseComplete: function () {
-                    gsap.to(".text-wrapper-map .lineInner", {
-                        yPercent: 0,
-                    })
+                    // gsap.to(".text-wrapper-map .lineInner", {
+                    //     yPercent: 0,
+                    // })
 
                     gsap.to(".text-wrapper-barca .lineInner", {
                         yPercent: -100,
@@ -3483,6 +3625,7 @@ function initTreeDiagram() {
 
 }
 
+
 function initVideoMap() {
 
     gsap.set(".video-modal", {
@@ -3684,6 +3827,266 @@ function initVideoMap() {
     });
 }
 
+function initFormAnimaton() {
+    gsap.set(".section.is--fields, .section.is--achat, .section.is--faq, .overlay-load", {
+        display: "none",
+    })
+
+    // Add button/checkbox logic
+    const textButton = document.querySelector('.text-checkbox.is--button');
+
+    if (textButton) {
+        // Add hover animations
+        textButton.addEventListener('mouseenter', function () {
+            // Skip hover effect if button was already clicked
+            if (this.getAttribute('data-clicked') === 'true') {
+                return;
+            }
+
+            // Subtle glow/pulse effect on hover
+            gsap.to(this, {
+                scale: 1.05,
+                duration: 0.2,
+                border: '.0625rem solid white'
+            });
+        });
+
+        textButton.addEventListener('mouseleave', function () {
+            // Skip if button was already clicked
+            if (this.getAttribute('data-clicked') === 'true') {
+                return;
+            }
+
+            // Return to normal state
+            gsap.to(this, {
+                border: '.0625rem solid transparent',
+                scale: 1,
+                duration: 0.2
+            });
+        });
+
+        textButton.addEventListener('click', function () {
+            // Check if button was already clicked
+            if (this.getAttribute('data-clicked') === 'true') {
+                return; // Do nothing if already clicked
+            }
+
+            // Mark as clicked
+            this.setAttribute('data-clicked', 'true');
+
+            // Toggle white border on the button
+            this.style.border = '.0625rem solid white';
+
+            // Remove any hover effects when clicked
+            gsap.to(this, {
+                boxShadow: 'none',
+                scale: 1,
+                duration: 0.2
+            });
+
+            // Find the inside div and animate it
+            const inside = this.querySelector('.tracker-checkbox-inside.is--button');
+            if (inside) {
+                // Animate the inside div with GSAP
+                gsap.fromTo(inside,
+                    { opacity: 0, scale: 1.6 },
+                    { opacity: 1, scale: 1, duration: 1, ease: "back.out(1.7)" }
+                );
+            }
+
+
+            //EXECUTE CODE AFTER CHECKBOX
+
+            gsap.set(".section.is--fields, .section.is--achat, .section.is--faq", {
+                display: "unset",
+            })
+
+            ScrollTrigger.refresh();
+
+            setTimeout(() => {
+                window.lenis.scrollTo(".section.is--fields", {
+                    duration: 1.2,
+                    immediate: false
+                });
+            }, 300);
+        });
+    }
+
+    let animationLocked = false;
+
+    const tl = gsap.timeline({
+        scrollTrigger: {
+            trigger: ".section.is--form",
+            start: "top top",
+            end: "+=300%",
+            pin: ".section.is--form .container.is--form",
+            pinSpacing: true,
+            scrub: true,
+            // pinReparent: true,
+            markers: true,
+            onUpdate: (self) => {
+                // Lock the timeline at 100% once it reaches the end
+                if (self.progress >= 0.99 && !animationLocked) {
+                    animationLocked = true;
+                    tl.progress(1);
+                }
+                // Prevent scrubbing backwards once locked
+                if (animationLocked) {
+                    tl.progress(1);
+                }
+            }
+        }
+    })
+
+    tl.from(".section.is--form .container.is--form [data-split='chars'] .charInner", {
+        opacity: 0.2,
+        duration: 1,
+        stagger: 0.1,
+        ease: "easeOutQuart",
+    })
+
+
+
+}
+
+function initBasicFormValidation() {
+    const forms = document.querySelectorAll('[data-form-validate]');
+
+    // Helpers for birthdate
+    const isValidDDMMYYYY = (val) => {
+        const m = /^(\d{2})\.(\d{2})\.(\d{4})$/.exec(val.trim());
+        if (!m) return false;
+        const day = parseInt(m[1], 10);
+        const month = parseInt(m[2], 10);
+        const year = parseInt(m[3], 10);
+
+        if (year < 1900 || year > 2100) return false;
+        if (month < 1 || month > 12) return false;
+        if (day < 1 || day > 31) return false;
+
+        const d = new Date(year, month - 1, day);
+        return d.getFullYear() === year && d.getMonth() === month - 1 && d.getDate() === day;
+    };
+
+    const toISOFromDDMMYYYY = (val) => {
+        const m = /^(\d{2})\.(\d{2})\.(\d{4})$/.exec(val.trim());
+        if (!m) return val.trim();
+        const [_, dd, mm, yyyy] = m;
+        return `${yyyy}-${mm}-${dd}`;
+    };
+
+    forms.forEach((form) => {
+        const fields = form.querySelectorAll('[data-validate] input, [data-validate] textarea');
+        const submitButtonDiv = form.querySelector('[data-submit]');
+        const submitInput = submitButtonDiv.querySelector('input[type="submit"]');
+
+        const formLoadTime = new Date().getTime();
+
+        // Optional: normalize birthdate fields right before submit if they carry data-birthdate-normalize
+        const normalizeBirthdatesIfNeeded = () => {
+            form.querySelectorAll('[data-birthdate-normalize]').forEach((el) => {
+                const v = el.value.trim();
+                if (v && isValidDDMMYYYY(v)) {
+                    // Put ISO back into the same field or into a hidden mirror
+                    // Here we overwrite the same field value. Remove this line if you prefer hidden inputs.
+                    el.value = toISOFromDDMMYYYY(v);
+                }
+            });
+        };
+
+        const validateField = (field) => {
+            const parent = field.closest('[data-validate]');
+            const minLength = field.getAttribute('min');
+            const maxLength = field.getAttribute('max');
+            const type = field.getAttribute('type');
+            const placeholder = field.getAttribute('placeholder') || '';
+            const isBirthdateField = field.hasAttribute('data-birthdate') || placeholder.includes('dd.mm.');
+
+            let isValid = true;
+
+            // Filled state
+            if (field.value.trim() !== '') parent.classList.add('is--filled');
+            else parent.classList.remove('is--filled');
+
+            // Length rules
+            if (minLength && field.value.length < parseInt(minLength, 10)) isValid = false;
+            if (maxLength && field.value.length > parseInt(maxLength, 10)) isValid = false;
+
+            // Email format
+            if (type === 'email' && !/\S+@\S+\.\S+/.test(field.value)) isValid = false;
+
+            // Birthdate format dd.mm.yyyy
+            if (isBirthdateField && field.value.trim() !== '' && !isValidDDMMYYYY(field.value)) {
+                isValid = false;
+            }
+
+            // UI classes
+            if (isValid) {
+                parent.classList.remove('is--error');
+                parent.classList.add('is--success');
+            } else {
+                parent.classList.remove('is--success');
+                parent.classList.add('is--error');
+            }
+
+            return isValid;
+        };
+
+        const startLiveValidation = (field) => {
+            field.addEventListener('input', function () {
+                validateField(field);
+            });
+        };
+
+        const validateAndStartLiveValidationForAll = () => {
+            let allValid = true;
+            let firstInvalidField = null;
+
+            fields.forEach((field) => {
+                const valid = validateField(field);
+                if (!valid && !firstInvalidField) firstInvalidField = field;
+                if (!valid) allValid = false;
+                startLiveValidation(field);
+            });
+
+            if (firstInvalidField) firstInvalidField.focus();
+            return allValid;
+        };
+
+        const isSpam = () => {
+            const currentTime = new Date().getTime();
+            const timeDifference = (currentTime - formLoadTime) / 1000;
+            return timeDifference < 5;
+        };
+
+        submitButtonDiv.addEventListener('click', function () {
+            if (validateAndStartLiveValidationForAll()) {
+                if (isSpam()) {
+                    alert('Form submitted too quickly. Please try again.');
+                    return;
+                }
+                normalizeBirthdatesIfNeeded(); // optional ISO normalization
+                submitInput.click();
+            }
+        });
+
+        form.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter' && event.target.tagName !== 'TEXTAREA') {
+                event.preventDefault();
+                if (validateAndStartLiveValidationForAll()) {
+                    if (isSpam()) {
+                        alert('Form submitted too quickly. Please try again.');
+                        return;
+                    }
+                    normalizeBirthdatesIfNeeded(); // optional ISO normalization
+                    submitInput.click();
+                }
+            }
+        });
+    });
+}
+
+
 
 function initSplit() {
     let elementToSplit = document.querySelectorAll('[data-split="lines"]');
@@ -3707,6 +4110,18 @@ function initSplit() {
             type: "words",
             mask: "words",
             wordsClass: "wordInner",
+            ignore: ".sup",
+        });
+    });
+
+
+    let elementToSplitChars = document.querySelectorAll('[data-split="chars"]');
+
+    elementToSplitChars.forEach(target => {
+        let splitInstance = new SplitText(target, {
+            type: "chars",
+            mask: "chars",
+            charsClass: "charInner",
             ignore: ".sup",
         });
     });
@@ -4230,6 +4645,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         //to remove
         // initTreeDiagramWrapper(); // on page load
+        initBasicFormValidation();
     });
     // initVideoMap();
     document.body.removeAttribute('data-preload');

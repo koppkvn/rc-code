@@ -615,3 +615,35 @@ html.lenis body {
             rgba(13, 13, 13, 0) 100%) !important;
 
 }
+
+
+.text-wrapper-spotify .lower-wrapper {
+
+    @media (max-width: 767px) {
+        position: relative;
+
+        &::before {
+            content: "";
+            position: absolute;
+            inset: -200px 0 -200px -20px;
+            background: radial-gradient(ellipse at 30%, rgb(0, 0, 0) 0%, rgb(0, 0, 0) 10%, rgba(0, 0, 0, 0.9)30%, transparent 70%);
+            z-index: -1;
+
+        }
+    }
+}
+
+/* Field: Error */
+[data-validate].is--error input,
+[data-validate].is--error textarea {
+    border-color: #FF4C24;
+}
+
+[data-validate].is--error .form-field-icon.is--error {
+    opacity: 1;
+}
+
+/* Field: Success */
+[data-validate].is--success .form-field-icon.is--success {
+    opacity: 1;
+}
