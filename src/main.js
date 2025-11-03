@@ -3882,9 +3882,7 @@ function initFormAnimaton() {
     gsap.set(".section.is--fields, .section.is--achat, .section.is--faq", {
         display: "none",
     })
-    gsap.set(".section.footer-section", {
-        display: "none",
-    })
+    document.querySelector(".section.footer-section").style.display = "none";
 
     // Add button/checkbox logic
     const textButton = document.querySelector('.text-checkbox.is--button');
