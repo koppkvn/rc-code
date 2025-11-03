@@ -4345,6 +4345,7 @@ function initAgeGate() {
 
 function initHeroAnimation() {
     window.lenis.scrollTo(0, { immediate: true });
+    //WATCH OUT
     // document.body.removeAttribute('data-preload');
 
     const bgVideo = document.getElementById("hero-bg-video");
