@@ -1,5 +1,5 @@
 
-// import './styles/main.scss'
+import './styles/main.scss'
 import { ElectricBorder } from './electricBorder.js'
 import { SparkSystem } from './sparkSystem.js'
 
@@ -3923,7 +3923,7 @@ function initFormAnimaton() {
             pinSpacing: true,
             scrub: true,
             // pinReparent: true,
-            markers: true,
+            // markers: true,
             onUpdate: (self) => {
                 // Lock the timeline at 100% once it reaches the end
                 if (self.progress >= 0.99 && !animationLocked) {
@@ -3952,6 +3952,9 @@ function initFormAnimaton() {
 function initBasicFormValidation() {
     const forms = document.querySelectorAll('[data-form-validate]');
 
+
+
+
     // Helpers for birthdate
     const isValidDDMMYYYY = (val) => {
         const m = /^(\d{2})\.(\d{2})\.(\d{4})$/.exec(val.trim());
@@ -3976,6 +3979,13 @@ function initBasicFormValidation() {
     };
 
     forms.forEach((form) => {
+
+        const hasMultiStep = form.querySelectorAll('.form-step').length > 0;
+        if (hasMultiStep) {
+            // Skip this form, multi-step handler will take care of it
+            return;
+        }
+
         const fields = form.querySelectorAll('[data-validate] input, [data-validate] textarea');
         const submitButtonDiv = form.querySelector('[data-submit]');
         const submitInput = submitButtonDiv.querySelector('input[type="submit"]');
@@ -4618,6 +4628,491 @@ function initAchat() {
 
     })();
 }
+function initMultiStepForm() {
+    const forms = document.querySelectorAll('[data-form-validate]');
+
+    forms.forEach((form) => {
+        const allSteps = Array.from(form.querySelectorAll('.form-step'));
+        const navigationContainer = form.querySelector('.form-navigation');
+        const originalSubmitBtn = form.querySelector('[data-submit]');
+
+        if (allSteps.length === 0 || !navigationContainer) return;
+
+        let currentStepIndex = 0;
+
+        // Hide original submit button's parent
+        if (originalSubmitBtn) {
+            const submitParent = originalSubmitBtn.closest('.form-field-group');
+            if (submitParent) submitParent.style.display = 'none';
+        }
+
+        // Map steps with their data-step values and conditions
+        const stepConfig = allSteps.map(step => ({
+            element: step,
+            id: step.getAttribute('data-step'),
+            condition: null // Will be set for conditional steps
+        }));
+
+        // Set condition for step 2-2 (only show if entrepreneur selected)
+        const step22 = stepConfig.find(s => s.id === '2-2');
+        if (step22) {
+            step22.condition = () => {
+                const entrepreneurRadio = form.querySelector('input[value="entrepreneur"]');
+                return entrepreneurRadio && entrepreneurRadio.checked;
+            };
+        }
+
+        // Get visible steps based on current form state
+        const getVisibleSteps = () => {
+            return stepConfig.filter(step => {
+                if (!step.condition) return true;
+                return step.condition();
+            });
+        };
+
+        // Create navigation buttons
+        const createNavigationButtons = () => {
+            navigationContainer.innerHTML = '';
+            const visibleSteps = getVisibleSteps();
+            const currentVisibleIndex = visibleSteps.findIndex(s => s === stepConfig[currentStepIndex]);
+
+            // Main wrapper - stack vertically on mobile
+            const navWrapper = document.createElement('div');
+            navWrapper.className = 'form-step-navigation';
+
+            // Step indicator at the top
+            const stepIndicator = document.createElement('div');
+            stepIndicator.className = 'form-step-indicator';
+            stepIndicator.innerHTML = `<p style="margin: 0; opacity: 0.7;">Étape ${currentVisibleIndex + 1} / ${visibleSteps.length}</p>`;
+            stepIndicator.style.color = 'white';
+            navWrapper.appendChild(stepIndicator);
+
+            // Buttons container
+            const buttonsContainer = document.createElement('div');
+            buttonsContainer.className = 'form-step-buttons';
+
+            // Check if current step is valid (without showing errors)
+            const isStepCurrentlyValid = () => {
+                const currentStepElement = stepConfig[currentStepIndex].element;
+                const textFields = currentStepElement.querySelectorAll('[data-validate] input[type="text"], [data-validate] input[type="email"], [data-validate] input[type="tel"], [data-validate] textarea');
+                const radioGroups = new Set();
+                const radioInputs = currentStepElement.querySelectorAll('[data-validate] input[type="radio"]');
+
+                radioInputs.forEach(radio => {
+                    if (radio.name) radioGroups.add(radio.name);
+                });
+
+                let allValid = true;
+
+                textFields.forEach((field) => {
+                    if (field.hasAttribute('required')) {
+                        if (field.value.trim() === '') {
+                            allValid = false;
+                        } else {
+                            const type = field.getAttribute('type');
+                            const value = field.value.trim();
+
+                            if (type === 'email' && !/\S+@\S+\.\S+/.test(value)) {
+                                allValid = false;
+                            }
+                        }
+                    }
+                });
+
+                radioGroups.forEach(groupName => {
+                    const radios = form.querySelectorAll(`input[name="${groupName}"]`);
+                    const isChecked = Array.from(radios).some(radio => radio.checked);
+                    if (!isChecked) {
+                        allValid = false;
+                    }
+                });
+
+                return allValid;
+            };
+
+            // Previous button (if not first step)
+            // Previous button (if not first step)
+            if (currentVisibleIndex > 0) {
+                const prevBtn = document.createElement('button');
+                prevBtn.type = 'button';
+                prevBtn.className = 'form-nav-btn form-nav-btn--prev';
+                prevBtn.innerHTML = '<p style="margin: 0;">← Précédent</p>';
+                prevBtn.style.cssText = 'padding: 1rem 1.2rem; cursor: pointer; border: 1px solid rgba(255,255,255,0.3); background: transparent; color: white; transition: all 0.3s; ';
+                prevBtn.addEventListener('mouseenter', () => {
+                    prevBtn.style.borderColor = 'white';
+                });
+                prevBtn.addEventListener('mouseleave', () => {
+                    prevBtn.style.borderColor = 'rgba(255,255,255,0.3)';
+                });
+                prevBtn.addEventListener('click', () => goToPreviousStep());
+                buttonsContainer.appendChild(prevBtn);
+            } else {
+                // Invisible spacer to keep step indicator centered on desktop
+                const spacer = document.createElement('div');
+                spacer.className = 'form-nav-spacer';
+                spacer.style.cssText = 'padding: 1rem 1.2rem; visibility: hidden; pointer-events: none;';
+                spacer.innerHTML = '<p style="margin: 0;">← Précédent</p>'; // Same size as prev button
+                buttonsContainer.appendChild(spacer);
+            }
+
+            // Next or Submit button
+            if (currentVisibleIndex < visibleSteps.length - 1) {
+                const nextBtn = document.createElement('button');
+                nextBtn.type = 'button';
+                nextBtn.className = 'form-nav-btn form-nav-btn--next';
+                nextBtn.innerHTML = '<p style="margin: 0;">Suivant →</p>';
+                nextBtn.style.flex = '1';
+
+                const updateButtonState = () => {
+                    const isValid = isStepCurrentlyValid();
+
+                    if (isValid) {
+                        nextBtn.style.cssText = ' padding: 1rem 1.2rem; cursor: pointer; border: 1px solid white; background: white; color: black; transition: all 0.3s; opacity: 1;';
+                        nextBtn.disabled = false;
+                    } else {
+                        nextBtn.style.cssText = ' padding: 1rem 1.2rem; cursor: not-allowed; border: 1px solid rgba(255,255,255,0.2); background: transparent; color: white; transition: all 0.3s; opacity: 0.3;';
+                        nextBtn.disabled = true;
+                    }
+                };
+
+                updateButtonState();
+
+                nextBtn.addEventListener('mouseenter', () => {
+                    if (!nextBtn.disabled) {
+                        // nextBtn.style.transform = 'translateX(4px)';
+                    }
+                });
+                nextBtn.addEventListener('mouseleave', () => {
+                    if (!nextBtn.disabled) {
+                        nextBtn.style.transform = 'translateX(0)';
+                    }
+                });
+
+                nextBtn.addEventListener('click', () => {
+                    if (validateCurrentStep()) {
+                        goToNextStep();
+                    }
+                });
+
+                const currentStepElement = stepConfig[currentStepIndex].element;
+                const allFields = currentStepElement.querySelectorAll('input, textarea');
+                allFields.forEach(field => {
+                    field.addEventListener('input', updateButtonState);
+                    field.addEventListener('change', updateButtonState);
+                });
+
+                buttonsContainer.appendChild(nextBtn);
+            } else {
+                // Final step - submit button
+                const submitBtn = document.createElement('button');
+                submitBtn.type = 'button';
+                submitBtn.className = 'form-nav-btn form-nav-btn--submit';
+                submitBtn.innerHTML = '<p style="margin: 0;">Envoyer</p>';
+                submitBtn.style.flex = '1';
+
+                const updateSubmitState = () => {
+                    const isValid = isStepCurrentlyValid();
+
+                    if (isValid) {
+                        submitBtn.style.cssText = 'padding: 1rem 1.2; cursor: pointer; border: 1px solid white; background: white; color: black; transition: all 0.3s; font-weight: 500; opacity: 1;';
+                        submitBtn.disabled = false;
+                    } else {
+                        submitBtn.style.cssText = 'padding: 1rem 1.2rem; cursor: not-allowed; border: 1px solid rgba(255,255,255,0.1); background: transparent; color: white; transition: all 0.3s; font-weight: 500; opacity: 0.3;';
+                        submitBtn.disabled = true;
+                    }
+                };
+
+                updateSubmitState();
+
+                submitBtn.addEventListener('mouseenter', () => {
+                    if (!submitBtn.disabled) {
+                        submitBtn.style.transform = 'scale(1.05)';
+                    }
+                });
+                submitBtn.addEventListener('mouseleave', () => {
+                    if (!submitBtn.disabled) {
+                        submitBtn.style.transform = 'scale(1)';
+                    }
+                });
+
+                submitBtn.addEventListener('click', () => {
+                    console.log('🔵 Submit button clicked!');
+
+                    const isValid = validateCurrentStep();
+                    console.log('🔵 Current step valid?', isValid);
+
+                    if (isValid) {
+                        console.log('🔵 Validation passed, attempting to submit...');
+
+                        if (originalSubmitBtn) {
+                            console.log('🔵 Found submit button, clicking it...');
+                            originalSubmitBtn.click();
+
+                            const submitInput = originalSubmitBtn.querySelector('input[type="submit"]');
+                            if (submitInput) {
+                                console.log('🔵 Also clicking submit input directly...');
+                                setTimeout(() => {
+                                    submitInput.click();
+                                }, 100);
+                            }
+                        } else {
+                            console.error('❌ originalSubmitBtn not found!');
+                        }
+                    } else {
+                        console.log('❌ Validation failed, not submitting');
+                    }
+                });
+
+                const currentStepElement = stepConfig[currentStepIndex].element;
+                const allFields = currentStepElement.querySelectorAll('input, textarea');
+                allFields.forEach(field => {
+                    field.addEventListener('input', updateSubmitState);
+                    field.addEventListener('change', updateSubmitState);
+                });
+
+                buttonsContainer.appendChild(submitBtn);
+            }
+
+            navWrapper.appendChild(buttonsContainer);
+            navigationContainer.appendChild(navWrapper);
+        };
+
+        // Navigate to specific step
+        const goToStepIndex = (newIndex) => {
+            const currentStep = stepConfig[currentStepIndex].element;
+            const newStep = stepConfig[newIndex].element;
+
+            // Animate out current step
+            gsap.to(currentStep, {
+                opacity: 0,
+                filter: "blur(5px)",
+                duration: 0.2,
+                onComplete: () => {
+                    allSteps.forEach(step => step.style.display = 'none');
+                    newStep.style.display = 'block';
+
+                    currentStepIndex = newIndex;
+
+                    // Animate in new step
+                    gsap.fromTo(newStep,
+                        { opacity: 0, filter: "blur(5px)" },
+                        { opacity: 1, filter: "blur(0px)", duration: 0.2 }
+                    );
+
+                    createNavigationButtons();
+                }
+            });
+        };
+
+        // Go to next visible step
+        const goToNextStep = () => {
+            const visibleSteps = getVisibleSteps();
+            const currentVisibleIndex = visibleSteps.findIndex(s => s === stepConfig[currentStepIndex]);
+
+            if (currentVisibleIndex < visibleSteps.length - 1) {
+                const nextVisibleStep = visibleSteps[currentVisibleIndex + 1];
+                const nextIndex = stepConfig.indexOf(nextVisibleStep);
+                goToStepIndex(nextIndex);
+            }
+        };
+
+        // Go to previous visible step
+        const goToPreviousStep = () => {
+            const visibleSteps = getVisibleSteps();
+            const currentVisibleIndex = visibleSteps.findIndex(s => s === stepConfig[currentStepIndex]);
+
+            if (currentVisibleIndex > 0) {
+                const prevVisibleStep = visibleSteps[currentVisibleIndex - 1];
+                const prevIndex = stepConfig.indexOf(prevVisibleStep);
+                goToStepIndex(prevIndex);
+            }
+        };
+
+        // Validate radio button group
+        const validateRadioGroup = (groupName, parent) => {
+            const radios = form.querySelectorAll(`input[name="${groupName}"]`);
+            const isChecked = Array.from(radios).some(radio => radio.checked);
+
+            if (isChecked) {
+                parent.classList.remove('is--error');
+                parent.classList.add('is--success');
+                return true;
+            } else {
+                parent.classList.remove('is--success');
+                parent.classList.add('is--error');
+                return false;
+            }
+        };
+
+        // Validate current step
+        const validateCurrentStep = () => {
+            const currentStepElement = stepConfig[currentStepIndex].element;
+            const textFields = currentStepElement.querySelectorAll('[data-validate] input[type="text"], [data-validate] input[type="email"], [data-validate] input[type="tel"], [data-validate] textarea');
+            const radioGroups = new Set();
+            const radioInputs = currentStepElement.querySelectorAll('[data-validate] input[type="radio"]');
+
+            // Collect unique radio group names
+            radioInputs.forEach(radio => {
+                if (radio.name) radioGroups.add(radio.name);
+            });
+
+            let allValid = true;
+            let firstInvalidField = null;
+
+            // Validate text fields
+            textFields.forEach((field) => {
+                const valid = validateTextField(field);
+                if (!valid) {
+                    allValid = false;
+                    if (!firstInvalidField) firstInvalidField = field;
+                }
+            });
+
+            // Validate radio groups
+            radioGroups.forEach(groupName => {
+                const firstRadio = currentStepElement.querySelector(`input[name="${groupName}"]`);
+                const parent = firstRadio?.closest('[data-validate]');
+                if (parent) {
+                    const valid = validateRadioGroup(groupName, parent);
+                    if (!valid) {
+                        allValid = false;
+                        if (!firstInvalidField) firstInvalidField = firstRadio;
+                    }
+                }
+            });
+
+            if (!allValid && firstInvalidField) {
+                firstInvalidField.focus();
+            }
+
+            return allValid;
+        };
+
+        // Validation helpers
+        const isValidDDMMYYYY = (val) => {
+            const m = /^(\d{2})\.(\d{2})\.(\d{4})$/.exec(val.trim());
+            if (!m) return false;
+            const day = parseInt(m[1], 10);
+            const month = parseInt(m[2], 10);
+            const year = parseInt(m[3], 10);
+
+            if (year < 1900 || year > 2100) return false;
+            if (month < 1 || month > 12) return false;
+            if (day < 1 || day > 31) return false;
+
+            const d = new Date(year, month - 1, day);
+            return d.getFullYear() === year && d.getMonth() === month - 1 && d.getDate() === day;
+        };
+
+        const isValidPhone = (val) => {
+            // Swiss phone format: 076 123 45 67 or 0761234567
+            const cleaned = val.replace(/\s/g, '');
+            return /^0\d{9}$/.test(cleaned);
+        };
+
+        const validateTextField = (field) => {
+            const parent = field.closest('[data-validate]');
+            if (!parent) return true;
+
+            const minLength = field.getAttribute('min');
+            const type = field.getAttribute('type');
+            const placeholder = field.getAttribute('placeholder') || '';
+            const isBirthdateField = field.hasAttribute('data-birthdate') || placeholder.includes('jj.mm.');
+            const isPhoneField = type === 'tel';
+            const isRequired = field.hasAttribute('required');
+
+            let isValid = true;
+            const value = field.value.trim();
+
+            // Filled state
+            if (value !== '') {
+                parent.classList.add('is--filled');
+            } else {
+                parent.classList.remove('is--filled');
+            }
+
+            // Required check
+            if (isRequired && value === '') {
+                isValid = false;
+            }
+
+            // Only validate format if field has value
+            if (value !== '') {
+                // Length rules
+                if (minLength && value.length < parseInt(minLength, 10)) isValid = false;
+
+                // Email format
+                if (type === 'email' && !/\S+@\S+\.\S+/.test(value)) {
+                    isValid = false;
+                }
+
+                // Phone format
+                if (isPhoneField && !isValidPhone(value)) {
+                    isValid = false;
+                }
+
+                // Birthdate format
+                if (isBirthdateField && !isValidDDMMYYYY(value)) {
+                    isValid = false;
+                }
+            }
+
+            // UI classes
+            if (isValid) {
+                parent.classList.remove('is--error');
+                if (value !== '') {
+                    parent.classList.add('is--success');
+                } else {
+                    parent.classList.remove('is--success');
+                }
+            } else {
+                parent.classList.remove('is--success');
+                parent.classList.add('is--error');
+            }
+
+            return isValid;
+        };
+
+        // Enable live validation
+        const enableLiveValidation = () => {
+            // Text fields
+            const allTextFields = form.querySelectorAll('[data-validate] input[type="text"], [data-validate] input[type="email"], [data-validate] input[type="tel"], [data-validate] textarea');
+            allTextFields.forEach((field) => {
+                field.addEventListener('input', () => validateTextField(field));
+                field.addEventListener('blur', () => validateTextField(field));
+            });
+
+            // Radio buttons - also refresh navigation when selection changes (for conditional steps)
+            const allRadios = form.querySelectorAll('[data-validate] input[type="radio"]');
+            const radioGroups = new Set();
+            allRadios.forEach(radio => {
+                if (radio.name) radioGroups.add(radio.name);
+            });
+
+            radioGroups.forEach(groupName => {
+                const radios = form.querySelectorAll(`input[name="${groupName}"]`);
+                radios.forEach(radio => {
+                    radio.addEventListener('change', () => {
+                        const parent = radio.closest('[data-validate]');
+                        if (parent) validateRadioGroup(groupName, parent);
+
+                        // If this is the situation radio group, refresh navigation
+                        if (groupName === 'situation') {
+                            createNavigationButtons();
+                        }
+                    });
+                });
+            });
+        };
+
+        // Initialize
+        allSteps.forEach(step => step.style.display = 'none');
+        stepConfig[0].element.style.display = 'block';
+        gsap.set(stepConfig[0].element, { opacity: 1, y: 0 });
+        createNavigationButtons();
+        enableLiveValidation();
+    });
+}
 
 document.addEventListener("DOMContentLoaded", () => {
     // Scroll to top immediately
@@ -4631,20 +5126,23 @@ document.addEventListener("DOMContentLoaded", () => {
         initSplit();
 
         // TO COMMENT
-        initAgeGate();
+        // initAgeGate();
         tlHeroAnimation = initHeroAnimation();
         // TO COMMENT
-        initIntro();
+        // initIntro();
         initTrackerCheckboxes();
         // TO COMMENT
-        initScrollLock();
+        // initScrollLock();
         initTrackerSection();
         initVideoMap();
 
 
 
         //to remove
-        // initTreeDiagramWrapper(); // on page load
+        initTreeDiagramWrapper(); // on page load
+
+
+        initMultiStepForm();
         initBasicFormValidation();
     });
     // initVideoMap();
