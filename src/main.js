@@ -4017,6 +4017,8 @@ function initFormAnimaton() {
                     duration: 1.2,
                     immediate: false
                 });
+                initAccordionCSS();
+
             }, 300);
         });
     }
@@ -5324,9 +5326,40 @@ function initAccordionCSS() {
             }
         });
     });
+
+    // ScrollTrigger animations for accordion items
+    document.querySelectorAll('.accordion-css__item').forEach((item) => {
+        const lineInner = item.querySelector('.lineInner');
+        const icon = item.querySelector('.accordion-css__item-icon');
+        const lineBottom = item.querySelector('.bottom-line');
+
+        const tl = gsap.timeline({
+            scrollTrigger: {
+                trigger: item,
+                start: "top 80%",
+                // markers: true,
+            }
+        });
+
+        tl.from(lineInner, {
+            yPercent: 100,
+            duration: 1,
+            ease: "power2.out"
+        })
+        tl.from(icon, {
+            opacity: 0,
+            duration: 1,
+            ease: "power2.out"
+        }, "<");
+
+        tl.to(lineBottom, {
+            scaleX: 0,
+            duration: 1,
+            transformOrigin: "right",
+            ease: "power2.out"
+        }, "<");
+    });
 }
-
-
 
 document.addEventListener("DOMContentLoaded", () => {
     // Scroll to top immediately
@@ -5336,6 +5369,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Call it before the matchMedia setup
     initLenis();
     // initAchat();
+
     document.fonts.ready.then(() => {
         initSplit();
         let mm = gsap.matchMedia();
@@ -5352,7 +5386,6 @@ document.addEventListener("DOMContentLoaded", () => {
         initScrollLock();
         initTrackerSection();
         initVideoMap();
-        initAccordionCSS();
 
 
         //to remove
