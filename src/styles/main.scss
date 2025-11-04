@@ -905,3 +905,14 @@ html.lenis body {
         flex: 1;
     }
 }
+
+.container.is--map .map-container {
+    @media (min-width: 768px) {
+        left: var(--map-container-left);
+        top: var(--map-container-top);
+    }
+}
+
+.text-wrapper-spotify {
+    pointer-events: none;
+}

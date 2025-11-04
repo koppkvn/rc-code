@@ -1,4 +1,4 @@
-// import './styles/main.scss'
+import './styles/main.scss'
 import { ElectricBorder } from './electricBorder.js'
 import { SparkSystem } from './sparkSystem.js'
 
@@ -592,6 +592,8 @@ function initTreeDiagram() {
     // });
 
     gsap.set(".parent-section .section", { position: "absolute" })
+
+
     //ICIIIIII
 
     // Set the lines outside the view
@@ -637,6 +639,9 @@ function initTreeDiagram() {
     const isMobile = window.matchMedia("(max-width: 767px)").matches;
     let treeTlOne;
     mm.add("(min-width: 768px)", () => {
+
+
+
         treeTlOne = gsap.timeline({
             defaults: {
                 duration: 1,
@@ -3679,6 +3684,8 @@ function initTreeDiagram() {
 
 function initVideoMap() {
 
+
+
     gsap.set(".video-modal", {
         position: "fixed",
         pointerEvents: "none",
@@ -4213,7 +4220,6 @@ function initAgeGate() {
     });
 
     //WATCH OUT
-    document.body.removeAttribute('data-preload');
 
     const yesBtn = document.querySelector('.button.is--yes');
     const noBtn = document.querySelector('.button.is--no');
@@ -5175,36 +5181,99 @@ function initMultiStepForm() {
     });
 }
 
+function centerMap() {
+    const mapWrapper = document.querySelector('.container.is--map .map-wrapper');
+    const mapContainer = document.querySelector('.container.is--map .map-container');
+    const centeredDot = document.querySelector('.container.is--map .dot-video.is--centered');
+
+    if (!mapWrapper || !mapContainer || !centeredDot) {
+        console.warn('Map wrapper, container, or centered dot not found');
+        return;
+    }
+
+    // Get bounding rectangles
+    const wrapperRect = mapWrapper.getBoundingClientRect();
+    const dotRect = centeredDot.getBoundingClientRect();
+
+    console.log("wrapperRect", wrapperRect);
+    console.log("dotRect", dotRect);
+
+    // Calculate the dot's position relative to the map-wrapper
+    const dotRelativeLeft = dotRect.left - wrapperRect.left;
+    const dotRelativeTop = dotRect.top - wrapperRect.top;
+
+    console.log("dotRelativeLeft", dotRelativeLeft);
+    console.log("dotRelativeTop", dotRelativeTop);
+
+    // Account for the dot's own dimensions to get its center point
+    const dotCenterX = dotRelativeLeft + (dotRect.width / 2);
+    const dotCenterY = dotRelativeTop + (dotRect.height / 2);
+
+    console.log("dotCenterX", dotCenterX);
+    console.log("dotCenterY", dotCenterY);
+
+    // Calculate the center of the map-wrapper
+    const wrapperCenterX = wrapperRect.width / 2;
+    const wrapperCenterY = wrapperRect.height / 2;
+
+    console.log("wrapperCenterX", wrapperCenterX);
+    console.log("wrapperCenterY", wrapperCenterY);
+
+    // Calculate scrollbar width
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+    console.log("scrollbarWidth", scrollbarWidth);
+    // Calculate how much we need to shift the map-container
+    // To center the dot, we move the container by (wrapper center - dot position)
+    let offsetLeft = wrapperCenterX - dotCenterX;
+    const offsetTop = wrapperCenterY - dotCenterY;
+
+    // Adjust for scrollbar width (shift left by half the scrollbar width)
+
+    console.log("offsetLeft", offsetLeft);
+    console.log("offsetTop", offsetTop);
+
+    document.body.style.setProperty('--map-container-left', `${offsetLeft - 2 + scrollbarWidth / 2}px`);
+    document.body.style.setProperty('--map-container-top', `${offsetTop}px`);
+}
+
+
+
 document.addEventListener("DOMContentLoaded", () => {
     // Scroll to top immediately
     scrollToTop();
     gsap.registerPlugin(ScrollTrigger, SplitText, Flip, DrawSVGPlugin, CustomEase, MorphSVGPlugin);
 
-
+    // Call it before the matchMedia setup
     initLenis();
     // initAchat();
     document.fonts.ready.then(() => {
         initSplit();
-
+        let mm = gsap.matchMedia();
+        mm.add("(min-width: 768px)", () => {
+            centerMap();
+        });
         // TO COMMENT
-        initAgeGate();
+        // initAgeGate();
         tlHeroAnimation = initHeroAnimation();
         // TO COMMENT
-        initIntro();
+        // initIntro();
         initTrackerCheckboxes();
         // TO COMMENT
-        initScrollLock();
+        // initScrollLock();
         initTrackerSection();
         initVideoMap();
 
 
 
         //to remove
-        // initTreeDiagramWrapper(); // on page load
+        initTreeDiagramWrapper(); // on page load
 
 
         initMultiStepForm();
         initBasicFormValidation();
+
+        document.body.removeAttribute('data-preload');
+
     });
     // initVideoMap();
 
