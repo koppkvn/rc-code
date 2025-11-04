@@ -1468,7 +1468,7 @@ function initTreeDiagram() {
             scaleX: window.innerWidth <= 767 ? 1 : 0,
             scaleY: window.innerWidth <= 767 ? 0 : 1,
             transformOrigin: window.innerWidth <= 767 ? "top" : "left",
-            duration: 3,
+            duration: 4,
             onComplete: function () {
                 scrambleChildLabelCompareTwo.play(0);
                 gsap.set(".label.color.is--compare", {
