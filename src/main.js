@@ -1,4 +1,4 @@
-import './styles/main.scss'
+// import './styles/main.scss'
 import { ElectricBorder } from './electricBorder.js'
 import { SparkSystem } from './sparkSystem.js'
 
@@ -527,6 +527,11 @@ function initTreeDiagram() {
     gsap.set(".mask-2", {
         display: "inline",
     })
+    const spotifyNumberEl = document.querySelector('.spotify-number');
+    const spotifyTarget = spotifyNumberEl ? parseFloat(spotifyNumberEl.textContent) : 0;
+    if (spotifyNumberEl) {
+        spotifyNumberEl.textContent = "0";
+    }
 
     // set the width of the timeline wrapper to 400vw on desktop only
     mm.add("(min-width: 48rem)", () => {
@@ -2553,9 +2558,31 @@ function initTreeDiagram() {
             .to(".img-spotify:not(.is--first)", {
                 autoAlpha: 1,
                 duration: 0.3,
-                stagger: 0.5,  // Delay between each image appearing (adjust as needed)
-                ease: "power2.inOut"
+                stagger: 0.5,
+                ease: "power2.inOut",
+                onUpdate: function () {
+                    const progress = this.progress();
+                    const spotifyNumber = document.querySelector('.spotify-number');
+
+                    if (spotifyNumber) {
+                        // Use the pre-captured target value
+                        const currentValue = Math.round(spotifyTarget * progress);
+                        spotifyNumber.textContent = currentValue;
+
+                        // Animate color from white to #fc0 based on progress
+                        const r = 255;
+                        const g = Math.round(255 - (51 * progress));  // 255 -> 204
+                        const b = Math.round(255 - (255 * progress)); // 255 -> 0
+                        spotifyNumber.style.color = `rgb(${r}, ${g}, ${b})`;
+                    }
+                }
+
             }, "+=0.5")  // Start 0.5s after the previous animation
+            // Add number counter and color animation
+
+            .to({}, {
+                duration: 1,
+            })
 
 
             .to(".map-container", {
@@ -3159,13 +3186,33 @@ function initTreeDiagram() {
                     }
                 })
 
-                // Add this NEW animation to sequentially reveal images
                 .to(".img-spotify:not(.is--first)", {
                     autoAlpha: 1,
                     duration: 0.3,
-                    stagger: 0.5,  // Delay between each image appearing (adjust as needed)
-                    ease: "power2.inOut"
-                }, "+=0.5")  // Start 0.5s after the previous animation
+                    stagger: 0.5,
+                    ease: "power2.inOut",
+                    onUpdate: function () {
+                        const progress = this.progress();
+                        const spotifyNumber = document.querySelector('.spotify-number');
+
+                        if (spotifyNumber) {
+                            // Use the pre-captured target value
+                            const currentValue = Math.round(spotifyTarget * progress);
+                            spotifyNumber.textContent = currentValue;
+
+                            // Animate color from white to #fc0 based on progress
+                            const r = 255;
+                            const g = Math.round(255 - (51 * progress));  // 255 -> 204
+                            const b = Math.round(255 - (255 * progress)); // 255 -> 0
+                            spotifyNumber.style.color = `rgb(${r}, ${g}, ${b})`;
+                        }
+                    }
+                }, "+=0.5")
+                // Add number counter and color animation
+
+                .to({}, {
+                    duration: 1,
+                })
 
 
                 .to(".map-container", {
@@ -4951,7 +4998,7 @@ function initMultiStepForm() {
             // Animate out current step
             gsap.to(currentStep, {
                 opacity: 0,
-                scale: 0.76,
+                scale: 0.9,
                 filter: "blur(5px)",
                 duration: 0.2,
                 onComplete: () => {
@@ -4962,7 +5009,7 @@ function initMultiStepForm() {
 
                     // Animate in new step
                     gsap.fromTo(newStep,
-                        { opacity: 0, filter: "blur(5px)", scale: 0.76 },
+                        { opacity: 0, filter: "blur(5px)", scale: 0.9 },
                         { opacity: 1, filter: "blur(0px)", scale: 1, duration: 0.2 }
                     );
 
@@ -5167,6 +5214,25 @@ function initMultiStepForm() {
                         if (groupName === 'situation') {
                             createNavigationButtons();
                         }
+
+                        // NEW CODE: Handle data-info attribute
+                        const rowFormRadio = radio.closest('.row-form.is--radio');
+                        if (rowFormRadio) {
+                            // Remove any existing info text
+                            const existingInfo = rowFormRadio.querySelector('.radio-info-text');
+                            if (existingInfo) {
+                                existingInfo.remove();
+                            }
+
+                            // If clicked radio has data-info, display it
+                            const dataInfo = radio.getAttribute('data-info');
+                            if (dataInfo) {
+                                const infoDiv = document.createElement('div');
+                                infoDiv.className = 'radio-info-text';
+                                infoDiv.textContent = dataInfo;
+                                rowFormRadio.appendChild(infoDiv);
+                            }
+                        }
                     });
                 });
             });
@@ -5236,6 +5302,30 @@ function centerMap() {
     document.body.style.setProperty('--map-container-top', `${offsetTop}px`);
 }
 
+function initAccordionCSS() {
+    document.querySelectorAll('[data-accordion-css-init]').forEach((accordion) => {
+        const closeSiblings = accordion.getAttribute('data-accordion-close-siblings') === 'true';
+
+        accordion.addEventListener('click', (event) => {
+            const toggle = event.target.closest('[data-accordion-toggle]');
+            if (!toggle) return; // Exit if the clicked element is not a toggle
+
+            const singleAccordion = toggle.closest('[data-accordion-status]');
+            if (!singleAccordion) return; // Exit if no accordion container is found
+
+            const isActive = singleAccordion.getAttribute('data-accordion-status') === 'active';
+            singleAccordion.setAttribute('data-accordion-status', isActive ? 'not-active' : 'active');
+
+            // When [data-accordion-close-siblings="true"]
+            if (closeSiblings && !isActive) {
+                accordion.querySelectorAll('[data-accordion-status="active"]').forEach((sibling) => {
+                    if (sibling !== singleAccordion) sibling.setAttribute('data-accordion-status', 'not-active');
+                });
+            }
+        });
+    });
+}
+
 
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -5253,20 +5343,20 @@ document.addEventListener("DOMContentLoaded", () => {
             centerMap();
         });
         // TO COMMENT
-        // initAgeGate();
+        initAgeGate();
         tlHeroAnimation = initHeroAnimation();
         // TO COMMENT
-        // initIntro();
+        initIntro();
         initTrackerCheckboxes();
         // TO COMMENT
-        // initScrollLock();
+        initScrollLock();
         initTrackerSection();
         initVideoMap();
-
+        initAccordionCSS();
 
 
         //to remove
-        initTreeDiagramWrapper(); // on page load
+        // initTreeDiagramWrapper(); // on page load
 
 
         initMultiStepForm();
