@@ -952,3 +952,12 @@ html.lenis body {
 [data-accordion-status="active"] .accordion-css__item-icon {
     transform: rotate(0.001deg);
 }
+
+.spotify-number {
+    &::before {
+        content: '+ ';
+        font-size: 2rem;
+        margin-right: .3rem;
+        display: inline-block;
+    }
+}
