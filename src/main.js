@@ -1,4 +1,3 @@
-import './styles/main.scss'
 import { ElectricBorder } from './electricBorder.js'
 import { SparkSystem } from './sparkSystem.js'
 
@@ -579,12 +578,13 @@ function initTreeDiagram() {
 
     })
 
-    const videoBarca = document.querySelector(".video-barca");
-    console.log(videoBarca);
-    gsap.set(".barca-video-wrapper", {
-        autoAlpha: 0,
-        yPercent: 20,
-    })
+    const videoBarca = document.querySelector(".barca-video-wrapper");
+    if (videoBarca) {
+        gsap.set(videoBarca, {
+            autoAlpha: 0,
+            yPercent: 20,
+        })
+    }
 
     // create the master pin 
     // ScrollTrigger.create({
@@ -3081,7 +3081,7 @@ function initTreeDiagram() {
                 endTrigger: "body",
                 end: "bottom top",
                 scrub: true,
-                markers: true,
+                // markers: true,
                 pinnedContainer: ".parent-section",
 
             },
@@ -3769,9 +3769,7 @@ function createMapTimeline() {
                 yPercent: 0,
                 duration: 1,
                 ease: "easeOutQuart",
-                onStart: function () {
-                    videoBarca.play();
-                }
+
             })
         },
         onReverseComplete: function () {
@@ -3788,10 +3786,7 @@ function createMapTimeline() {
                 duration: 1,
                 yPercent: 20,
                 ease: "easeOutQuart",
-                onStart: function () {
-                    videoBarca.pause();
-                    videoBarca.currentTime = 0;
-                }
+
             })
 
         }
@@ -5451,19 +5446,19 @@ document.addEventListener("DOMContentLoaded", () => {
             centerMap();
         });
         // TO COMMENT
-        // initAgeGate();
+        initAgeGate();
         tlHeroAnimation = initHeroAnimation();
         // TO COMMENT
-        // initIntro();
+        initIntro();
         initTrackerCheckboxes();
         // TO COMMENT
-        // initScrollLock();
+        initScrollLock();
         initTrackerSection();
         initVideoMap();
 
 
         //to remove
-        initTreeDiagramWrapper(); // on page load
+        // initTreeDiagramWrapper(); // on page load
 
 
         initMultiStepForm();
