@@ -1,4 +1,4 @@
-// import './styles/main.scss'
+import './styles/main.scss'
 import { ElectricBorder } from './electricBorder.js'
 import { SparkSystem } from './sparkSystem.js'
 
@@ -511,7 +511,7 @@ function initScrollLock() {
     });
 }
 
-
+let spotifyTarget;
 function initTreeDiagram() {
 
     let mm = gsap.matchMedia();
@@ -528,7 +528,7 @@ function initTreeDiagram() {
         display: "inline",
     })
     const spotifyNumberEl = document.querySelector('.spotify-number');
-    const spotifyTarget = spotifyNumberEl ? parseFloat(spotifyNumberEl.textContent) : 0;
+    spotifyTarget = spotifyNumberEl ? parseFloat(spotifyNumberEl.textContent) : 0;
     if (spotifyNumberEl) {
         spotifyNumberEl.textContent = "0";
     }
@@ -677,7 +677,7 @@ function initTreeDiagram() {
             scrollTrigger: {
                 trigger: ".parent-section",
                 start: "top top",
-                end: "+=2000%",
+                end: "+=1500%",
                 pin: true,
                 pinSpacing: "margin",
                 scrub: true,
@@ -1354,8 +1354,16 @@ function initTreeDiagram() {
             duration: 1,
         })
         treeTlOne.to(".tree-container.is--three .tree-child-wrapper.is--one", {
-            yPercent: -730, // adjust as needed
+            yPercent: -565, // adjust as needed
             duration: 3,
+            onComplete: function () {
+                gsap.to(".section.is--personnes [data-split='lines'] .lineInner", {
+                    yPercent: -100,
+                    duration: .6,
+                    stagger: 0.05,
+                    ease: "power1.out"
+                })
+            },
 
         },);
 
@@ -1396,6 +1404,15 @@ function initTreeDiagram() {
                 ease: "power1.out"
                 // })
             })
+
+            // mm.add("(max-width: 767px)", () => {
+            //     gsap.to(".section.is--personnes [data-split='lines'] .lineInner", {
+            //         yPercent: 0,
+            //         duration: .6,
+            //         stagger: 0.05,
+            //         ease: "power1.out"
+            //     })
+            // })
 
 
         }
@@ -1647,11 +1664,22 @@ function initTreeDiagram() {
         })
 
         // scramble animation of inscription rc
-        .to(".tree-container.is--compare .inscription-rc", {
-            autoAlpha: 1,
-            overwrite: true,
+        .to({}, {
             onStart: function () {
-                scrambleInscriptionRc.play(0);
+                // scrambleInscriptionRc.play(0);
+                gsap.to(".tree-container.is--compare .inscription-rc", {
+                    autoAlpha: 1,
+                })
+                mm.add("(max-width: 767px)", () => {
+                    createMapTimeline();
+                    initFormAnimaton();
+
+                })
+            },
+            onReverseComplete: function () {
+                gsap.to(".tree-container.is--compare .inscription-rc", {
+                    autoAlpha: 0,
+                })
             }
         }, "<")
         // .to({}, {
@@ -2700,7 +2728,8 @@ function initTreeDiagram() {
         console.log("calc:", `calc(${timelineHeight / 16}rem - ${distanceBetween / 16}rem - ${panelHeight / 16}rem)`);
         gsap.set(".grey-line-new", {
             top: `${distanceBetween}px`,
-            height: `calc(${timelineHeight}px - ${distanceBetween}px - ${panelHeight + 150}px)`,
+            // height: `calc(${timelineHeight}px - ${distanceBetween}px - ${panelHeight + 150}px)`,
+            height: timelineHeight * 2,
         })
 
         gsap.set(".line-container", {
@@ -2744,16 +2773,15 @@ function initTreeDiagram() {
         //     });
         // });
 
-        // gsap.to(".timeline-panel.is--4.is--fixed", {
+        // gsap.to(".timeline-panel.is--4.is--fixed .structure-container", {
         //     autoAlpha: 0,
-        //     // filter: "blur(10px)",
-        //     // scale: 0,
+
         //     duration: 0.5,
         //     scrollTrigger: {
-        //         trigger: ".timeline-panel.is--4.is--fixed",
-        //         start: "top 20%",
+        //         trigger: ".timeline-panel.is--4.is--fixed .structure-container",
+        //         start: "bottom 50%",
         //         toggleActions: "play reverse play reverse",
-        //         // markers: true,
+        //         markers: true,
         //         pinnedContainer: ".parent-section",
 
         //     }
@@ -2868,56 +2896,58 @@ function initTreeDiagram() {
 
                 }, "<")
 
+        // gsap.set(".line-container", {
+        //     opacity: 0,
+        // })
+        treeTlOne.to(".section.is--timeline .timeline-container", {
 
-            .to(".section.is--timeline .timeline-container", {
-                autoAlpha: 1,
-
-
-                onStart: function () {
-                    createMapTimeline();
-                    gsap.to(".panel [data-split='lines'] .lineInner", {
-                        yPercent: 0,
-                    })
-
-                    gsap.to(".panel .t-inner-wrapper.is--spec", {
-                        autoAlpha: 1,
-                        yPercent: 0,
-                        duration: 1,
-                        ease: "power2.out"
-                    })
-
-                    initFormAnimaton();
+            autoAlpha: 1,
 
 
+            onStart: function () {
+                // createMapTimeline();
+                gsap.to(".panel [data-split='lines'] .lineInner", {
+                    yPercent: 0,
+                })
 
-
-
-                    // gsap.to(".section.is--compare .inscription-rc", {
-                    //     autoAlpha: 0,
-                    // })
-                },
-                onReverseComplete: function () {
-
-                    // gsap.to(".section.is--compare .inscription-rc", {
-                    //     autoAlpha: 1,
-                    // })
+                gsap.to(".panel .t-inner-wrapper.is--spec", {
+                    autoAlpha: 1,
+                    yPercent: 0,
+                    duration: 1,
+                    ease: "power2.out"
+                })
 
 
 
-                    gsap.to(".panel [data-split='lines'] .lineInner", {
-                        yPercent: 100,
-                    })
 
-                    gsap.to(".panel .t-inner-wrapper.is--spec", {
-                        autoAlpha: 0,
-                        yPercent: 10,
-                        duration: 1,
-                        ease: "power2.out"
-                    })
 
-                },
 
-            }, "<+=1")
+                // gsap.to(".section.is--compare .inscription-rc", {
+                //     autoAlpha: 0,
+                // })
+            },
+            onReverseComplete: function () {
+
+                // gsap.to(".section.is--compare .inscription-rc", {
+                //     autoAlpha: 1,
+                // })
+
+
+
+                gsap.to(".panel [data-split='lines'] .lineInner", {
+                    yPercent: 100,
+                })
+
+                gsap.to(".panel .t-inner-wrapper.is--spec", {
+                    autoAlpha: 0,
+                    yPercent: 10,
+                    duration: 1,
+                    ease: "power2.out"
+                })
+
+            },
+
+        }, "<")
 
             .to(".section.is--compare .line-wrapper-bottom", {
                 autoAlpha: 0,
@@ -2930,11 +2960,13 @@ function initTreeDiagram() {
             scaleY: 0,
             transformOrigin: "bottom",
         })
+
         ScrollTrigger.create({
             trigger: ".section.is--compare",
-            start: "bottom bottom-=1%",
+            start: "bottom bottom",
             endTrigger: ".section.is--timeline .timeline-panel.is--4.is--fixed",
-            end: `top ${distanceBetween - 2}px`,
+            // end: `top ${distanceBetween - 2}px`,
+            end: `bottom top`,
             pin: ".section.is--timeline .line-container",
             pinSpacing: true,
             pinReparent: true,
@@ -2942,6 +2974,16 @@ function initTreeDiagram() {
             markers: false,
             anticipatePin: 1,
 
+            // onEnter: function () {
+            //     gsap.to(".line-container", {
+            //         opacity: 1,
+            //     })
+            // },
+            // onLeave: function () {
+            //     gsap.to(".line-container", {
+            //         opacity: 0,
+            //     })
+            // }
 
             // onLeave: function () {
             //     gsap.to(".line-container .line-new", {
@@ -2959,39 +3001,35 @@ function initTreeDiagram() {
             trigger: ".section.is--compare",
             start: "bottom bottom-=1%",
             endTrigger: ".section.is--timeline",
-            end: "bottom top+=80%",
+            end: "bottom top+=90%",
             pin: ".timeline-panel .stats-container",
             pinSpacing: "margin",
             // markers: true,
             pinReparent: true,
             zIndex: 100,
             pinnedContainer: ".parent-section",
-            markers: false,
-
 
             onUpdate: function (self) {
                 const progress = self.progress;
 
-                // Only start animating values after 40% scroll progress
-                // This aligns with when the stats container opacity animates to 1
+                // Only start animating values after 35% scroll progress
                 const threshold = 0.35;
                 const adjustedProgress = progress < threshold ? 0 : (progress - threshold) / (1 - threshold);
 
-                // Update each stat based on adjusted progress
+                // Cap at 0.65 so values only reach 65% during scroll
+                // The remaining 35% will animate separately after scroll ends
+                const cappedProgress = Math.min(adjustedProgress * 0.65, 0.65);
+
+                // Update each stat based on capped progress
                 document.querySelectorAll('[data-target]').forEach(el => {
                     const target = parseFloat(el.dataset.target);
-                    const currentValue = Math.round(target * adjustedProgress);
+                    const currentValue = Math.round(target * cappedProgress);
                     const valueSpan = el.querySelector('.stat-value');
 
-
                     if (valueSpan) {
-                        // Determine how many digits the target has
                         const targetLength = Math.abs(target).toString().length;
-
-                        // Pad the current value with leading zeros
                         let paddedValue = Math.abs(currentValue).toString().padStart(targetLength, '0');
 
-                        // Add negative sign back if needed
                         if (target < 0) {
                             paddedValue = '-' + paddedValue;
                         }
@@ -3001,31 +3039,61 @@ function initTreeDiagram() {
                         valueSpan.style.color = colorInterpolate;
                     }
                 });
+            },
 
-                // // Fade out the timeline section during the last 20% of progress
-                // const fadeThreshold = 0.88; // Start fading at 80% progress
-                // let opacity = 1;
+            onLeave: function () {
+                // When ScrollTrigger ends, animate the remaining 35% with GSAP
+                document.querySelectorAll('[data-target]').forEach(el => {
+                    const target = parseFloat(el.dataset.target);
+                    const valueSpan = el.querySelector('.stat-value');
+                    const targetLength = Math.abs(target).toString().length;
 
-                // if (progress > fadeThreshold) {
-                //     // Calculate opacity: goes from 1 to 0 between 80% and 100% progress
-                //     // (progress - 0.8) gives us 0 to 0.2
-                //     // Multiply by 5 to get 0 to 1
-                //     // Subtract from 1 to get 1 to 0
-                //     opacity = Math.max(0, 1 - ((progress - fadeThreshold) * 5));
-                // }
+                    if (valueSpan) {
+                        const startValue = Math.round(target * 0.65); // Start from 65%
 
-                // // Apply the opacity to the timeline section
-                // const timelineSection = document.querySelector('.timeline-panel.is--4.is--fixed');
-                // if (timelineSection) {
-                //     timelineSection.style.opacity = opacity;
-                // }
+                        gsap.to({ value: startValue }, {
+                            value: target,
+                            duration: 1.5,
+                            ease: "power2.out",
+                            onUpdate: function () {
+                                const currentValue = Math.round(this.targets()[0].value);
+                                let paddedValue = Math.abs(currentValue).toString().padStart(targetLength, '0');
+
+                                if (target < 0) {
+                                    paddedValue = '-' + paddedValue;
+                                }
+
+                                valueSpan.textContent = paddedValue;
+                            }
+                        });
+                    }
+                });
             }
-
-
-
         })
 
         // Separate trigger for the line animation
+
+
+        const timelineTl = gsap.timeline({
+            scrollTrigger: {
+                trigger: ".timeline-panel.is--4 .structure-container",
+                start: "top top",
+                endTrigger: "body",
+                end: "bottom top",
+                scrub: true,
+                markers: true,
+                pinnedContainer: ".parent-section",
+
+            },
+        })
+        timelineTl.to(".section.is--timeline, .line-container, .grey-line-new", {
+            opacity: 0,
+            duration: .5,
+            ease: "linear"
+        })
+        timelineTl.to({}, {
+            duration: 3
+        })
 
 
 
@@ -3065,669 +3133,673 @@ function initTreeDiagram() {
         // const pinDuration = window.innerHeight * 7; // because +=300%
 
         // document.querySelector(".map-spacer").style.height = `${pinDuration}px`;
-        let mapTl = null;
-        function createMapTimeline() {
-            if (mapTl) {
-                return
-            }
-            mapTl = gsap.timeline({
-                scrollTrigger: {
-                    trigger: ".section.is--map",
-                    start: "top top",
-                    end: `+=1000%`,
-                    pin: true,
-
-                    pinnedContainer: ".parent-section",
-                    pinReparent: true,
-                    scrub: true,
-                    // markers: true,
-                    // markers: { startColor: "pink", endColor: "blue", fontSize: 20 }
-                }, defaults: {
-                    duration: 1,
-                }
 
 
-            });
-
-            mapTl.to(".map-svg path", {
-                drawSVG: "0% 100%",
-
-                onStart: function () {
-                    gsap.to(".section.is--map .text-wrapper-map [data-split='lines'] .lineInner", {
-                        yPercent: 0,
-                        duration: 1,
-                        ease: "power2.out"
-                    },)
-                },
-                onReverseComplete: function () {
-                    gsap.to(".section.is--map .text-wrapper-map [data-split='lines'] .lineInner", {
-                        yPercent: 100,
-                        duration: 1,
-                        ease: "power2.out"
-                    },)
-                }
-            })
-
-                .from(".map-container .dot-normal, .map-container .dot-video", {
-                    onStart: function () {
-                        gsap.fromTo(".map-container .dot-video .dot-bg", {
-                            scale: 0,
-                            autoAlpha: 1,
-                        }, {
-                            scale: 1.3,
-                            autoAlpha: 0,
-                            duration: 1,
-                            repeat: -1,
-                            ease: "power1.inOut"
-                        })
-
-                    },
-                    autoAlpha: 0,
-                    duration: 3,
-                }, "<")
-                .from(".click-me", {
-                    autoAlpha: 0,
-                }, "<")
-                .to(".section.is--map .map-container", {
-                    scale: 2,
-                    duration: 3,
-                }, "<")
-
-                //SPOTIFY
-                .to(".click-me", {
-                    autoAlpha: 0,
-                    onComplete: function () {
-                        gsap.set(".map-container .dot-video", {
-                            pointerEvents: "none",
-                        })
-
-                        //interrupt the dot-video animation
-                        gsap.killTweensOf(".map-container .dot-video .dot-bg");
-                        gsap.set(".map-container .dot-video .dot-bg", {
-                            autoAlpha: 0,
-                        })
-                    },
-                    onReverseComplete: function () {
-                        gsap.fromTo(".map-container .dot-video .dot-bg", {
-                            scale: 0,
-                            autoAlpha: 1,
-                        }, {
-                            scale: 1.3,
-                            autoAlpha: 0,
-                            duration: 1,
-                            repeat: -1,
-                            ease: "power1.inOut"
-                        })
-                    }
-                })
-                .to(".text-wrapper-spotify .lower-wrapper > *, .text-wrapper-spotify .lower-wrapper", {
-                    autoAlpha: 1,
-                    duration: 1,
-                    ease: "power2.out",
-
-                    onStart: function () {
-                        gsap.to(".text-wrapper-map .lineInner", {
-                            yPercent: -100,
-                        })
-                        gsap.to(".text-wrapper-spotify .lineInner", {
-                            yPercent: 0,
-                        })
-                    },
-                    onReverseComplete: function () {
-                        gsap.to(".text-wrapper-map .lineInner", {
-                            yPercent: 0,
-                        })
-                        gsap.to(".text-wrapper-spotify .lineInner", {
-                            yPercent: 100,
-                        })
-                        gsap.set(".map-container .dot-video", {
-                            pointerEvents: "auto",
-                        })
-                    }
-                })
-
-                .to(".img-spotify:not(.is--first)", {
-                    autoAlpha: 1,
-                    duration: 0.3,
-                    stagger: 0.5,
-                    ease: "power2.inOut",
-                    onUpdate: function () {
-                        const progress = this.progress();
-                        const spotifyNumber = document.querySelector('.spotify-number');
-
-                        if (spotifyNumber) {
-                            // Use the pre-captured target value
-                            const currentValue = Math.round(spotifyTarget * progress);
-                            spotifyNumber.textContent = currentValue;
-
-                            // Animate color from white to #fc0 based on progress
-                            const r = 255;
-                            const g = Math.round(255 - (51 * progress));  // 255 -> 204
-                            const b = Math.round(255 - (255 * progress)); // 255 -> 0
-                            spotifyNumber.style.color = `rgb(${r}, ${g}, ${b})`;
-                        }
-                    }
-                }, "+=0.5")
-                // Add number counter and color animation
-
-                .to({}, {
-                    duration: 1,
-                })
-
-
-                .to(".map-container", {
-                    yPercent: -85,
-                    xPercent: 45,
-                    scale: 2.6,
-                    duration: 3,
-                    ease: "power1.out",
-                    onStart: function () {
-                        gsap.to(".text-wrapper-spotify .lineInner", {
-                            yPercent: -100,
-                        })
-
-                        gsap.to(".text-wrapper-spotify .lower-wrapper > *, .text-wrapper-spotify .lower-wrapper", {
-                            autoAlpha: 0,
-                        })
-
-                    },
-                    onReverseComplete: function () {
-                        gsap.to(".text-wrapper-spotify .lineInner", {
-                            yPercent: 0,
-                        })
-
-                        gsap.to(".text-wrapper-spotify .lower-wrapper > *, .text-wrapper-spotify .lower-wrapper", {
-                            autoAlpha: 1,
-                        })
-                    }
-                },)
-                .to(".click-me", {
-                    autoAlpha: 0,
-                }, "<")
-                .to(".map-container mask rect", {
-                    xPercent: -10,
-                    yPercent: 25,
-                    duration: 3,
-                }, "<")
-
-            const allDots = gsap.utils.toArray(".dot-video, .dot-normal");
-            const barcelonaDot = document.querySelector(".dot-barcelona");
-
-            allDots.forEach(dot => {
-                mapTl.add(
-                    Flip.fit(dot, barcelonaDot, {
-                        duration: 1, // needed for Flip to work but overwritten by scrub
-                        ease: "none"
-                    }), "<+=.03"
-                    // add all tweens at the same point in the timeline
-                );
-            });
-
-            mapTl.to({}, {
-                onStart: function () {
-                    console.log("start")
-                    // gsap.to(".text-wrapper-map .lineInner", {
-                    //     yPercent: -100,
-                    // })
-                    gsap.to(".text-wrapper-barca .lineInner", {
-                        yPercent: 0,
-                    })
-
-                    gsap.to(".barca-video-wrapper", {
-                        autoAlpha: 1,
-                        yPercent: 0,
-                        duration: 1,
-                        ease: "easeOutQuart",
-                        onStart: function () {
-                            videoBarca.play();
-                        }
-                    })
-                },
-                onReverseComplete: function () {
-                    // gsap.to(".text-wrapper-map .lineInner", {
-                    //     yPercent: 0,
-                    // })
-
-                    gsap.to(".text-wrapper-barca .lineInner", {
-                        yPercent: -100,
-                    })
-
-                    gsap.to(".barca-video-wrapper", {
-                        autoAlpha: 0,
-                        duration: 1,
-                        yPercent: 20,
-                        ease: "easeOutQuart",
-                        onStart: function () {
-                            videoBarca.pause();
-                            videoBarca.currentTime = 0;
-                        }
-                    })
-
-                }
-            }, "<+=1")
-            mapTl.to({}, {
-                duration: 1
-            },)
-        }
     })
 
-    mm.add("(min-width: 20000px)", () => {
-
-        gsap.set(".section.is--groupe p.is--second", {
-            marginTop: 50
-        })
-
-
-        // const timelineOne = gsap.timeline({
-        //     scrollTrigger: {
-        //         trigger: ".parent-section",
-        //         start: "bottom top",
-        //         endTrigger: ".section.is--timeline",
-        //         end: "bottom top",
-        //         pin: true,
-        //         scrub: true,
-        //         markers: true,
-
-        //     },
-        // });
-        // gsap.set(".map-svg path", { drawSVG: "0% 100%" });
-
-
-        gsap.set(".parent-section .section.is--timeline", {
-            position: "relative",
-            paddingTop: "100vh"
-        })
-        gsap.set(".section.is--placeholder", {
-            height: () => document.querySelector(".section.is--timeline").offsetHeight
-        })
-
-        gsap.set(".dot-video, .dot-normal", {
-            scale: .5,
-        })
-
-        // treeTlOne.add(Flip.fit(".section.is--compare .tree-right-wrapper .line-wrapper-bottom", ".section.is--timeline .timeline-container", {
-        //     ease: "none",
-        //     duration: 1,
-        //     // duration: 2,
-        //     onStart: function () {
-        //         console.log("start");
-
-        //         gsap.to(".section.is--compare [data-split='lines'] .lineInner", {
-        //             yPercent: -100,
-        //         })
-        //     },
-
-
-
-        //     onReverseComplete: function () {
-        //         gsap.to(".section.is--compare [data-split='lines'] .lineInner", {
-        //             yPercent: 0,
-        //         })
-        //     }
-        // },))
-
-        treeTlOne.to({}, {
-            ease: "none",
-            duration: 1,
-            // duration: 2,
-            onStart: function () {
-                console.log("start");
-
-                gsap.to(".section.is--compare [data-split='lines'] .lineInner", {
-                    yPercent: -100,
-                })
-            },
-
-
-
-            onReverseComplete: function () {
-                gsap.to(".section.is--compare [data-split='lines'] .lineInner", {
-                    yPercent: 0,
-                })
-            }
-        },)
-
-
-        treeTlOne.to(".section.is--compare .is--reallywant", {
-
-            height: "+=100vh",
-            transformOrigin: "top",
-            duration: 1,
-            ease: "none"
-        }, "<")
-
-            .to(".section.is--compare .label.is--compare3", {
-
-                y: "+=100vh",
-                transformOrigin: "top",
-                duration: 1,
-                ease: "none"
-            }, "<")
-
-            .to(".section.is--compare .line-wrapper-top, .section.is--compare .line.is--vertical, .section.is--compare .tree-left-side", {
-                autoAlpha: 0,
-                // scale: .5
-            }, "<")
-            // .to(".section.is--personnes .is--toi", {
-            //     autoAlpha: 0,
-            //     y: "-=300",
-            //     ease: "none"
-
-            // }, "<")
-
-            // .to(".section.is--compare .is--reallywant, .section.is--compare .dot-wrapper", {
-            //     autoAlpha: 0,
-            //     duration: 0.001,
-            // },)
-
-            .to(".section.is--timeline .timeline-wrapper, .section.is--timeline .dot-wrapper", {
-                autoAlpha: 1,
-                duration: 0.001,
-
-                onStart: function () {
-
-                    gsap.to(".panel [data-split='lines'] .lineInner", {
-                        yPercent: 0,
-                    })
-
-                    gsap.to(".panel .t-inner-wrapper.is--spec", {
-                        autoAlpha: 1,
-                        yPercent: 0,
-                        duration: 1,
-                        ease: "power2.out"
-                    })
-                    // if (!hasCreatedTriggers) {
-
-                    //     hasCreatedTriggers = true; // ✅ set the flag so it only runs once
-
-                    //     document.querySelectorAll(".panel .text-wrapper").forEach(wrapper => {
-                    //         ScrollTrigger.create({
-                    //             trigger: wrapper,
-                    //             start: "top center+=10%",
-                    //             end: "bottom center",
-                    //             markers: true,
-                    //             onEnter: () => {
-                    //                 gsap.to(wrapper.querySelectorAll(".panel [data-split='lines'] .lineInner"), {
-                    //                     yPercent: 0,
-                    //                 })
-                    //                 if (wrapper.querySelector(".panel .t-inner-wrapper.is--spec")) {
-                    //                     gsap.to(wrapper.querySelectorAll(".panel .t-inner-wrapper.is--spec"), {
-                    //                         autoAlpha: 1,
-                    //                         yPercent: 0,
-                    //                         duration: 1,
-                    //                         ease: "power2.out"
-                    //                     })
-                    //                 }
-                    //                 console.log("entered");
-
-                    //             },
-
-                    //         });
-                    //     });
-                    // }
-
-
-                    gsap.fromTo(".tree-container.is--timeline .dot-wrapper .dot .dot-bg", {
-                        scale: 0,
-                        autoAlpha: 1
-                    }, {
-                        scale: 1.2,
-                        autoAlpha: 0,
-                        duration: 1.2,
-                        repeat: -1,
-                        ease: "power1.inOut"
-                    })
-
-
-                    gsap.to(".section.is--compare .inscription-rc", {
-                        autoAlpha: 0,
-                    })
-                },
-                onReverseComplete: function () {
-                    // gsap.set(".panel [data-split='lines'] .lineInner", {
-                    //     yPercent: 100,
-                    // })
-
-                    // gsap.to(".panel.is--third .text-wrapper.is--third .t-inner-wrapper.is--spec", {
-                    //     autoAlpha: 0,
-                    //     duration: 1,
-                    //     ease: "power2.out"
-                    // },)
-                    gsap.to(".section.is--compare .inscription-rc", {
-                        autoAlpha: 1,
-                    })
-
-                    gsap.to(".section.is--timeline .timeline-wrapper .white-line", {
-                        scaleY: 0,
-                        transformOrigin: "bottom",
-                        duration: .5,
-                        ease: "power2.out"
-                    }, "<")
-
-                    gsap.to(".panel [data-split='lines'] .lineInner", {
-                        yPercent: 100,
-                    })
-
-                    gsap.to(".panel .t-inner-wrapper.is--spec", {
-                        autoAlpha: 0,
-                        yPercent: 10,
-                        duration: 1,
-                        ease: "power2.out"
-                    })
-
-                },
-                onComplete: function () {
-                    gsap.fromTo(".section.is--timeline .timeline-wrapper .white-line", {
-                        scaleY: 0,
-                    }, {
-                        scaleY: 1,
-                        transformOrigin: "bottom",
-                        duration: .5,
-                        ease: "power2.out"
-                    }, "<")
-
-
-
-
-                    // gsap.to(".panel [data-split='lines'] .lineInner", {
-                    //     yPercent: 0,
-                    // })
-
-                    // gsap.to(".panel.is--third .text-wrapper.is--third .t-inner-wrapper.is--spec", {
-                    //     autoAlpha: 1,
-                    //     yPercent: 0,
-                    //     duration: 1,
-                    //     ease: "power2.out"
-                    // },)
-
-                }
-            }, "<")
-
-        // gsap.set(".section.is--timeline .timeline-wrapper .white-line", {
-        //     scaleY: 0,
-        //     transformOrigin: "top"
-        // });
-        ScrollTrigger.create({
-            trigger: ".section.is--placeholder",
-            start: "top bottom",
-            end: `+=${document.querySelector(".section.is--timeline .timeline-container").offsetHeight}`,
-            // scrub: 0,
-            pin: ".section.is--timeline .timeline-container .white-line",
-            pinSpacing: true,
-            // anticipatePin: 1,
-            pinReparent: true,
-            markers: false,
-            // onEnter: function () {
-            //     gsap.to(".section.is--timeline .timeline-wrapper .white-line", {
-            //         scaleY: 1,
-            //         transformOrigin: "bottom",
-            //         duration: 1,
-            //         ease: "power2.out"
-            //     })
-            // },
-
-        })
-        let once = false;
-        const timeline = gsap.timeline({
-            scrollTrigger: {
-                trigger: ".section.is--placeholder",
-                start: "top bottom",
-                end: `+=${document.querySelector(".section.is--timeline .timeline-container").offsetHeight}`,
-                // scrub: 0,
-                pin: ".dot-wrapper.is--timeline",
-                // invalidateOnRefresh: true,
-                // anticipatePin: 1,
-                pinReparent: true,
-                markers: false,
-
-            },
-
-        });
-
-        const pinDuration = window.innerHeight * 7; // because +=300%
-
-        document.querySelector(".map-spacer").style.height = `${pinDuration}px`;
-
-
-        const mapTl = gsap.timeline({
-            scrollTrigger: {
-                trigger: ".map-spacer",
-                start: "top bottom",
-                end: `+=${pinDuration}`,
-                pin: ".section.is--map",
-                pinReparent: true,
-                scrub: true,
-                // invalidateOnRefresh: true,
-                // markers: { startColor: "pink", endColor: "blue", fontSize: 20 }
-            }, defaults: {
-                duration: 1,
-            }
-
-
-        });
-
-        mapTl.to(".map-svg path", {
-            drawSVG: "0% 100%",
-
-            onStart: function () {
-                gsap.to(".section.is--map .text-wrapper-map [data-split='lines'] .lineInner", {
-                    yPercent: 0,
-                    duration: 1,
-                    ease: "power2.out"
-                },)
-            },
-            onReverseComplete: function () {
-                gsap.to(".section.is--map .text-wrapper-map [data-split='lines'] .lineInner", {
-                    yPercent: 100,
-                    duration: 1,
-                    ease: "power2.out"
-                },)
-            }
-        })
-
-            .from(".map-container .dot-normal, .map-container .dot-video", {
-                onStart: function () {
-                    gsap.fromTo(".map-container .dot-video .dot-bg", {
-                        scale: 0,
-                        autoAlpha: 1,
-                    }, {
-                        scale: 1.3,
-                        autoAlpha: 0,
-                        duration: 1,
-                        repeat: -1,
-                        ease: "power1.inOut"
-                    })
-
-                },
-                autoAlpha: 0,
-                duration: 3,
-            }, "<")
-            .from(".click-me", {
-                autoAlpha: 0,
-            }, "<")
-            .to(".section.is--map .map-container", {
-                scale: 2,
-                duration: 3,
-            }, "<")
-            .to(".map-container", {
-                yPercent: -85,
-                xPercent: 45,
-                scale: 2.6,
-                duration: 3,
-                ease: "power1.out"
-            },)
-            .to(".click-me", {
-                autoAlpha: 0,
-            }, "<")
-            .to(".map-container mask rect", {
-                xPercent: -10,
-                yPercent: 25,
-                duration: 3,
-            }, "<")
-
-        const allDots = gsap.utils.toArray(".dot-video, .dot-normal");
-        const barcelonaDot = document.querySelector(".dot-barcelona");
-
-        allDots.forEach(dot => {
-            mapTl.add(
-                Flip.fit(dot, barcelonaDot, {
-                    duration: 1, // needed for Flip to work but overwritten by scrub
-                    ease: "none"
-                }), "<+=.03"
-                // add all tweens at the same point in the timeline
-            );
-        });
-
-        mapTl.to({}, {
-            onStart: function () {
-                console.log("start")
-                gsap.to(".text-wrapper-map .lineInner", {
-                    yPercent: -100,
-                })
-                gsap.to(".text-wrapper-barca .lineInner", {
-                    yPercent: 0,
-                })
-
-                gsap.to(".barca-video-wrapper", {
-                    autoAlpha: 1,
-                    yPercent: 0,
-                    duration: 1,
-                    ease: "easeOutQuart",
-                    onStart: function () {
-                        videoBarca.play();
-                    }
-                })
-            },
-            onReverseComplete: function () {
-                gsap.to(".text-wrapper-map .lineInner", {
-                    yPercent: 0,
-                })
-
-                gsap.to(".text-wrapper-barca .lineInner", {
-                    yPercent: -100,
-                })
-
-                gsap.to(".barca-video-wrapper", {
-                    autoAlpha: 0,
-                    duration: 1,
-                    yPercent: 20,
-                    ease: "easeOutQuart",
-                    onStart: function () {
-                        videoBarca.pause();
-                        videoBarca.currentTime = 0;
-                    }
-                })
-
-            }
-        }, "<+=1")
-        mapTl.to({}, {
-            duration: 1
-        },)
-    })
+    // mm.add("(min-width: 20000px)", () => {
+
+    //     gsap.set(".section.is--groupe p.is--second", {
+    //         marginTop: 50
+    //     })
+
+
+    //     // const timelineOne = gsap.timeline({
+    //     //     scrollTrigger: {
+    //     //         trigger: ".parent-section",
+    //     //         start: "bottom top",
+    //     //         endTrigger: ".section.is--timeline",
+    //     //         end: "bottom top",
+    //     //         pin: true,
+    //     //         scrub: true,
+    //     //         markers: true,
+
+    //     //     },
+    //     // });
+    //     // gsap.set(".map-svg path", { drawSVG: "0% 100%" });
+
+
+    //     gsap.set(".parent-section .section.is--timeline", {
+    //         position: "relative",
+    //         paddingTop: "100vh"
+    //     })
+    //     gsap.set(".section.is--placeholder", {
+    //         height: () => document.querySelector(".section.is--timeline").offsetHeight
+    //     })
+
+    //     gsap.set(".dot-video, .dot-normal", {
+    //         scale: .5,
+    //     })
+
+    //     // treeTlOne.add(Flip.fit(".section.is--compare .tree-right-wrapper .line-wrapper-bottom", ".section.is--timeline .timeline-container", {
+    //     //     ease: "none",
+    //     //     duration: 1,
+    //     //     // duration: 2,
+    //     //     onStart: function () {
+    //     //         console.log("start");
+
+    //     //         gsap.to(".section.is--compare [data-split='lines'] .lineInner", {
+    //     //             yPercent: -100,
+    //     //         })
+    //     //     },
+
+
+
+    //     //     onReverseComplete: function () {
+    //     //         gsap.to(".section.is--compare [data-split='lines'] .lineInner", {
+    //     //             yPercent: 0,
+    //     //         })
+    //     //     }
+    //     // },))
+
+    //     treeTlOne.to({}, {
+    //         ease: "none",
+    //         duration: 1,
+    //         // duration: 2,
+    //         onStart: function () {
+    //             console.log("start");
+
+    //             gsap.to(".section.is--compare [data-split='lines'] .lineInner", {
+    //                 yPercent: -100,
+    //             })
+    //         },
+
+
+
+    //         onReverseComplete: function () {
+    //             gsap.to(".section.is--compare [data-split='lines'] .lineInner", {
+    //                 yPercent: 0,
+    //             })
+    //         }
+    //     },)
+
+
+    //     treeTlOne.to(".section.is--compare .is--reallywant", {
+
+    //         height: "+=100vh",
+    //         transformOrigin: "top",
+    //         duration: 1,
+    //         ease: "none"
+    //     }, "<")
+
+    //         .to(".section.is--compare .label.is--compare3", {
+
+    //             y: "+=100vh",
+    //             transformOrigin: "top",
+    //             duration: 1,
+    //             ease: "none"
+    //         }, "<")
+
+    //         .to(".section.is--compare .line-wrapper-top, .section.is--compare .line.is--vertical, .section.is--compare .tree-left-side", {
+    //             autoAlpha: 0,
+    //             // scale: .5
+    //         }, "<")
+    //         // .to(".section.is--personnes .is--toi", {
+    //         //     autoAlpha: 0,
+    //         //     y: "-=300",
+    //         //     ease: "none"
+
+    //         // }, "<")
+
+    //         // .to(".section.is--compare .is--reallywant, .section.is--compare .dot-wrapper", {
+    //         //     autoAlpha: 0,
+    //         //     duration: 0.001,
+    //         // },)
+
+    //         .to(".section.is--timeline .timeline-wrapper, .section.is--timeline .dot-wrapper", {
+    //             autoAlpha: 1,
+    //             duration: 0.001,
+
+    //             onStart: function () {
+
+    //                 gsap.to(".panel [data-split='lines'] .lineInner", {
+    //                     yPercent: 0,
+    //                 })
+
+    //                 gsap.to(".panel .t-inner-wrapper.is--spec", {
+    //                     autoAlpha: 1,
+    //                     yPercent: 0,
+    //                     duration: 1,
+    //                     ease: "power2.out"
+    //                 })
+    //                 // if (!hasCreatedTriggers) {
+
+    //                 //     hasCreatedTriggers = true; // ✅ set the flag so it only runs once
+
+    //                 //     document.querySelectorAll(".panel .text-wrapper").forEach(wrapper => {
+    //                 //         ScrollTrigger.create({
+    //                 //             trigger: wrapper,
+    //                 //             start: "top center+=10%",
+    //                 //             end: "bottom center",
+    //                 //             markers: true,
+    //                 //             onEnter: () => {
+    //                 //                 gsap.to(wrapper.querySelectorAll(".panel [data-split='lines'] .lineInner"), {
+    //                 //                     yPercent: 0,
+    //                 //                 })
+    //                 //                 if (wrapper.querySelector(".panel .t-inner-wrapper.is--spec")) {
+    //                 //                     gsap.to(wrapper.querySelectorAll(".panel .t-inner-wrapper.is--spec"), {
+    //                 //                         autoAlpha: 1,
+    //                 //                         yPercent: 0,
+    //                 //                         duration: 1,
+    //                 //                         ease: "power2.out"
+    //                 //                     })
+    //                 //                 }
+    //                 //                 console.log("entered");
+
+    //                 //             },
+
+    //                 //         });
+    //                 //     });
+    //                 // }
+
+
+    //                 gsap.fromTo(".tree-container.is--timeline .dot-wrapper .dot .dot-bg", {
+    //                     scale: 0,
+    //                     autoAlpha: 1
+    //                 }, {
+    //                     scale: 1.2,
+    //                     autoAlpha: 0,
+    //                     duration: 1.2,
+    //                     repeat: -1,
+    //                     ease: "power1.inOut"
+    //                 })
+
+
+    //                 gsap.to(".section.is--compare .inscription-rc", {
+    //                     autoAlpha: 0,
+    //                 })
+    //             },
+    //             onReverseComplete: function () {
+    //                 // gsap.set(".panel [data-split='lines'] .lineInner", {
+    //                 //     yPercent: 100,
+    //                 // })
+
+    //                 // gsap.to(".panel.is--third .text-wrapper.is--third .t-inner-wrapper.is--spec", {
+    //                 //     autoAlpha: 0,
+    //                 //     duration: 1,
+    //                 //     ease: "power2.out"
+    //                 // },)
+    //                 gsap.to(".section.is--compare .inscription-rc", {
+    //                     autoAlpha: 1,
+    //                 })
+
+    //                 gsap.to(".section.is--timeline .timeline-wrapper .white-line", {
+    //                     scaleY: 0,
+    //                     transformOrigin: "bottom",
+    //                     duration: .5,
+    //                     ease: "power2.out"
+    //                 }, "<")
+
+    //                 gsap.to(".panel [data-split='lines'] .lineInner", {
+    //                     yPercent: 100,
+    //                 })
+
+    //                 gsap.to(".panel .t-inner-wrapper.is--spec", {
+    //                     autoAlpha: 0,
+    //                     yPercent: 10,
+    //                     duration: 1,
+    //                     ease: "power2.out"
+    //                 })
+
+    //             },
+    //             onComplete: function () {
+    //                 gsap.fromTo(".section.is--timeline .timeline-wrapper .white-line", {
+    //                     scaleY: 0,
+    //                 }, {
+    //                     scaleY: 1,
+    //                     transformOrigin: "bottom",
+    //                     duration: .5,
+    //                     ease: "power2.out"
+    //                 }, "<")
+
+
+
+
+    //                 // gsap.to(".panel [data-split='lines'] .lineInner", {
+    //                 //     yPercent: 0,
+    //                 // })
+
+    //                 // gsap.to(".panel.is--third .text-wrapper.is--third .t-inner-wrapper.is--spec", {
+    //                 //     autoAlpha: 1,
+    //                 //     yPercent: 0,
+    //                 //     duration: 1,
+    //                 //     ease: "power2.out"
+    //                 // },)
+
+    //             }
+    //         }, "<")
+
+    //     // gsap.set(".section.is--timeline .timeline-wrapper .white-line", {
+    //     //     scaleY: 0,
+    //     //     transformOrigin: "top"
+    //     // });
+    //     ScrollTrigger.create({
+    //         trigger: ".section.is--placeholder",
+    //         start: "top bottom",
+    //         end: `+=${document.querySelector(".section.is--timeline .timeline-container").offsetHeight}`,
+    //         // scrub: 0,
+    //         pin: ".section.is--timeline .timeline-container .white-line",
+    //         pinSpacing: true,
+    //         // anticipatePin: 1,
+    //         pinReparent: true,
+    //         markers: false,
+    //         // onEnter: function () {
+    //         //     gsap.to(".section.is--timeline .timeline-wrapper .white-line", {
+    //         //         scaleY: 1,
+    //         //         transformOrigin: "bottom",
+    //         //         duration: 1,
+    //         //         ease: "power2.out"
+    //         //     })
+    //         // },
+
+    //     })
+    //     let once = false;
+    //     const timeline = gsap.timeline({
+    //         scrollTrigger: {
+    //             trigger: ".section.is--placeholder",
+    //             start: "top bottom",
+    //             end: `+=${document.querySelector(".section.is--timeline .timeline-container").offsetHeight}`,
+    //             // scrub: 0,
+    //             pin: ".dot-wrapper.is--timeline",
+    //             // invalidateOnRefresh: true,
+    //             // anticipatePin: 1,
+    //             pinReparent: true,
+    //             markers: false,
+
+    //         },
+
+    //     });
+
+    //     const pinDuration = window.innerHeight * 7; // because +=300%
+
+    //     document.querySelector(".map-spacer").style.height = `${pinDuration}px`;
+
+
+    //     const mapTl = gsap.timeline({
+    //         scrollTrigger: {
+    //             trigger: ".map-spacer",
+    //             start: "top bottom",
+    //             end: `+=${pinDuration}`,
+    //             pin: ".section.is--map",
+    //             pinReparent: true,
+    //             scrub: true,
+    //             // invalidateOnRefresh: true,
+    //             // markers: { startColor: "pink", endColor: "blue", fontSize: 20 }
+    //         }, defaults: {
+    //             duration: 1,
+    //         }
+
+
+    //     });
+
+    //     mapTl.to(".map-svg path", {
+    //         drawSVG: "0% 100%",
+
+    //         onStart: function () {
+    //             gsap.to(".section.is--map .text-wrapper-map [data-split='lines'] .lineInner", {
+    //                 yPercent: 0,
+    //                 duration: 1,
+    //                 ease: "power2.out"
+    //             },)
+    //         },
+    //         onReverseComplete: function () {
+    //             gsap.to(".section.is--map .text-wrapper-map [data-split='lines'] .lineInner", {
+    //                 yPercent: 100,
+    //                 duration: 1,
+    //                 ease: "power2.out"
+    //             },)
+    //         }
+    //     })
+
+    //         .from(".map-container .dot-normal, .map-container .dot-video", {
+    //             onStart: function () {
+    //                 gsap.fromTo(".map-container .dot-video .dot-bg", {
+    //                     scale: 0,
+    //                     autoAlpha: 1,
+    //                 }, {
+    //                     scale: 1.3,
+    //                     autoAlpha: 0,
+    //                     duration: 1,
+    //                     repeat: -1,
+    //                     ease: "power1.inOut"
+    //                 })
+
+    //             },
+    //             autoAlpha: 0,
+    //             duration: 3,
+    //         }, "<")
+    //         .from(".click-me", {
+    //             autoAlpha: 0,
+    //         }, "<")
+    //         .to(".section.is--map .map-container", {
+    //             scale: 2,
+    //             duration: 3,
+    //         }, "<")
+    //         .to(".map-container", {
+    //             yPercent: -85,
+    //             xPercent: 45,
+    //             scale: 2.6,
+    //             duration: 3,
+    //             ease: "power1.out"
+    //         },)
+    //         .to(".click-me", {
+    //             autoAlpha: 0,
+    //         }, "<")
+    //         .to(".map-container mask rect", {
+    //             xPercent: -10,
+    //             yPercent: 25,
+    //             duration: 3,
+    //         }, "<")
+
+    //     const allDots = gsap.utils.toArray(".dot-video, .dot-normal");
+    //     const barcelonaDot = document.querySelector(".dot-barcelona");
+
+    //     allDots.forEach(dot => {
+    //         mapTl.add(
+    //             Flip.fit(dot, barcelonaDot, {
+    //                 duration: 1, // needed for Flip to work but overwritten by scrub
+    //                 ease: "none"
+    //             }), "<+=.03"
+    //             // add all tweens at the same point in the timeline
+    //         );
+    //     });
+
+    //     mapTl.to({}, {
+    //         onStart: function () {
+    //             console.log("start")
+    //             gsap.to(".text-wrapper-map .lineInner", {
+    //                 yPercent: -100,
+    //             })
+    //             gsap.to(".text-wrapper-barca .lineInner", {
+    //                 yPercent: 0,
+    //             })
+
+    //             gsap.to(".barca-video-wrapper", {
+    //                 autoAlpha: 1,
+    //                 yPercent: 0,
+    //                 duration: 1,
+    //                 ease: "easeOutQuart",
+    //                 onStart: function () {
+    //                     videoBarca.play();
+    //                 }
+    //             })
+    //         },
+    //         onReverseComplete: function () {
+    //             gsap.to(".text-wrapper-map .lineInner", {
+    //                 yPercent: 0,
+    //             })
+
+    //             gsap.to(".text-wrapper-barca .lineInner", {
+    //                 yPercent: -100,
+    //             })
+
+    //             gsap.to(".barca-video-wrapper", {
+    //                 autoAlpha: 0,
+    //                 duration: 1,
+    //                 yPercent: 20,
+    //                 ease: "easeOutQuart",
+    //                 onStart: function () {
+    //                     videoBarca.pause();
+    //                     videoBarca.currentTime = 0;
+    //                 }
+    //             })
+
+    //         }
+    //     }, "<+=1")
+    //     mapTl.to({}, {
+    //         duration: 1
+    //     },)
+    // })
 
 
 }
 
+let mapTl = null;
+function createMapTimeline() {
+    if (mapTl) {
+        return
+    }
+
+    mapTl = gsap.timeline({
+        scrollTrigger: {
+            trigger: ".section.is--map",
+            start: "top top",
+            end: `+=1000%`,
+            pin: true,
+
+            pinnedContainer: ".parent-section",
+            pinReparent: true,
+            scrub: true,
+            // markers: true,
+            // markers: { startColor: "pink", endColor: "blue", fontSize: 20 }
+        }, defaults: {
+            duration: 1,
+        }
+
+
+    });
+
+    mapTl.to(".map-svg path", {
+        drawSVG: "0% 100%",
+
+        onStart: function () {
+            gsap.to(".section.is--map .text-wrapper-map [data-split='lines'] .lineInner", {
+                yPercent: 0,
+                duration: 1,
+                ease: "power2.out"
+            },)
+        },
+        onReverseComplete: function () {
+            gsap.to(".section.is--map .text-wrapper-map [data-split='lines'] .lineInner", {
+                yPercent: 100,
+                duration: 1,
+                ease: "power2.out"
+            },)
+        }
+    })
+
+        .from(".map-container .dot-normal, .map-container .dot-video", {
+            onStart: function () {
+                gsap.fromTo(".map-container .dot-video .dot-bg", {
+                    scale: 0,
+                    autoAlpha: 1,
+                }, {
+                    scale: 1.3,
+                    autoAlpha: 0,
+                    duration: 1,
+                    repeat: -1,
+                    ease: "power1.inOut"
+                })
+
+            },
+            autoAlpha: 0,
+            duration: 3,
+        }, "<")
+        .from(".click-me", {
+            autoAlpha: 0,
+        }, "<")
+        .to(".section.is--map .map-container", {
+            scale: 2,
+            duration: 3,
+        }, "<")
+
+        //SPOTIFY
+        .to(".click-me", {
+            autoAlpha: 0,
+            onComplete: function () {
+                gsap.set(".map-container .dot-video", {
+                    pointerEvents: "none",
+                })
+
+                //interrupt the dot-video animation
+                gsap.killTweensOf(".map-container .dot-video .dot-bg");
+                gsap.set(".map-container .dot-video .dot-bg", {
+                    autoAlpha: 0,
+                })
+            },
+            onReverseComplete: function () {
+                gsap.fromTo(".map-container .dot-video .dot-bg", {
+                    scale: 0,
+                    autoAlpha: 1,
+                }, {
+                    scale: 1.3,
+                    autoAlpha: 0,
+                    duration: 1,
+                    repeat: -1,
+                    ease: "power1.inOut"
+                })
+            }
+        })
+        .to(".text-wrapper-spotify .lower-wrapper > *, .text-wrapper-spotify .lower-wrapper", {
+            autoAlpha: 1,
+            duration: 1,
+            ease: "power2.out",
+
+            onStart: function () {
+                gsap.to(".text-wrapper-map .lineInner", {
+                    yPercent: -100,
+                })
+                gsap.to(".text-wrapper-spotify .lineInner", {
+                    yPercent: 0,
+                })
+            },
+            onReverseComplete: function () {
+                gsap.to(".text-wrapper-map .lineInner", {
+                    yPercent: 0,
+                })
+                gsap.to(".text-wrapper-spotify .lineInner", {
+                    yPercent: 100,
+                })
+                gsap.set(".map-container .dot-video", {
+                    pointerEvents: "auto",
+                })
+            }
+        })
+
+        .to(".img-spotify:not(.is--first)", {
+            autoAlpha: 1,
+            duration: 0.3,
+            stagger: 0.5,
+            ease: "power2.inOut",
+            onUpdate: function () {
+                const progress = this.progress();
+                console.log("progress:", progress);
+                const spotifyNumber = document.querySelector('.spotify-number');
+
+                if (spotifyNumber) {
+                    // Use the pre-captured target value
+                    const currentValue = Math.round(spotifyTarget * progress);
+                    spotifyNumber.textContent = currentValue;
+
+                    // Animate color from white to #fc0 based on progress
+                    const r = 255;
+                    const g = Math.round(255 - (51 * progress));  // 255 -> 204
+                    const b = Math.round(255 - (255 * progress)); // 255 -> 0
+                    spotifyNumber.style.color = `rgb(${r}, ${g}, ${b})`;
+                }
+            }
+        }, "+=0.5")
+        // Add number counter and color animation
+
+        .to({}, {
+            duration: 1,
+        })
+
+
+        .to(".map-container", {
+            yPercent: -85,
+            xPercent: 45,
+            scale: 2.6,
+            duration: 3,
+            ease: "power1.out",
+            onStart: function () {
+                gsap.to(".text-wrapper-spotify .lineInner", {
+                    yPercent: -100,
+                })
+
+                gsap.to(".text-wrapper-spotify .lower-wrapper > *, .text-wrapper-spotify .lower-wrapper", {
+                    autoAlpha: 0,
+                })
+
+            },
+            onReverseComplete: function () {
+                gsap.to(".text-wrapper-spotify .lineInner", {
+                    yPercent: 0,
+                })
+
+                gsap.to(".text-wrapper-spotify .lower-wrapper > *, .text-wrapper-spotify .lower-wrapper", {
+                    autoAlpha: 1,
+                })
+            }
+        },)
+        .to(".click-me", {
+            autoAlpha: 0,
+        }, "<")
+        .to(".map-container mask rect", {
+            xPercent: -10,
+            yPercent: 25,
+            duration: 3,
+        }, "<")
+
+    const allDots = gsap.utils.toArray(".dot-video, .dot-normal");
+    const barcelonaDot = document.querySelector(".dot-barcelona");
+
+    allDots.forEach(dot => {
+        mapTl.add(
+            Flip.fit(dot, barcelonaDot, {
+                duration: 1, // needed for Flip to work but overwritten by scrub
+                ease: "none"
+            }), "<+=.03"
+            // add all tweens at the same point in the timeline
+        );
+    });
+
+    mapTl.to({}, {
+        onStart: function () {
+            console.log("start")
+            // gsap.to(".text-wrapper-map .lineInner", {
+            //     yPercent: -100,
+            // })
+            gsap.to(".text-wrapper-barca .lineInner", {
+                yPercent: 0,
+            })
+
+            gsap.to(".barca-video-wrapper", {
+                autoAlpha: 1,
+                yPercent: 0,
+                duration: 1,
+                ease: "easeOutQuart",
+                onStart: function () {
+                    videoBarca.play();
+                }
+            })
+        },
+        onReverseComplete: function () {
+            // gsap.to(".text-wrapper-map .lineInner", {
+            //     yPercent: 0,
+            // })
+
+            gsap.to(".text-wrapper-barca .lineInner", {
+                yPercent: -100,
+            })
+
+            gsap.to(".barca-video-wrapper", {
+                autoAlpha: 0,
+                duration: 1,
+                yPercent: 20,
+                ease: "easeOutQuart",
+                onStart: function () {
+                    videoBarca.pause();
+                    videoBarca.currentTime = 0;
+                }
+            })
+
+        }
+    }, "<+=1")
+    mapTl.to({}, {
+        duration: 1
+    },)
+}
 
 function initVideoMap() {
 
@@ -3931,8 +4003,10 @@ function initVideoMap() {
         });
     });
 }
-
+let hasCreatedTriggers = false;
 function initFormAnimaton() {
+    if (hasCreatedTriggers) return;
+    hasCreatedTriggers = true;
     gsap.set(".section.is--fields, .section.is--achat, .section.is--faq, .section.is--footerlast", {
         display: "none",
     })
@@ -5377,19 +5451,19 @@ document.addEventListener("DOMContentLoaded", () => {
             centerMap();
         });
         // TO COMMENT
-        initAgeGate();
+        // initAgeGate();
         tlHeroAnimation = initHeroAnimation();
         // TO COMMENT
-        initIntro();
+        // initIntro();
         initTrackerCheckboxes();
         // TO COMMENT
-        initScrollLock();
+        // initScrollLock();
         initTrackerSection();
         initVideoMap();
 
 
         //to remove
-        // initTreeDiagramWrapper(); // on page load
+        initTreeDiagramWrapper(); // on page load
 
 
         initMultiStepForm();
