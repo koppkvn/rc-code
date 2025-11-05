@@ -1,4 +1,4 @@
-// import './styles/main.scss'
+import './styles/main.scss'
 import { ElectricBorder } from './electricBorder.js'
 import { SparkSystem } from './sparkSystem.js'
 
@@ -579,7 +579,7 @@ function initTreeDiagram() {
 
     })
 
-    const videoBarca = document.querySelector(".barca-video");
+    const videoBarca = document.querySelector(".barca-video-wrapper");
     if (videoBarca) {
         gsap.set(videoBarca, {
             autoAlpha: 0,
@@ -1891,12 +1891,11 @@ function initTreeDiagram() {
     position: fixed;
     top: ${grayLineTop}px;  /* Use the exact position of the gray line */
     left: 0;  /* Start from left edge of screen */
-    width: 50%;  /* Width to center of screen */
+    width: calc(50% - 10px);  /* Width to center of screen */
     height: 2px;  /* Match the gray line height */
     background-color: white;
     transform: translateY(-50%) scaleX(0);  /* Center vertically and start scaled to 0 */
     transform-origin: right center;  /* Scale from right edge (at screen center) */
-    z-index: 50;
 `;
                         // Append to body instead of inside the scaled container
                         document.body.appendChild(progressLine);
@@ -2388,6 +2387,7 @@ function initTreeDiagram() {
                             repeat: -1,
                             yoyo: true,
                             ease: "power2.inOut",
+
                             zIndex: 100
                         });
                         centerDot.style.backgroundColor = "#ffcc00";
@@ -2557,12 +2557,14 @@ function initTreeDiagram() {
                     })
                 }
             })
-            .to(".text-wrapper-spotify .lower-wrapper > *", {
-                autoAlpha: 1,
-                duration: 1,
-                ease: "power2.out",
+            .to({}, {
+
 
                 onStart: function () {
+
+                    gsap.to(".text-wrapper-spotify .lower-wrapper > *", {
+                        autoAlpha: 1,
+                    })
                     gsap.to(".text-wrapper-map .lineInner", {
                         yPercent: -100,
                     })
@@ -2571,6 +2573,9 @@ function initTreeDiagram() {
                     })
                 },
                 onReverseComplete: function () {
+                    gsap.to(".text-wrapper-spotify .lower-wrapper > *", {
+                        autoAlpha: 0,
+                    })
                     gsap.to(".text-wrapper-map .lineInner", {
                         yPercent: 0,
                     })
@@ -2678,7 +2683,7 @@ function initTreeDiagram() {
                     yPercent: 0,
                     ease: "easeOutQuart",
                     onStart: function () {
-                        videoBarca.play();
+                        videoBarca.firstChild.play();
                     }
                 })
 
@@ -2698,8 +2703,8 @@ function initTreeDiagram() {
                     yPercent: 20,
                     ease: "easeOutQuart",
                     onStart: function () {
-                        videoBarca.pause();
-                        videoBarca.currentTime = 0;
+                        videoBarca.firstChild.pause();
+                        videoBarca.firstChild.currentTime = 0;
                     }
                 })
             }
@@ -3077,24 +3082,49 @@ function initTreeDiagram() {
 
         const timelineTl = gsap.timeline({
             scrollTrigger: {
-                trigger: ".timeline-panel.is--4 .structure-container",
-                start: "top top",
-                endTrigger: "body",
-                end: "bottom top",
+                trigger: ".timeline-panel.is--9",
+                start: "50% top",
+                endTrigger: ".section.is--timeline",
+                end: "bottom 50%",
                 scrub: true,
                 // markers: true,
                 pinnedContainer: ".parent-section",
+                onEnter: () => {
+                    // Add class when scrolling forward into the trigger zone
+                    document.body.classList.add('is-hidden');
+                    document.body.classList.remove('is-visible');
 
+                },
+                onLeaveBack: () => {
+                    // Remove class when scrolling back up
+                    document.body.classList.remove('is-hidden');
+                    document.body.classList.add('is-visible');
+
+                },
+                onLeave: () => {
+                    gsap.to(".structure-container", {
+                        opacity: 0,
+                        duration: .5,
+                        ease: "power2.out"
+                    })
+                },
+                onEnterBack: () => {
+                    gsap.to(".structure-container", {
+                        opacity: 1,
+                        duration: .5,
+                        ease: "power2.out"
+                    })
+                }
             },
         })
-        timelineTl.to(".section.is--timeline, .line-container, .grey-line-new", {
-            opacity: 0,
-            duration: .5,
-            ease: "linear"
-        })
-        timelineTl.to({}, {
-            duration: 3
-        })
+        // timelineTl.to(" .line-container, .grey-line-new, .stats-container .stats-inner", {
+        //     opacity: 0,
+        //     duration: .5,
+        //     ease: "linear"
+        // })
+        // timelineTl.to({}, {
+        //     duration: 3
+        // })
 
 
 
@@ -3579,9 +3609,12 @@ function createMapTimeline() {
 
 
     });
+    gsap.set(".map-svg path", { drawSVG: "0% 100%" });
+    // mapTl.to(".map-svg path", {
+    //     drawSVG: "0% 100%",
 
-    mapTl.to(".map-svg path", {
-        drawSVG: "0% 100%",
+    mapTl.from(".map-svg", {
+        opacity: 0,
 
         onStart: function () {
             gsap.to(".section.is--map .text-wrapper-map [data-split='lines'] .lineInner", {
@@ -3742,7 +3775,9 @@ function createMapTimeline() {
             duration: 3,
         }, "<")
 
-    const allDots = gsap.utils.toArray(".dot-video, .dot-normal");
+    // const allDots = gsap.utils.toArray(".dot-video, .dot-normal");
+    const allDots = gsap.utils.toArray(".dot-video, .gebs");
+
     const barcelonaDot = document.querySelector(".dot-barcelona");
 
     allDots.forEach(dot => {
@@ -4250,13 +4285,25 @@ function initBasicFormValidation() {
             return timeDifference < 5;
         };
 
+        // ADD THIS NEW FUNCTION
+        const isHoneypotFilled = () => {
+            const honeypotField = form.querySelector('[data-honeypot]');
+            if (!honeypotField) return false; // No honeypot field, skip check
+            return honeypotField.value.trim() !== '';
+        };
+
         submitButtonDiv.addEventListener('click', function () {
             if (validateAndStartLiveValidationForAll()) {
                 if (isSpam()) {
                     alert('Form submitted too quickly. Please try again.');
                     return;
                 }
-                normalizeBirthdatesIfNeeded(); // optional ISO normalization
+                // ADD THIS CHECK
+                if (isHoneypotFilled()) {
+                    console.log('Bot detected via honeypot');
+                    return; // Silently fail for bots
+                }
+                normalizeBirthdatesIfNeeded();
                 submitInput.click();
             }
         });
@@ -4269,7 +4316,12 @@ function initBasicFormValidation() {
                         alert('Form submitted too quickly. Please try again.');
                         return;
                     }
-                    normalizeBirthdatesIfNeeded(); // optional ISO normalization
+                    // ADD THIS CHECK
+                    if (isHoneypotFilled()) {
+                        console.log('Bot detected via honeypot');
+                        return; // Silently fail for bots
+                    }
+                    normalizeBirthdatesIfNeeded();
                     submitInput.click();
                 }
             }
@@ -4628,191 +4680,7 @@ function initTreeDiagramWrapper() {
 }
 
 
-function initAchat() {
-    // Webflow Checkout Integration Script
-    // Add this to your Webflow site's custom code section
 
-    (function () {
-        'use strict';
-
-        // Configuration - Update this with your deployed Astro site URL
-        const CHECKOUT_URL = 'https://astro-rc-paiement.vercel.app/checkout';
-
-        // Product pricing and discount logic
-        const PRODUCTS = {
-            'reboot-camp': { name: 'Reboot Camp', price: 800 },
-            'agenda': { name: 'Agenda', price: 60 },
-            'drapeau': { name: 'Drapeau', price: 40 },
-            'tshirt': { name: 'T-shirt', price: 50 },
-            'cours-finance': { name: 'Cours Finance', price: 49 },
-            'contenu-anglais': { name: 'Contenu Anglais', price: 149 },
-            'appel-1': { name: '1 appel avec Elio', price: 200 },
-            'appel-2': { name: '2 appels avec Elio', price: 400 },
-            'appel-3': { name: '3 appels avec Elio', price: 600 }
-        };
-
-        // Discount rules
-        const DISCOUNTS = {
-            material: {
-                condition: (selectedItems) => {
-                    const materialItems = selectedItems.filter(id => ['agenda', 'drapeau', 'tshirt'].includes(id));
-                    return materialItems.length === 3;
-                },
-                discount: 51
-            },
-            formation: {
-                condition: (selectedItems) => {
-                    const hasRebootCamp = selectedItems.includes('reboot-camp');
-                    const hasCoursFinance = selectedItems.includes('cours-finance');
-                    const hasContenuAnglais = selectedItems.includes('contenu-anglais');
-                    return hasRebootCamp && hasCoursFinance && hasContenuAnglais;
-                },
-                discount: 251
-            }
-        };
-
-        // Calculate total with discounts
-        function calculateTotal(selectedItems) {
-            let total = 0;
-
-            // Add selected items
-            selectedItems.forEach(itemId => {
-                const product = PRODUCTS[itemId];
-                if (product) {
-                    total += product.price;
-                }
-            });
-
-            // Apply discounts
-            let totalDiscount = 0;
-            for (const [category, discountRule] of Object.entries(DISCOUNTS)) {
-                if (discountRule.condition(selectedItems)) {
-                    totalDiscount += discountRule.discount;
-                }
-            }
-
-            return total - totalDiscount;
-        }
-
-        // Get selected items from form
-        function getSelectedItems(form) {
-            const selectedItems = [];
-
-            // Check checkboxes
-            const checkboxes = form.querySelectorAll('input[type="checkbox"]:checked');
-            checkboxes.forEach(checkbox => {
-
-                console.log(checkbox.name);
-
-                if (PRODUCTS[checkbox.name]) {
-                    selectedItems.push(checkbox.name);
-                }
-            });
-
-            // Check radio buttons
-            // const radios = form.querySelectorAll('input[type="radio"]:checked');
-            // radios.forEach(radio => {
-            //     if (PRODUCTS[radio.value]) {
-            //         selectedItems.push(radio.value);
-            //     }
-            // });
-
-
-            const slider = form.querySelector('#appel-slider');
-            if (slider) {
-                const sliderValue = parseInt(slider.value);
-                const callValues = ['', 'appel-1', 'appel-2', 'appel-3'];
-
-                if (sliderValue > 0 && callValues[sliderValue] && PRODUCTS[callValues[sliderValue]]) {
-                    selectedItems.push(callValues[sliderValue]);
-                }
-            }
-
-            return selectedItems;
-        }
-
-        // Update total display (if you have a total element)
-        function updateTotal(selectedItems) {
-            const totalElement = document.querySelector('[data-total]');
-            if (totalElement) {
-                const total = calculateTotal(selectedItems);
-                totalElement.textContent = `${total.toFixed(2)}€`;
-            }
-        }
-
-        // Handle form submission
-        function handleFormSubmit(event) {
-            event.preventDefault();
-
-            const form = event.target;
-            const selectedItems = getSelectedItems(form);
-
-            // Validate that at least one item is selected
-            if (selectedItems.length === 0) {
-                alert('Veuillez sélectionner au moins un produit.');
-                return false;
-            }
-
-            // Validate engagement checkbox
-            const engagementCheckbox = form.querySelector('[name="engagement"]');
-            if (engagementCheckbox && !engagementCheckbox.checked) {
-                alert('Vous devez accepter de respecter vos engagements.');
-                return false;
-            }
-
-            // Build URL with form data
-            const params = new URLSearchParams();
-            selectedItems.forEach(itemId => {
-                params.append(itemId, 'on');
-            });
-
-            // Add engagement if checked
-            if (engagementCheckbox && engagementCheckbox.checked) {
-                params.append('engagement', 'on');
-            }
-
-            // Redirect to checkout
-            const checkoutUrl = `${CHECKOUT_URL}?${params.toString()}`;
-            window.location.href = checkoutUrl;
-
-            return false;
-        }
-
-        // Initialize when DOM is ready
-        function init() {
-            // Find the checkout form
-            const form = document.querySelector('.form-achat');
-            if (!form) {
-                console.warn('Checkout form not found. Make sure your form has the class "form-achat"');
-                return;
-            }
-
-            // Add submit handler
-            form.addEventListener('submit', handleFormSubmit);
-
-            // Add change handlers for real-time total updates
-            const inputs = form.querySelectorAll('input[type="checkbox"], input[type="radio"]');
-            inputs.forEach(input => {
-                input.addEventListener('change', () => {
-                    const selectedItems = getSelectedItems(form);
-                    updateTotal(selectedItems);
-                });
-            });
-
-            // Initialize total
-            const selectedItems = getSelectedItems(form);
-            updateTotal(selectedItems);
-        }
-
-        // Run initialization
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', init);
-        } else {
-            init();
-        }
-
-    })();
-}
 function initMultiStepForm() {
     const forms = document.querySelectorAll('[data-form-validate]');
 
@@ -5020,11 +4888,22 @@ function initMultiStepForm() {
                     }
                 });
 
+                const isHoneypotFilled = () => {
+                    const honeypotField = form.querySelector('[data-honeypot]');
+                    if (!honeypotField) return false;
+                    return honeypotField.value.trim() !== '';
+                };
+
                 submitBtn.addEventListener('click', () => {
                     console.log('🔵 Submit button clicked!');
 
                     const isValid = validateCurrentStep();
                     console.log('🔵 Current step valid?', isValid);
+
+                    if (isHoneypotFilled()) {
+                        console.log('Bot detected via honeypot');
+                        return; // Silently fail for bots
+                    }
 
                     if (isValid) {
                         console.log('🔵 Validation passed, attempting to submit...');
@@ -5432,6 +5311,29 @@ function initAccordionCSS() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+
+
+    const initialWidth = window.innerWidth;
+    document.body.style.width = `${initialWidth}px`;
+    document.body.style.minWidth = `${initialWidth}px`;
+    document.body.style.maxWidth = `${initialWidth}px`;
+    document.body.style.overflow = 'hidden'; // Prevent horizontal scroll
+
+    ScrollTrigger.config({
+        autoRefreshEvents: "visibilitychange,DOMContentLoaded,load"
+    });
+
+    // let initialWidth = window.innerWidth;
+
+    // window.addEventListener('resize', () => {
+    //     if (window.innerWidth !== initialWidth) {
+    //         // Show a message (optional)
+    //         // alert('Window size changed. Reloading page for optimal experience.');
+    //         location.reload();
+    //     }
+    // });
+
+
     // Scroll to top immediately
     scrollToTop();
     gsap.registerPlugin(ScrollTrigger, SplitText, Flip, DrawSVGPlugin, CustomEase, MorphSVGPlugin);
@@ -5439,6 +5341,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Call it before the matchMedia setup
     initLenis();
     // initAchat();
+    document.body.removeAttribute('data-preload');
 
     document.fonts.ready.then(() => {
         initSplit();
@@ -5465,7 +5368,6 @@ document.addEventListener("DOMContentLoaded", () => {
         initMultiStepForm();
         initBasicFormValidation();
 
-        document.body.removeAttribute('data-preload');
 
     });
     // initVideoMap();

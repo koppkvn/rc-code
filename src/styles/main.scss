@@ -961,3 +961,38 @@ html.lenis body {
         display: inline-block;
     }
 }
+
+.line-progress {
+    z-index: 1;
+}
+
+body.is-hidden {
+
+    .line-container,
+    .grey-line-new,
+    .stats-container .stats-inner {
+        opacity: 0 !important;
+        transition: opacity 0.5s ease;
+    }
+}
+
+body.is-visible {
+
+    .line-container,
+    .grey-line-new,
+    .stats-container .stats-inner {
+        opacity: 1 !important;
+        transition: opacity 0.5s ease;
+    }
+}
+
+.dot-video {
+
+
+    &::before {
+        content: '';
+        position: absolute;
+        inset: -32px;
+        border-radius: 50%;
+    }
+}
