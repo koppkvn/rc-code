@@ -1,3 +1,4 @@
+// import './styles/main.scss'
 import { ElectricBorder } from './electricBorder.js'
 import { SparkSystem } from './sparkSystem.js'
 
@@ -578,7 +579,7 @@ function initTreeDiagram() {
 
     })
 
-    const videoBarca = document.querySelector(".barca-video-wrapper");
+    const videoBarca = document.querySelector(".barca-video");
     if (videoBarca) {
         gsap.set(videoBarca, {
             autoAlpha: 0,
