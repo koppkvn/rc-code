@@ -5342,15 +5342,7 @@ document.addEventListener("DOMContentLoaded", () => {
             centerMap();
 
 
-            const initialWidth = window.innerWidth;
-            document.body.style.width = `${initialWidth}px`;
-            document.body.style.minWidth = `${initialWidth}px`;
-            document.body.style.maxWidth = `${initialWidth}px`;
-            document.body.style.overflow = 'hidden'; // Prevent horizontal scroll
 
-            ScrollTrigger.config({
-                autoRefreshEvents: "visibilitychange,DOMContentLoaded,load"
-            });
         });
         // TO COMMENT
         initAgeGate();
@@ -5380,7 +5372,24 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // Also add a window load event to catch any late scroll restoration
-window.addEventListener('load', scrollToTop);
+window.addEventListener('load', () => {
+
+
+    scrollToTop();
+
+    mm.add("(min-width: 768px)", () => {
+
+        const initialWidth = window.innerWidth;
+        document.body.style.width = `${initialWidth}px`;
+        document.body.style.minWidth = `${initialWidth}px`;
+        document.body.style.maxWidth = `${initialWidth}px`;
+        document.body.style.overflow = 'hidden'; // Prevent horizontal scroll
+
+        ScrollTrigger.config({
+            autoRefreshEvents: "visibilitychange,DOMContentLoaded,load"
+        });
+    })
+});
 
 // Re-init on resize with debounce
 // let resizeTimeout;
