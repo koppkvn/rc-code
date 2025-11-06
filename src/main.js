@@ -5384,18 +5384,18 @@ window.addEventListener('load', () => {
 
     scrollToTop();
 
-    mm.add("(min-width: 768px)", () => {
+    // mm.add("(min-width: 768px)", () => {
 
-        const initialWidth = window.innerWidth;
-        document.body.style.width = `${initialWidth}px`;
-        document.body.style.minWidth = `${initialWidth}px`;
-        document.body.style.maxWidth = `${initialWidth}px`;
-        document.body.style.overflow = 'hidden'; // Prevent horizontal scroll
+    const initialWidth = window.innerWidth;
+    document.body.style.width = `${initialWidth}px`;
+    document.body.style.minWidth = `${initialWidth}px`;
+    document.body.style.maxWidth = `${initialWidth}px`;
+    document.body.style.overflow = 'hidden'; // Prevent horizontal scroll
 
-        ScrollTrigger.config({
-            autoRefreshEvents: "visibilitychange,DOMContentLoaded,load"
-        });
-    })
+    ScrollTrigger.config({
+        autoRefreshEvents: "visibilitychange,DOMContentLoaded,load"
+    });
+    // })
 });
 
 // Re-init on resize with debounce
