@@ -5309,7 +5309,7 @@ function initAccordionCSS() {
         }, "<");
     });
 }
-
+let mm;
 document.addEventListener("DOMContentLoaded", () => {
 
 
@@ -5337,7 +5337,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.fonts.ready.then(() => {
         initSplit();
-        let mm = gsap.matchMedia();
+        mm = gsap.matchMedia();
         mm.add("(min-width: 768px)", () => {
             centerMap();
 
