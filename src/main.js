@@ -5313,15 +5313,7 @@ function initAccordionCSS() {
 document.addEventListener("DOMContentLoaded", () => {
 
 
-    const initialWidth = window.innerWidth;
-    document.body.style.width = `${initialWidth}px`;
-    document.body.style.minWidth = `${initialWidth}px`;
-    document.body.style.maxWidth = `${initialWidth}px`;
-    document.body.style.overflow = 'hidden'; // Prevent horizontal scroll
 
-    ScrollTrigger.config({
-        autoRefreshEvents: "visibilitychange,DOMContentLoaded,load"
-    });
 
     // let initialWidth = window.innerWidth;
 
@@ -5348,6 +5340,17 @@ document.addEventListener("DOMContentLoaded", () => {
         let mm = gsap.matchMedia();
         mm.add("(min-width: 768px)", () => {
             centerMap();
+
+
+            const initialWidth = window.innerWidth;
+            document.body.style.width = `${initialWidth}px`;
+            document.body.style.minWidth = `${initialWidth}px`;
+            document.body.style.maxWidth = `${initialWidth}px`;
+            document.body.style.overflow = 'hidden'; // Prevent horizontal scroll
+
+            ScrollTrigger.config({
+                autoRefreshEvents: "visibilitychange,DOMContentLoaded,load"
+            });
         });
         // TO COMMENT
         initAgeGate();
