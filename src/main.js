@@ -5390,7 +5390,7 @@ window.addEventListener('load', () => {
     document.body.style.width = `${initialWidth}px`;
     document.body.style.minWidth = `${initialWidth}px`;
     document.body.style.maxWidth = `${initialWidth}px`;
-    document.body.style.overflow = 'hidden'; // Prevent horizontal scroll
+    document.body.style.overflowX = 'clip'; // Prevent horizontal scroll
 
     ScrollTrigger.config({
         autoRefreshEvents: "visibilitychange,DOMContentLoaded,load"
