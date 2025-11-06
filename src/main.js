@@ -4390,6 +4390,10 @@ function initAgeGate() {
         pointerEvents: "none",
     });
 
+    gsap.set(".overlay-load", {
+        opacity: 1
+    })
+
     //WATCH OUT
 
     const yesBtn = document.querySelector('.button.is--yes');
@@ -5333,6 +5337,9 @@ document.addEventListener("DOMContentLoaded", () => {
     // Call it before the matchMedia setup
     initLenis();
     // initAchat();
+    gsap.set(".overlay-load", {
+        opacity: 0
+    })
     document.body.removeAttribute('data-preload');
 
     document.fonts.ready.then(() => {
