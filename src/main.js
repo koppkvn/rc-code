@@ -1,4 +1,4 @@
-// import './styles/main.scss'
+import './styles/main.scss'
 import { ElectricBorder } from './electricBorder.js'
 import { SparkSystem } from './sparkSystem.js'
 
@@ -294,7 +294,7 @@ function initTrackerSection() {
 function initTrackerCheckboxes() {
     const trackerButtons = document.querySelectorAll('.tracker-checkbox.is--button');
     const pompeCounterEl = document.querySelector('.tracker-pompes .color');
-    let pompeCount = 40; // Initial count
+    let pompeCount = 0; // Initial count
 
     // Object to use for GSAP animation of the counter
     let counterObj = { value: pompeCount };
@@ -323,7 +323,7 @@ function initTrackerCheckboxes() {
             numberSpan.style.display = 'inline-block';
             numberSpan.style.minWidth = '1.1em'; // Adjust width as needed
             numberSpan.style.textAlign = 'center';
-            numberSpan.textContent = numberMatch[0];
+            numberSpan.textContent = pompeCount; // Start at 0
 
             // Add a data attribute to easily find this span later
             numberSpan.setAttribute('data-pompe-counter', 'true');
@@ -397,35 +397,33 @@ function initTrackerCheckboxes() {
                 );
             }
 
-            // Decrease push-up count by 10 (if above 0)
-            if (pompeCount > 0) {
-                // Store the starting value
-                const startValue = pompeCount;
-                // Calculate target value (never below 0)
-                const targetValue = Math.max(0, pompeCount - 10);
+            // Increase push-up count by 10
+            // Store the starting value
+            const startValue = pompeCount;
+            // Calculate target value (increase by 10)
+            const targetValue = pompeCount + 10;
 
-                // Update the actual count
-                pompeCount = targetValue;
+            // Update the actual count
+            pompeCount = targetValue;
 
-                // Reset the counter object to the start value
-                counterObj.value = startValue;
+            // Reset the counter object to the start value
+            counterObj.value = startValue;
 
-                // Animate the counter down
-                gsap.to(counterObj, {
-                    value: targetValue,
-                    duration: .8,
-                    ease: "easeOutQuart",
-                    onUpdate: function () {
-                        // Update the display with the rounded current value
-                        const currentValue = Math.round(counterObj.value);
-                        // Find the number span we created
-                        const numberSpan = document.querySelector('[data-pompe-counter="true"]');
-                        if (numberSpan) {
-                            numberSpan.textContent = currentValue;
-                        }
+            // Animate the counter up
+            gsap.to(counterObj, {
+                value: targetValue,
+                duration: .8,
+                ease: "easeOutQuart",
+                onUpdate: function () {
+                    // Update the display with the rounded current value
+                    const currentValue = Math.round(counterObj.value);
+                    // Find the number span we created
+                    const numberSpan = document.querySelector('[data-pompe-counter="true"]');
+                    if (numberSpan) {
+                        numberSpan.textContent = currentValue;
                     }
-                });
-            }
+                }
+            });
         });
     });
 }
@@ -4227,6 +4225,17 @@ function initBasicFormValidation() {
             const type = field.getAttribute('type');
             const placeholder = field.getAttribute('placeholder') || '';
             const isBirthdateField = field.hasAttribute('data-birthdate') || placeholder.includes('dd.mm.');
+            const isPhoneField = type === 'tel';
+
+            // E.164 international phone format validator
+            const isValidPhone = (val) => {
+                // E.164 international format: +[country code][number]
+                // Examples: +41 79 123 45 67, +1 555 123 4567, +33 6 12 34 56 78
+                const cleaned = val.replace(/\s/g, '');
+                // Must start with +, followed by 1-3 digit country code, then 4-12 more digits
+                // Total length after + should be between 7-15 digits (E.164 standard)
+                return /^\+[1-9]\d{6,14}$/.test(cleaned);
+            };
 
             let isValid = true;
 
@@ -4240,6 +4249,11 @@ function initBasicFormValidation() {
 
             // Email format
             if (type === 'email' && !/\S+@\S+\.\S+/.test(field.value)) isValid = false;
+
+            // Phone format (E.164 international format)
+            if (isPhoneField && field.value.trim() !== '' && !isValidPhone(field.value)) {
+                isValid = false;
+            }
 
             // Birthdate format dd.mm.yyyy
             if (isBirthdateField && field.value.trim() !== '' && !isValidDDMMYYYY(field.value)) {
@@ -5074,9 +5088,12 @@ function initMultiStepForm() {
         };
 
         const isValidPhone = (val) => {
-            // Swiss phone format: 076 123 45 67 or 0761234567
+            // E.164 international format: +[country code][number]
+            // Examples: +41 79 123 45 67, +1 555 123 4567, +33 6 12 34 56 78
             const cleaned = val.replace(/\s/g, '');
-            return /^0\d{9}$/.test(cleaned);
+            // Must start with +, followed by 1-3 digit country code, then 4-12 more digits
+            // Total length after + should be between 7-15 digits (E.164 standard)
+            return /^\+[1-9]\d{6,14}$/.test(cleaned);
         };
 
         const validateTextField = (field) => {
