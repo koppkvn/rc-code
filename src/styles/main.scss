@@ -1013,4 +1013,41 @@ body.is-visible {
         top: 50%;
         left: 0;
     }
+
+    .level {
+        display: inline-block;
+        transition: color 0.3s ease;
+    }
+
+    .level.is--level-up {
+        color: rgb(255, 204, 0);
+        text-shadow:
+            0 0 10px rgba(255, 204, 0, 0.8),
+            0 0 20px rgba(255, 204, 0, 0.6),
+            0 0 30px rgba(255, 204, 0, 0.4),
+            0 0 40px rgba(255, 204, 0, 0.2);
+        animation: level-glow-pulse 2s ease-in-out infinite;
+    }
+}
+
+@keyframes level-glow-pulse {
+
+    0%,
+    100% {
+        text-shadow:
+            0 0 10px rgba(255, 204, 0, 0.8),
+            0 0 20px rgba(255, 204, 0, 0.6),
+            0 0 30px rgba(255, 204, 0, 0.4),
+            0 0 40px rgba(255, 204, 0, 0.2);
+        transform: scale(1);
+    }
+
+    50% {
+        text-shadow:
+            0 0 20px rgba(255, 204, 0, 1),
+            0 0 30px rgba(255, 204, 0, 0.8),
+            0 0 40px rgba(255, 204, 0, 0.6),
+            0 0 50px rgba(255, 204, 0, 0.4);
+        transform: scale(1.05);
+    }
 }

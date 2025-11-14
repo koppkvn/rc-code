@@ -1,4 +1,4 @@
-import './styles/main.scss'
+// import './styles/main.scss'
 import { ElectricBorder } from './electricBorder.js'
 import { SparkSystem } from './sparkSystem.js'
 
@@ -478,6 +478,64 @@ function initScrollLock() {
         if (waitMessage) {
             // Simple scramble animation of the existing text
             gsap.to(waitMessage, { duration: 1, color: "#fc0", scrambleText: "Parfait! Tu peux continuer." });
+        }
+
+        // Animate level up from 4 to 5
+        const levelElement = document.querySelector('.niveaux .level');
+        if (levelElement) {
+            // Set transform origin for smooth scaling/rotation
+            gsap.set(levelElement, {
+                transformOrigin: "center center"
+            });
+
+            // Create a timeline for the level up animation
+            const levelUpTl = gsap.timeline();
+
+            // Step 1: Scale up and rotate slightly with anticipation
+            levelUpTl.to(levelElement, {
+                scale: 1.3,
+                rotation: 5,
+                duration: 0.3,
+                ease: "back.out(1.7)"
+            })
+                // Step 2: Quick scale down and rotate back (anticipation)
+                .to(levelElement, {
+                    scale: 0.8,
+                    rotation: -5,
+                    duration: 0.2,
+                    ease: "power2.in"
+                })
+                // Step 3: Change number from 4 to 5 with scramble effect - apply yellow glow immediately
+                .to(levelElement, {
+                    scrambleText: "5",
+                    duration: 0.6,
+                    ease: "power2.out",
+                    onStart: function () {
+                        // Add the glowing class and yellow color right when "5" starts appearing
+                        levelElement.classList.add('is--level-up');
+                        levelElement.style.color = "rgb(255, 204, 0)";
+                    }
+                })
+                // Step 4: Scale up dramatically with bounce
+                .to(levelElement, {
+                    scale: 1.4,
+                    rotation: 0,
+                    duration: 0.4,
+                    ease: "back.out(2)"
+                })
+                // Step 5: Settle to final state
+                .to(levelElement, {
+                    scale: 1,
+                    duration: 0.3,
+                    ease: "power2.out",
+                    onComplete: function () {
+                        // Remove brightness filter, keep the glow class
+                        levelElement.style.filter = "";
+                    }
+                });
+
+            // Optional: Add a celebratory particle burst effect
+            // You could trigger sparkSystem here if available
         }
 
         // Restart Lenis
@@ -2348,7 +2406,7 @@ function initTreeDiagram() {
                     // Create and start a more subtle spark system
                     if (!sparkSystemInstance) {
                         sparkSystemInstance = new SparkSystem({
-                            color: "#ffcc00",
+                            color: "#fc0",
                             secondaryColor: "#ffdd44",
                             particleCount: 4,  // Even fewer particles
                             minSize: 0.4,      // Slightly bigger minimum
@@ -2379,7 +2437,7 @@ function initTreeDiagram() {
                     const centerDot = document.querySelector(".dot-wrapper .dot");
                     if (centerDot) {
                         gsap.to(centerDot, {
-                            boxShadow: "0 0 10px #ffcc00, 0 0 20px #ffcc00",  // Reduced glow
+                            boxShadow: "0 0 10px #fc0, 0 0 20px #fc0",  // Reduced glow
                             scale: 1.1,  // Smaller scale
                             duration: 0.8,  // Slower pulse
                             repeat: -1,
@@ -2388,7 +2446,7 @@ function initTreeDiagram() {
 
                             zIndex: 100
                         });
-                        centerDot.style.backgroundColor = "#ffcc00";
+                        centerDot.style.backgroundColor = "#fc0";
                     }
                 },
                 onReverseComplete: function () {
