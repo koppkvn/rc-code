@@ -2802,7 +2802,7 @@ function initTreeDiagram() {
         // Only set styles for second text if enabled
         if (shouldAnimateSecond) {
             gsap.set(".section.is--groupe p.is--second", {
-                marginTop: 50,
+                marginTop: 85,
                 right: "unset",
                 left: 0,
                 // paddingLeft: 0
