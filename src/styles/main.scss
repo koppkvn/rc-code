@@ -1017,6 +1017,7 @@ body.is-visible {
     .level {
         display: inline-block;
         transition: color 0.3s ease;
+        margin-left: -1.2em; // Reduce gap between "NIVEAU" text and number
     }
 
     .level.is--level-up {

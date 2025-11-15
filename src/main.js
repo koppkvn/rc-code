@@ -299,6 +299,28 @@ function initTrackerCheckboxes() {
     // Object to use for GSAP animation of the counter
     let counterObj = { value: pompeCount };
 
+    // Prepare the level element early to prevent shift when animation starts
+    // Set fixed width and positioning before any checkboxes are clicked
+    const levelElement = document.querySelector('.niveaux .level');
+    if (levelElement) {
+        const rect = levelElement.getBoundingClientRect();
+        const computedStyle = window.getComputedStyle(levelElement);
+        const currentWidth = rect.width;
+        const fontSize = parseFloat(computedStyle.fontSize);
+        // Use a generous width to ensure both "4" and "5" fit without shifting
+        const fixedWidth = Math.max(currentWidth, fontSize * 1.5);
+
+        // Set transform origin and fixed width early to prevent reflow
+        gsap.set(levelElement, {
+            transformOrigin: "center center",
+            minWidth: 20 + "px",
+            width: 20 + "px",
+            textAlign: "center",
+            display: "inline-block",
+            boxSizing: "border-box"
+        });
+    }
+
     // Set up the counter with a fixed width container for the number
     if (pompeCounterEl) {
         // Create and insert a span for the number with fixed width
@@ -483,59 +505,139 @@ function initScrollLock() {
         // Animate level up from 4 to 5
         const levelElement = document.querySelector('.niveaux .level');
         if (levelElement) {
-            // Set transform origin for smooth scaling/rotation
-            gsap.set(levelElement, {
-                transformOrigin: "center center"
-            });
+            // Element is already prepared with fixed width from initTrackerCheckboxes()
+            // No need to set width/positioning here to avoid shift
+
+            // Create a spark system for the level element
+            let levelSparkSystem = null;
 
             // Create a timeline for the level up animation
             const levelUpTl = gsap.timeline();
 
-            // Step 1: Scale up and rotate slightly with anticipation
+            // Step 1: Scale down the "4" completely and fade out
             levelUpTl.to(levelElement, {
-                scale: 1.3,
-                rotation: 5,
+                scale: 0,
+                opacity: 0,
                 duration: 0.3,
-                ease: "back.out(1.7)"
+                ease: "power2.in",
+                onComplete: function () {
+                    // Change text to "5" immediately when "4" completely disappears
+                    levelElement.textContent = "5";
+                    levelElement.style.color = "rgb(255, 204, 0)";
+                    // Reset to starting state for "5" animation
+                    gsap.set(levelElement, {
+                        opacity: 0,
+                        scale: 0
+                    });
+                }
             })
-                // Step 2: Quick scale down and rotate back (anticipation)
+                // Step 2: Scale up "5" with bounce effect, fade in immediately
                 .to(levelElement, {
-                    scale: 0.8,
-                    rotation: -5,
-                    duration: 0.2,
-                    ease: "power2.in"
-                })
-                // Step 3: Change number from 4 to 5 with scramble effect - apply yellow glow immediately
-                .to(levelElement, {
-                    scrambleText: "5",
-                    duration: 0.6,
-                    ease: "power2.out",
+                    scale: 1.8,
+                    opacity: 1,
+                    duration: 0.5,
+                    ease: "back.out(2)",
                     onStart: function () {
-                        // Add the glowing class and yellow color right when "5" starts appearing
-                        levelElement.classList.add('is--level-up');
-                        levelElement.style.color = "rgb(255, 204, 0)";
+                        // Create and start spark system for the level element (much more subtle)
+                        levelSparkSystem = new SparkSystem({
+                            color: "#ffca1c",
+                            secondaryColor: "#ff8c00",
+                            particleCount: 15,
+                            minSize: 0.3,
+                            maxSize: 1.2,
+                            minSpeed: 1,
+                            maxSpeed: 4,
+                            gravity: 0.05,
+                            fadeSpeed: 0.015,
+                            emissionRate: 1,
+                            spreadAngle: 360
+                        });
+
+                        // Override emitSparks to emit from level element instead of dot
+                        levelSparkSystem.emitSparks = function () {
+                            if (!this.isAnimating) return;
+
+                            this.emissionCounter = (this.emissionCounter || 0) + this.emissionRate;
+                            if (this.emissionCounter < 1) return;
+                            this.emissionCounter -= Math.floor(this.emissionCounter);
+
+                            // Emit from level element instead of dot
+                            const rect = levelElement.getBoundingClientRect();
+                            const centerX = rect.left + rect.width / 2;
+                            const centerY = rect.top + rect.height / 2;
+
+                            // Emit spark from element edge in a random direction (smaller radius)
+                            const elementRadius = Math.max(rect.width, rect.height) / 2 + 2; // Reduced from +5 to +2 for tighter circle
+                            const angle = Math.random() * Math.PI * 2;
+                            const startX = centerX + Math.cos(angle) * elementRadius;
+                            const startY = centerY + Math.sin(angle) * elementRadius;
+
+                            // Create particle with velocity pointing outward from level element center
+                            const speed = this.minSpeed + Math.random() * (this.maxSpeed - this.minSpeed);
+                            const particle = {
+                                x: startX,
+                                y: startY,
+                                vx: Math.cos(angle) * speed,
+                                vy: Math.sin(angle) * speed,
+                                size: this.minSize + Math.random() * (this.maxSize - this.minSize),
+                                life: 1,
+                                color: Math.random() > 0.5 ? this.sparkColor : this.secondaryColor,
+                                trail: []
+                            };
+
+                            this.particles.push(particle);
+
+                            // Limit particle count
+                            if (this.particles.length > this.particleCount) {
+                                this.particles = this.particles.slice(-this.particleCount);
+                            }
+                        };
+
+                        // Start the spark system
+                        levelSparkSystem.start();
                     }
                 })
-                // Step 4: Scale up dramatically with bounce
-                .to(levelElement, {
-                    scale: 1.4,
-                    rotation: 0,
-                    duration: 0.4,
-                    ease: "back.out(2)"
-                })
-                // Step 5: Settle to final state
+                // Step 3: Settle to final state (after bounce)
                 .to(levelElement, {
                     scale: 1,
                     duration: 0.3,
                     ease: "power2.out",
                     onComplete: function () {
-                        // Remove brightness filter, keep the glow class
+                        // Remove brightness filter
                         levelElement.style.filter = "";
+
+                        // Gradually fade out sparks and transition color back to white over 4 seconds
+                        if (levelSparkSystem) {
+                            // Store original emission rate
+                            const originalEmissionRate = levelSparkSystem.emissionRate;
+
+                            // Gradually reduce emission rate to 0 over 4 seconds using GSAP
+                            gsap.to({ value: originalEmissionRate }, {
+                                value: 0,
+                                duration: 4,
+                                ease: "power2.out",
+                                onUpdate: function () {
+                                    if (levelSparkSystem) {
+                                        levelSparkSystem.emissionRate = this.targets()[0].value;
+                                    }
+                                },
+                                onComplete: function () {
+                                    // Stop spark system after fade out completes
+                                    if (levelSparkSystem) {
+                                        levelSparkSystem.stop();
+                                    }
+                                }
+                            });
+                        }
+
+                        // Gradually transition color from yellow to white over 4 seconds
+                        gsap.to(levelElement, {
+                            color: "white",
+                            duration: 4,
+                            ease: "power2.out"
+                        });
                     }
                 });
-
-            // Optional: Add a celebratory particle burst effect
-            // You could trigger sparkSystem here if available
         }
 
         // Restart Lenis
