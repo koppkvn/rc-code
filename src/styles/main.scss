@@ -998,38 +998,38 @@ body.is-visible {
 }
 
 
-.niveaux {
-    padding-left: 2rem;
+// .niveaux {
+//     padding-left: 2rem;
 
-    &::before {
-        content: '';
-        width: 1.2rem;
-        height: 2px;
-        background-color: currentColor;
-        margin-right: 0.5em;
-        display: inline-block;
-        vertical-align: middle;
-        position: absolute;
-        top: 50%;
-        left: 0;
-    }
+//     &::before {
+//         content: '';
+//         width: 1.2rem;
+//         height: 2px;
+//         background-color: currentColor;
+//         margin-right: 0.5em;
+//         display: inline-block;
+//         vertical-align: middle;
+//         position: absolute;
+//         top: 50%;
+//         left: 0;
+//     }
 
-    .level {
-        display: inline-block;
-        transition: color 0.3s ease;
-        margin-left: -1.2em; // Reduce gap between "NIVEAU" text and number
-    }
+//     .level {
+//         display: inline-block;
+//         transition: color 0.3s ease;
+//         margin-left: -1.2em; // Reduce gap between "NIVEAU" text and number
+//     }
 
-    .level.is--level-up {
-        color: rgb(255, 204, 0);
-        text-shadow:
-            0 0 10px rgba(255, 204, 0, 0.8),
-            0 0 20px rgba(255, 204, 0, 0.6),
-            0 0 30px rgba(255, 204, 0, 0.4),
-            0 0 40px rgba(255, 204, 0, 0.2);
-        animation: level-glow-pulse 2s ease-in-out infinite;
-    }
-}
+//     .level.is--level-up {
+//         color: rgb(255, 204, 0);
+//         text-shadow:
+//             0 0 10px rgba(255, 204, 0, 0.8),
+//             0 0 20px rgba(255, 204, 0, 0.6),
+//             0 0 30px rgba(255, 204, 0, 0.4),
+//             0 0 40px rgba(255, 204, 0, 0.2);
+//         animation: level-glow-pulse 2s ease-in-out infinite;
+//     }
+// }
 
 @keyframes level-glow-pulse {
 
