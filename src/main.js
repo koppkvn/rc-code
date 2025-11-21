@@ -1,4 +1,4 @@
-import './styles/main.scss'
+// import './styles/main.scss'
 import { ElectricBorder } from './electricBorder.js'
 import { SparkSystem } from './sparkSystem.js'
 
@@ -544,9 +544,9 @@ function initScrollLock() {
                             secondaryColor: "#ff8c00",
                             particleCount: 15,
                             minSize: 0.3,
-                            maxSize: 1.2,
-                            minSpeed: 1,
-                            maxSpeed: 4,
+                            maxSize: .8,
+                            minSpeed: 0.5,
+                            maxSpeed: 2,
                             gravity: 0.05,
                             fadeSpeed: 0.015,
                             emissionRate: 1,
@@ -1193,6 +1193,10 @@ function initTreeDiagram() {
                         ease: "power1.out",
                     })
 
+                    gsap.to(".tree-child-wrapper.is--five .label.is--last", {
+                        border: "1px solid white",
+                    })
+
                     gsap.to(".section.is--groupe p[data-split='lines'].is--second", {
                         autoAlpha: 1,
                         duration: .6,
@@ -1222,6 +1226,10 @@ function initTreeDiagram() {
                         autoAlpha: 0,
                         duration: .6,
                         ease: "power1.out",
+                    })
+
+                    gsap.to(".tree-child-wrapper.is--five .label.is--last", {
+                        border: "1px solid transparent",
                     })
 
                     gsap.to(".section.is--groupe p[data-split='lines'].is--first .lineInner", {
