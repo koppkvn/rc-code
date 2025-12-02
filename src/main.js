@@ -538,63 +538,61 @@ function initScrollLock() {
                     duration: 0.5,
                     ease: "back.out(2)",
                     onStart: function () {
-                        // Create and start spark system for the level element (much more subtle)
+                        // Create spark system for the level element (firework burst effect)
                         levelSparkSystem = new SparkSystem({
                             color: "#ffca1c",
                             secondaryColor: "#ff8c00",
-                            particleCount: 15,
-                            minSize: 0.3,
-                            maxSize: .8,
-                            minSpeed: 0.5,
-                            maxSpeed: 2,
-                            gravity: 0.05,
-                            fadeSpeed: 0.015,
-                            emissionRate: 1,
+                            particleCount: 40,  // More particles for a big burst
+                            minSize: 0.4,
+                            maxSize: 1.2,
+                            minSpeed: 2,        // Faster initial speed for explosion feel
+                            maxSpeed: 5,
+                            gravity: 0.08,
+                            fadeSpeed: 0.025,   // Faster fade so effect lasts ~1 second
+                            emissionRate: 0,    // No continuous emission
                             spreadAngle: 360
                         });
 
-                        // Override emitSparks to emit from level element instead of dot
-                        levelSparkSystem.emitSparks = function () {
-                            if (!this.isAnimating) return;
-
-                            this.emissionCounter = (this.emissionCounter || 0) + this.emissionRate;
-                            if (this.emissionCounter < 1) return;
-                            this.emissionCounter -= Math.floor(this.emissionCounter);
-
-                            // Emit from level element instead of dot
+                        // Override emitSparks to do a single burst of all particles at once
+                        levelSparkSystem.emitBurst = function () {
+                            // Emit from level element
                             const rect = levelElement.getBoundingClientRect();
                             const centerX = rect.left + rect.width / 2;
                             const centerY = rect.top + rect.height / 2;
+                            const elementRadius = Math.max(rect.width, rect.height) / 2 + 2;
 
-                            // Emit spark from element edge in a random direction (smaller radius)
-                            const elementRadius = Math.max(rect.width, rect.height) / 2 + 2; // Reduced from +5 to +2 for tighter circle
-                            const angle = Math.random() * Math.PI * 2;
-                            const startX = centerX + Math.cos(angle) * elementRadius;
-                            const startY = centerY + Math.sin(angle) * elementRadius;
+                            // Create all particles at once for firework burst effect
+                            for (let i = 0; i < this.particleCount; i++) {
+                                const angle = (Math.PI * 2 * i / this.particleCount) + (Math.random() - 0.5) * 0.3;
+                                const startX = centerX + Math.cos(angle) * elementRadius;
+                                const startY = centerY + Math.sin(angle) * elementRadius;
 
-                            // Create particle with velocity pointing outward from level element center
-                            const speed = this.minSpeed + Math.random() * (this.maxSpeed - this.minSpeed);
-                            const particle = {
-                                x: startX,
-                                y: startY,
-                                vx: Math.cos(angle) * speed,
-                                vy: Math.sin(angle) * speed,
-                                size: this.minSize + Math.random() * (this.maxSize - this.minSize),
-                                life: 1,
-                                color: Math.random() > 0.5 ? this.sparkColor : this.secondaryColor,
-                                trail: []
-                            };
-
-                            this.particles.push(particle);
-
-                            // Limit particle count
-                            if (this.particles.length > this.particleCount) {
-                                this.particles = this.particles.slice(-this.particleCount);
+                                const speed = this.minSpeed + Math.random() * (this.maxSpeed - this.minSpeed);
+                                const particle = {
+                                    x: startX,
+                                    y: startY,
+                                    vx: Math.cos(angle) * speed,
+                                    vy: Math.sin(angle) * speed,
+                                    size: this.minSize + Math.random() * (this.maxSize - this.minSize),
+                                    life: 1,
+                                    color: Math.random() > 0.5 ? this.sparkColor : this.secondaryColor,
+                                    trail: []
+                                };
+                                this.particles.push(particle);
                             }
                         };
 
-                        // Start the spark system
+                        // Start the spark system and emit burst immediately
                         levelSparkSystem.start();
+                        levelSparkSystem.emitBurst();
+
+                        // Stop emitting new particles after burst, let existing ones fade naturally
+                        // System will auto-stop when all particles are gone
+                        setTimeout(() => {
+                            if (levelSparkSystem) {
+                                levelSparkSystem.stop();
+                            }
+                        }, 1200); // Stop after ~1.2 seconds
                     }
                 })
                 // Step 3: Settle to final state (after bounce)
@@ -606,34 +604,10 @@ function initScrollLock() {
                         // Remove brightness filter
                         levelElement.style.filter = "";
 
-                        // Gradually fade out sparks and transition color back to white over 4 seconds
-                        if (levelSparkSystem) {
-                            // Store original emission rate
-                            const originalEmissionRate = levelSparkSystem.emissionRate;
-
-                            // Gradually reduce emission rate to 0 over 4 seconds using GSAP
-                            gsap.to({ value: originalEmissionRate }, {
-                                value: 0,
-                                duration: 4,
-                                ease: "power2.out",
-                                onUpdate: function () {
-                                    if (levelSparkSystem) {
-                                        levelSparkSystem.emissionRate = this.targets()[0].value;
-                                    }
-                                },
-                                onComplete: function () {
-                                    // Stop spark system after fade out completes
-                                    if (levelSparkSystem) {
-                                        levelSparkSystem.stop();
-                                    }
-                                }
-                            });
-                        }
-
-                        // Gradually transition color from yellow to white over 4 seconds
+                        // Gradually transition color from yellow to white over 2 seconds (faster since firework is quick)
                         gsap.to(levelElement, {
                             color: "white",
-                            duration: 4,
+                            duration: 2,
                             ease: "power2.out"
                         });
                     }
@@ -2760,6 +2734,13 @@ function initTreeDiagram() {
                 duration: 0.3,
                 stagger: 0.5,
                 ease: "power2.inOut",
+
+
+            }, "+=0.5")  // Start 0.5s after the previous animation
+            // Add number counter and color animation
+
+            .to({}, {
+                duration: 8,
                 onUpdate: function () {
                     const progress = this.progress();
                     const spotifyNumber = document.querySelector('.spotify-number');
@@ -2776,13 +2757,8 @@ function initTreeDiagram() {
                         spotifyNumber.style.color = `rgb(${r}, ${g}, ${b})`;
                     }
                 }
+            }, "<")
 
-            }, "+=0.5")  // Start 0.5s after the previous animation
-            // Add number counter and color animation
-
-            .to({}, {
-                duration: 1,
-            })
 
 
             .to(".map-container", {
@@ -2811,7 +2787,7 @@ function initTreeDiagram() {
                         autoAlpha: 1,
                     })
                 }
-            },)
+            }, "-=3")
 
             .to(".map-container mask rect", {
                 xPercent: 10,
@@ -3881,6 +3857,11 @@ function createMapTimeline() {
             duration: 0.3,
             stagger: 0.5,
             ease: "power2.inOut",
+
+        }, "+=0.5")
+        // Add number counter and color animation
+        .to({}, {
+            duration: 8,
             onUpdate: function () {
                 const progress = this.progress();
                 console.log("progress:", progress);
@@ -3898,12 +3879,8 @@ function createMapTimeline() {
                     spotifyNumber.style.color = `rgb(${r}, ${g}, ${b})`;
                 }
             }
-        }, "+=0.5")
-        // Add number counter and color animation
+        }, "<")
 
-        .to({}, {
-            duration: 1,
-        })
 
 
         .to(".map-container", {
@@ -3931,7 +3908,7 @@ function createMapTimeline() {
                     autoAlpha: 1,
                 })
             }
-        },)
+        }, "-=3")
         .to(".click-me", {
             autoAlpha: 0,
         }, "<")
@@ -4744,14 +4721,14 @@ function initHeroAnimation() {
             })
 
             console.log("start")
-            gsap.to(".scroll-arrow", {
-                y: 45,
-                duration: 1.2,
-                ease: "easeOutQuart",
-                repeat: -1,
-                delay: 1.2,
-                repeatDelay: 1
-            })
+            // gsap.to(".scroll-arrow", {
+            //     y: 45,
+            //     duration: 1.2,
+            //     ease: "easeOutQuart",
+            //     repeat: -1,
+            //     delay: 1.2,
+            //     repeatDelay: 1
+            // })
         }
     })
 
@@ -4801,7 +4778,7 @@ function initHeroAnimation() {
                 // Wait for the video to actually start playing, then fade it in
                 bgVideo.addEventListener('playing', () => {
                     gsap.to(bgVideo, {
-                        opacity: 0.8,
+                        opacity: 0.6,
                         duration: 0.5,
                         ease: "easeOutQuart"
                     });
