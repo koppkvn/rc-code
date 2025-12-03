@@ -1,4 +1,4 @@
-import './styles/main.scss'
+// import './styles/main.scss'
 import { ElectricBorder } from './electricBorder.js'
 import { SparkSystem } from './sparkSystem.js'
 
@@ -2472,7 +2472,7 @@ function initTreeDiagram() {
                                     onUpdate: function () {
                                         const progress = this.progress();
                                         const currentValue = Math.floor(target * progress);
-                                        valueEl.textContent = String(currentValue).padStart(valueEl.getAttribute('data-original').length, '0');
+                                        valueEl.textContent = String(currentValue).padStart(3, '0');
                                     },
                                     ease: "power2.out"
                                 });
@@ -3159,7 +3159,7 @@ function initTreeDiagram() {
                             ease: "power2.out",
                             onUpdate: function () {
                                 const currentValue = Math.round(this.targets()[0].value);
-                                let paddedValue = Math.abs(currentValue).toString().padStart(targetLength, '0');
+                                let paddedValue = Math.abs(currentValue).toString().padStart(3, '0');
 
                                 if (target < 0) {
                                     paddedValue = '-' + paddedValue;
@@ -3709,7 +3709,8 @@ function createMapTimeline() {
     // mapTl.to(".map-svg path", {
     //     drawSVG: "0% 100%",
     gsap.set(".section.is--map .map-container", {
-        scale: 1.5
+        scale: 2,
+        willChange: "transform",
     })
     mapTl.from(".map-svg", {
         opacity: 0,
@@ -3749,19 +3750,19 @@ function createMapTimeline() {
         }, "<")
         .from(".click-me", {
             autoAlpha: 0,
-            onStart: function () {
-                gsap.to(".section.is--map .map-container", {
-                    scale: 2,
-                    duration: 3,
-                })
-            },
-            onReverseComplete: function () {
-                gsap.to(".section.is--map .map-container", {
-                    scale: 1.5,
-                    duration: 2,
-                    ease: "power1.out",
-                })
-            }
+            // onStart: function () {
+            //     gsap.to(".section.is--map .map-container", {
+            //         scale: 2,
+            //         duration: 3,
+            //     })
+            // },
+            // onReverseComplete: function () {
+            //     gsap.to(".section.is--map .map-container", {
+            //         scale: 1.8,
+            //         duration: 2,
+            //         ease: "power1.out",
+            //     })
+            // }
         }, "<")
 
         //SPOTIFY
@@ -3815,7 +3816,7 @@ function createMapTimeline() {
                     pointerEvents: "auto",
                 })
             }
-        })
+        }, "<+=1")
 
         .to(".img-spotify:not(.is--first)", {
             autoAlpha: 1,
@@ -3829,7 +3830,7 @@ function createMapTimeline() {
             duration: 8,
             onUpdate: function () {
                 const progress = this.progress();
-                console.log("progress:", progress);
+                // console.log("progress:", progress);
                 const spotifyNumber = document.querySelector('.spotify-number');
 
                 if (spotifyNumber) {
@@ -3847,59 +3848,72 @@ function createMapTimeline() {
         }, "<")
 
 
+    gsap.set(".map-container", {
+        willChange: "transform",
+    })
+    mapTl.to(".map-container", {
+        yPercent: -85,
+        xPercent: 45,
+        scale: 2.6,
+        duration: 3,
+        ease: "power1.out",
+        onStart: function () {
+            gsap.to(".text-wrapper-spotify .lineInner", {
+                yPercent: -100,
+            })
 
-        .to({}, {
+            gsap.to(".text-wrapper-spotify .lower-wrapper > *, .text-wrapper-spotify .lower-wrapper", {
+                autoAlpha: 0,
+            })
 
-            onStart: function () {
-                gsap.to(".section.is--map .map-container", {
-                    yPercent: -85,
-                    xPercent: 45,
-                    scale: 2.6,
-                    duration: 3,
-                    ease: "power1.out",
+            gsap.to(".dot-normal:not(.gebs), .dot-video:not(.gebs)", {
+                autoAlpha: 0,
+                duration: 1,
+                ease: "power1.out"
+            })
 
-                })
-                gsap.to(".text-wrapper-spotify .lineInner", {
-                    yPercent: -100,
-                })
+        },
 
-                gsap.to(".text-wrapper-spotify .lower-wrapper > *, .text-wrapper-spotify .lower-wrapper", {
-                    autoAlpha: 0,
-                })
+        onReverseComplete: function () {
+            gsap.to(".text-wrapper-spotify .lineInner", {
+                yPercent: 0,
+            })
 
-            },
-            onReverseComplete: function () {
-                gsap.to(".section.is--map .map-container", {
-                    yPercent: 0,
-                    xPercent: 0,
-                    scale: 2,
-                    duration: 2,
-                    ease: "power1.out",
-                })
-                gsap.to(".text-wrapper-spotify .lineInner", {
-                    yPercent: 0,
-                })
+            gsap.to(".text-wrapper-spotify .lower-wrapper > *, .text-wrapper-spotify .lower-wrapper", {
+                autoAlpha: 1,
+            })
 
-                gsap.to(".text-wrapper-spotify .lower-wrapper > *, .text-wrapper-spotify .lower-wrapper", {
-                    autoAlpha: 1,
-                })
-            }
-        }, "-=3")
+
+        }
+    }, "-=3")
         .to(".click-me", {
             autoAlpha: 0,
+            onReverseComplete: function () {
+                gsap.to(".dot-normal:not(.gebs), .dot-video:not(.gebs)", {
+                    autoAlpha: 1,
+                    duration: 1,
+                    ease: "power1.out"
+                })
+            }
         }, "<")
-        .to(".map-container mask rect", {
-            xPercent: -10,
-            yPercent: 25,
-            duration: 3,
-        }, "<")
+    // .to(".map-container mask rect", {
+    //     xPercent: -10,
+    //     yPercent: 25,
+    //     duration: 3,
+    // }, "<")
 
     // const allDots = gsap.utils.toArray(".dot-video, .dot-normal");
-    const allDots = gsap.utils.toArray(".dot-video, .gebs");
+    const allDots = gsap.utils.toArray(".dot-normal.gebs");
+
+    console.log("allDots:", allDots);
+
 
     const barcelonaDot = document.querySelector(".dot-barcelona");
+    console.log("barcelonaDot:", barcelonaDot);
 
     allDots.forEach(dot => {
+        console.log("dot:", dot);
+
         mapTl.add(
             Flip.fit(dot, barcelonaDot, {
                 duration: 1, // needed for Flip to work but overwritten by scrub

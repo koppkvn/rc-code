@@ -611,7 +611,8 @@ html.lenis body {
 
     background: linear-gradient(to bottom,
             #0d0d0d 0%,
-            #0d0d0d 80%,
+            #0d0d0d 65%,
+            hsl(0, 0%, 5%, 0.8) 84%,
             rgba(13, 13, 13, 0) 100%) !important;
 
 }
@@ -1069,3 +1070,7 @@ body.is-visible {
 //         white-space: wrap;
 //     }
 // }
+
+.stat-value {
+    width: unset !important;
+}
