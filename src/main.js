@@ -1141,6 +1141,14 @@ function initTreeDiagram() {
                     stagger: 0.05,
                     ease: "power1.out"
                 })
+                //ON LE BOUGE ICI
+                mm.add("(max-width: 767px)", () => {
+                    gsap.to(".section.is--groupe .tree-container.is--second", {
+                        y: 40,
+                        duration: .6,
+                        ease: "power1.out"
+                    })
+                })
             },
             onReverseComplete: function () {
                 gsap.to(".section.is--section [data-split='lines'] .lineInner", {
@@ -1155,6 +1163,13 @@ function initTreeDiagram() {
                     duration: .6,
                     stagger: 0.05,
                     ease: "power1.out"
+                })
+                mm.add("(max-width: 767px)", () => {
+                    gsap.to(".section.is--groupe .tree-container.is--second", {
+                        y: 0,
+                        duration: .6,
+                        ease: "power1.out"
+                    })
                 })
 
             }
@@ -1270,15 +1285,29 @@ function initTreeDiagram() {
         .to(".tree-container.is--second .tree-child-wrapper:not(.is--three)", {
             autoAlpha: 0
         }, "focusSection")
-        .to(".tree-container.is--second .tree-child-wrapper.is--three", {
+
+    //ICI
+    mm.add("(max-width: 767px)", () => {
+        treeTlOne.to(".tree-container.is--second .tree-child-wrapper.is--three", {
+            yPercent: -405,
+            duration: 1.5,
+
+        }, "focusSection")
+    }
+    )
+
+    mm.add("(min-width: 768px)", () => {
+
+        treeTlOne.to(".tree-container.is--second .tree-child-wrapper.is--three", {
             yPercent: -302,
             duration: 1.5,
 
         }, "focusSection")
-        .to(".tree-container.is--second .tree-child-wrapper.is--three .line", {
-            autoAlpha: 0,
-            duration: 0.1,
-        }, "focusSection")
+    })
+    treeTlOne.to(".tree-container.is--second .tree-child-wrapper.is--three .line", {
+        autoAlpha: 0,
+        duration: 0.1,
+    }, "focusSection")
 
 
         // beginning of third tree container
@@ -1305,6 +1334,8 @@ function initTreeDiagram() {
                         duration: .6,
                         ease: "power1.out",
                     })
+
+
                 } else {
                     // If second is disabled, animate out first text instead
                     gsap.to(".section.is--groupe [data-split='lines'].is--first .lineInner", {
@@ -1334,6 +1365,8 @@ function initTreeDiagram() {
 
             },
             onReverseComplete: function () {
+
+
                 if (shouldAnimateSecond) {
                     // Normal behavior: bring back second text
                     gsap.to(".section.is--groupe [data-split='lines'].is--second .lineInner", {
@@ -1403,7 +1436,13 @@ function initTreeDiagram() {
             ease: "none",
 
             onStart: function () {
-
+                mm.add("(max-width: 767px)", () => {
+                    gsap.to(".section.is--personnes .tree-container.is--three", {
+                        y: 40,
+                        duration: .6,
+                        ease: "power1.out"
+                    })
+                })
                 if (shouldAnimateSecond) {
                     // Normal behavior: animate out second text
                     gsap.to(".section.is--groupe [data-split='lines'].is--second .lineInner", {
@@ -1447,6 +1486,14 @@ function initTreeDiagram() {
 
             },
             onReverseComplete: function () {
+
+                mm.add("(max-width: 767px)", () => {
+                    gsap.to(".section.is--personnes .tree-container.is--three", {
+                        y: 0,
+                        duration: .6,
+                        ease: "power1.out"
+                    })
+                })
                 if (shouldAnimateSecond) {
                     // Normal behavior: bring back second text
                     // gsap.to(".section.is--groupe [data-split='lines'].is--second .lineInner", {
@@ -1505,7 +1552,7 @@ function initTreeDiagram() {
             duration: 1,
         })
         treeTlOne.to(".tree-container.is--three .tree-child-wrapper.is--one", {
-            yPercent: -465, // adjust as needed
+            yPercent: -568, // adjust as needed
             duration: 3,
             onComplete: function () {
                 gsap.to(".section.is--personnes [data-split='lines'] .lineInner", {
