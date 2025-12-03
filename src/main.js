@@ -1,4 +1,4 @@
-// import './styles/main.scss'
+import './styles/main.scss'
 import { ElectricBorder } from './electricBorder.js'
 import { SparkSystem } from './sparkSystem.js'
 
@@ -749,7 +749,17 @@ function initTreeDiagram() {
         left: "unset",
     })
 
+    gsap.set(".text-wrapper-date", {
+        position: "absolute",
+        left: "unset",
+        top: "15rem"
+    })
+
     gsap.set(".text-wrapper-barca .lineInner", {
+        yPercent: 100,
+    })
+
+    gsap.set(".text-wrapper-date .lineInner", {
         yPercent: 100,
     })
 
@@ -1495,7 +1505,7 @@ function initTreeDiagram() {
             duration: 1,
         })
         treeTlOne.to(".tree-container.is--three .tree-child-wrapper.is--one", {
-            yPercent: -565, // adjust as needed
+            yPercent: -465, // adjust as needed
             duration: 3,
             onComplete: function () {
                 gsap.to(".section.is--personnes [data-split='lines'] .lineInner", {
@@ -1950,7 +1960,6 @@ function initTreeDiagram() {
 
         // Store the electric border instance for later use
         let electricBorderInstance = null;
-        let sparkSystemInstance = null;
 
 
 
@@ -2186,11 +2195,6 @@ function initTreeDiagram() {
                         progressLine.style.backgroundColor = "white";
                     }
 
-                    // Stop the spark system
-                    if (sparkSystemInstance) {
-                        sparkSystemInstance.stop();
-                    }
-
                     // Remove center dot effects
                     const centerDot = document.querySelector(".dot-wrapper .dot");
                     if (centerDot) {
@@ -2218,18 +2222,13 @@ function initTreeDiagram() {
                         progressLine.style.backgroundColor = "white";
                     }
 
-                    // Restart the spark system
-                    if (sparkSystemInstance) {
-                        sparkSystemInstance.start();
-                    }
-
-                    // Re-enable center dot glow (subtle)
+                    // Re-enable center dot glow (yellow)
                     const centerDot = document.querySelector(".dot-wrapper .dot");
                     if (centerDot) {
                         gsap.to(centerDot, {
-                            boxShadow: "0 0 10px #ffcc00, 0 0 20px #ffcc00",  // Reduced glow
-                            scale: 1.1,  // Smaller scale
-                            duration: 0.8,  // Slower pulse
+                            boxShadow: "0 0 10px #ffcc00, 0 0 20px #ffcc00",
+                            scale: 1.1,
+                            duration: 0.8,
                             repeat: -1,
                             yoyo: true,
                             ease: "power2.inOut",
@@ -2481,53 +2480,25 @@ function initTreeDiagram() {
                         }
                     });
 
-                    // SUPER SAIYAN MODE code continues here...
-                    console.log('Super Saiyan Mode Activating!');
-
-                    // Don't create the electric border - we want it more subtle
-                    // Just keep the sparks on the dot
-
-                    // Create and start a more subtle spark system
-                    if (!sparkSystemInstance) {
-                        sparkSystemInstance = new SparkSystem({
-                            color: "#fc0",
-                            secondaryColor: "#ffdd44",
-                            particleCount: 4,  // Even fewer particles
-                            minSize: 0.4,      // Slightly bigger minimum
-                            maxSize: 0.8,      // Smaller max size
-                            minSpeed: 0.3,     // Much slower speed
-                            maxSpeed: 0.8,     // Much slower max speed
-                            gravity: 0.02,     // Very light gravity
-                            fadeSpeed: 0.015,  // Even slower fade for longer lasting particles
-                            emissionRate: 0.5, // Emit every other frame
-                            spreadAngle: 360   // Full circle around dot
-                        });
-                    }
-
                     // Keep the line white, don't make it yellow
                     const progressLine = document.querySelector(".line-progress");
                     if (progressLine) {
-                        console.log('Keeping progress line white with subtle glow');
                         // Just a subtle white glow, no yellow
                         progressLine.style.boxShadow = "0 0 8px rgba(255,255,255,0.6)";
                         // Keep it white
                         progressLine.style.backgroundColor = "white";
                     }
 
-                    // Start the spark system
-                    sparkSystemInstance.start();
-
-                    // Add subtle pulsing glow to the center dot
+                    // Add pulsing glow to the center dot (yellow color, no sparks)
                     const centerDot = document.querySelector(".dot-wrapper .dot");
                     if (centerDot) {
                         gsap.to(centerDot, {
-                            boxShadow: "0 0 10px #fc0, 0 0 20px #fc0",  // Reduced glow
-                            scale: 1.1,  // Smaller scale
-                            duration: 0.8,  // Slower pulse
+                            boxShadow: "0 0 10px #fc0, 0 0 20px #fc0",
+                            scale: 1.1,
+                            duration: 0.8,
                             repeat: -1,
                             yoyo: true,
                             ease: "power2.inOut",
-
                             zIndex: 100
                         });
                         centerDot.style.backgroundColor = "#fc0";
@@ -2569,11 +2540,7 @@ function initTreeDiagram() {
                         progressLine.style.backgroundColor = "white";
                     }
 
-                    // Stop the spark system
-                    if (sparkSystemInstance) {
-                        sparkSystemInstance.stop();
-                    }
-
+                    // Reset center dot
                     const centerDot = document.querySelector(".dot-wrapper .dot");
                     if (centerDot) {
                         gsap.killTweensOf(centerDot);
@@ -2596,13 +2563,8 @@ function initTreeDiagram() {
                         const valueSpan = el.querySelector('.stat-value');
 
                         if (valueSpan) {
-                            // Determine how many digits the target has
-                            const targetLength = Math.abs(target).toString().length;
+                            let paddedValue = Math.abs(currentValue).toString().padStart(3, '0');
 
-                            // Pad the current value with leading zeros
-                            let paddedValue = Math.abs(currentValue).toString().padStart(targetLength, '0');
-
-                            // Add negative sign back if needed
                             if (target < 0) {
                                 paddedValue = '-' + paddedValue;
                             }
@@ -2815,7 +2777,7 @@ function initTreeDiagram() {
                 // gsap.to(".text-wrapper-map .lineInner", {
                 //     yPercent: -100,
                 // })
-                gsap.to(".text-wrapper-barca .lineInner", {
+                gsap.to(".text-wrapper-barca .lineInner, .text-wrapper-date .lineInner", {
                     yPercent: 0,
                 })
 
@@ -2835,7 +2797,7 @@ function initTreeDiagram() {
                 //     yPercent: 0,
                 // })
 
-                gsap.to(".text-wrapper-barca .lineInner", {
+                gsap.to(".text-wrapper-barca .lineInner, .text-wrapper-date .lineInner", {
                     yPercent: 100,
                 })
 
@@ -3065,11 +3027,6 @@ function initTreeDiagram() {
                     ease: "power2.out"
                 })
 
-
-
-
-
-
                 // gsap.to(".section.is--compare .inscription-rc", {
                 //     autoAlpha: 0,
                 // })
@@ -3079,8 +3036,6 @@ function initTreeDiagram() {
                 // gsap.to(".section.is--compare .inscription-rc", {
                 //     autoAlpha: 1,
                 // })
-
-
 
                 gsap.to(".panel [data-split='lines'] .lineInner", {
                     yPercent: 100,
@@ -3095,7 +3050,7 @@ function initTreeDiagram() {
 
             },
 
-        }, "<")
+        }, "<+=1")
 
             .to(".section.is--compare .line-wrapper-bottom", {
                 autoAlpha: 0,
@@ -3175,8 +3130,7 @@ function initTreeDiagram() {
                     const valueSpan = el.querySelector('.stat-value');
 
                     if (valueSpan) {
-                        const targetLength = Math.abs(target).toString().length;
-                        let paddedValue = Math.abs(currentValue).toString().padStart(targetLength, '0');
+                        let paddedValue = Math.abs(currentValue).toString().padStart(3, '0');
 
                         if (target < 0) {
                             paddedValue = '-' + paddedValue;
@@ -3754,7 +3708,9 @@ function createMapTimeline() {
     gsap.set(".map-svg path", { drawSVG: "0% 100%" });
     // mapTl.to(".map-svg path", {
     //     drawSVG: "0% 100%",
-
+    gsap.set(".section.is--map .map-container", {
+        scale: 1.5
+    })
     mapTl.from(".map-svg", {
         opacity: 0,
 
@@ -3793,10 +3749,19 @@ function createMapTimeline() {
         }, "<")
         .from(".click-me", {
             autoAlpha: 0,
-        }, "<")
-        .to(".section.is--map .map-container", {
-            scale: 2,
-            duration: 3,
+            onStart: function () {
+                gsap.to(".section.is--map .map-container", {
+                    scale: 2,
+                    duration: 3,
+                })
+            },
+            onReverseComplete: function () {
+                gsap.to(".section.is--map .map-container", {
+                    scale: 1.5,
+                    duration: 2,
+                    ease: "power1.out",
+                })
+            }
         }, "<")
 
         //SPOTIFY
@@ -3883,13 +3848,17 @@ function createMapTimeline() {
 
 
 
-        .to(".map-container", {
-            yPercent: -85,
-            xPercent: 45,
-            scale: 2.6,
-            duration: 3,
-            ease: "power1.out",
+        .to({}, {
+
             onStart: function () {
+                gsap.to(".section.is--map .map-container", {
+                    yPercent: -85,
+                    xPercent: 45,
+                    scale: 2.6,
+                    duration: 3,
+                    ease: "power1.out",
+
+                })
                 gsap.to(".text-wrapper-spotify .lineInner", {
                     yPercent: -100,
                 })
@@ -3900,6 +3869,13 @@ function createMapTimeline() {
 
             },
             onReverseComplete: function () {
+                gsap.to(".section.is--map .map-container", {
+                    yPercent: 0,
+                    xPercent: 0,
+                    scale: 2,
+                    duration: 2,
+                    ease: "power1.out",
+                })
                 gsap.to(".text-wrapper-spotify .lineInner", {
                     yPercent: 0,
                 })
@@ -3939,7 +3915,7 @@ function createMapTimeline() {
             // gsap.to(".text-wrapper-map .lineInner", {
             //     yPercent: -100,
             // })
-            gsap.to(".text-wrapper-barca .lineInner", {
+            gsap.to(".text-wrapper-barca .lineInner, .text-wrapper-date .lineInner", {
                 yPercent: 0,
             })
 
@@ -3956,7 +3932,7 @@ function createMapTimeline() {
             //     yPercent: 0,
             // })
 
-            gsap.to(".text-wrapper-barca .lineInner", {
+            gsap.to(".text-wrapper-barca .lineInner, .text-wrapper-date .lineInner", {
                 yPercent: -100,
             })
 
@@ -4521,9 +4497,10 @@ function initSplit() {
 
     elementToSplitChars.forEach(target => {
         let splitInstance = new SplitText(target, {
-            type: "chars",
+            type: "words, chars",
             mask: "chars",
             charsClass: "charInner",
+            wordsClass: "wordWrapper",
             ignore: ".sup",
         });
     });
@@ -5444,7 +5421,7 @@ function initAccordionCSS() {
 
     // ScrollTrigger animations for accordion items
     document.querySelectorAll('.accordion-css__item').forEach((item) => {
-        const lineInner = item.querySelector('.lineInner');
+        const lineInner = item.querySelectorAll('.lineInner');
         const icon = item.querySelector('.accordion-css__item-icon');
         const lineBottom = item.querySelector('.bottom-line');
 
