@@ -1,4 +1,4 @@
-// import './styles/main.scss'
+import './styles/main.scss'
 import { ElectricBorder } from './electricBorder.js'
 import { SparkSystem } from './sparkSystem.js'
 
@@ -121,7 +121,6 @@ function initIntro() {
         paused: true,
     });
 
-
     flashAndScrambleTl
         .set(iciWrapper, { autoAlpha: 1 }, "label")
         .set(iciSvg, { visibility: "visible" })
@@ -131,7 +130,6 @@ function initIntro() {
         .to(iciSvg, { visibility: "visible", duration: 0.1, ease: "none" })
         .to(iciSvg, { visibility: "hidden", duration: 0.05, ease: "none" })
         .to(iciSvg, { visibility: "visible", duration: 0.1, ease: "none" });
-
 
     // Split and prepare the text
     const split = new SplitText(iciText, {
@@ -545,8 +543,8 @@ function initScrollLock() {
                             particleCount: 40,  // More particles for a big burst
                             minSize: 0.4,
                             maxSize: 1.2,
-                            minSpeed: 2,        // Faster initial speed for explosion feel
-                            maxSpeed: 5,
+                            minSpeed: 1,        // Faster initial speed for explosion feel
+                            maxSpeed: 2.5,
                             gravity: 0.08,
                             fadeSpeed: 0.025,   // Faster fade so effect lasts ~1 second
                             emissionRate: 0,    // No continuous emission
