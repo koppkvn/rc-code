@@ -1545,12 +1545,12 @@ function initTreeDiagram() {
 
     // we move "toi" to the top on mobile only
     mm.add("(max-width: 767px)", () => {
-        console.log("mobile");
-        treeTlOne.to({}, {
-            duration: 1,
-        })
+        //DELAY ENLEVE
+        // treeTlOne.to({}, {
+        //     duration: 1,
+        // })
         treeTlOne.to(".tree-container.is--three .tree-child-wrapper.is--one", {
-            yPercent: -568, // adjust as needed
+            yPercent: -564, // adjust as needed
             duration: 3,
             onComplete: function () {
                 gsap.to(".section.is--personnes [data-split='lines'] .lineInner", {
@@ -1562,7 +1562,6 @@ function initTreeDiagram() {
             },
 
         },);
-
     })
 
 
