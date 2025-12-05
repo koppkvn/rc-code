@@ -1,4 +1,4 @@
-import './styles/main.scss'
+// import './styles/main.scss'
 import { ElectricBorder } from './electricBorder.js'
 import { SparkSystem } from './sparkSystem.js'
 
@@ -1546,9 +1546,9 @@ function initTreeDiagram() {
     // we move "toi" to the top on mobile only
     mm.add("(max-width: 767px)", () => {
         //DELAY ENLEVE
-        // treeTlOne.to({}, {
-        //     duration: 1,
-        // })
+        treeTlOne.to({}, {
+            duration: .5,
+        })
         treeTlOne.to(".tree-container.is--three .tree-child-wrapper.is--one", {
             yPercent: -564, // adjust as needed
             duration: 3,
@@ -3835,7 +3835,7 @@ function createMapTimeline() {
                     ease: "power1.inOut"
                 })
             }
-        })
+        }, "<+=2")
         .to(".text-wrapper-spotify .lower-wrapper > *, .text-wrapper-spotify .lower-wrapper", {
             autoAlpha: 1,
             duration: 1,
@@ -3860,18 +3860,18 @@ function createMapTimeline() {
                     pointerEvents: "auto",
                 })
             }
-        }, "<+=1")
+        }, "<")
 
         .to(".img-spotify:not(.is--first)", {
             autoAlpha: 1,
             duration: 0.3,
             stagger: 0.5,
-            ease: "power2.inOut",
+            ease: "linear",
 
-        }, "+=0.5")
+        }, "<")
         // Add number counter and color animation
         .to({}, {
-            duration: 8,
+            duration: 6,
             onUpdate: function () {
                 const progress = this.progress();
                 // console.log("progress:", progress);
@@ -3910,11 +3910,7 @@ function createMapTimeline() {
                 autoAlpha: 0,
             })
 
-            gsap.to(".dot-normal:not(.gebs), .dot-video:not(.gebs)", {
-                autoAlpha: 0,
-                duration: 1,
-                ease: "power1.out"
-            })
+
 
         },
 
@@ -3933,11 +3929,7 @@ function createMapTimeline() {
         .to(".click-me", {
             autoAlpha: 0,
             onReverseComplete: function () {
-                gsap.to(".dot-normal:not(.gebs), .dot-video:not(.gebs)", {
-                    autoAlpha: 1,
-                    duration: 1,
-                    ease: "power1.out"
-                })
+
             }
         }, "<")
     // .to(".map-container mask rect", {
@@ -3947,7 +3939,7 @@ function createMapTimeline() {
     // }, "<")
 
     // const allDots = gsap.utils.toArray(".dot-video, .dot-normal");
-    const allDots = gsap.utils.toArray(".dot-normal.gebs");
+    const allDots = gsap.utils.toArray(".dot-normal.gebs, .dot-video.gebs");
 
     console.log("allDots:", allDots);
 
@@ -3960,7 +3952,7 @@ function createMapTimeline() {
 
         mapTl.add(
             Flip.fit(dot, barcelonaDot, {
-                duration: 1, // needed for Flip to work but overwritten by scrub
+                duration: 2, // needed for Flip to work but overwritten by scrub
                 ease: "none"
             }), "<+=.03"
             // add all tweens at the same point in the timeline
@@ -3975,6 +3967,11 @@ function createMapTimeline() {
             // })
             gsap.to(".text-wrapper-barca .lineInner, .text-wrapper-date .lineInner", {
                 yPercent: 0,
+            })
+            gsap.to(".dot-normal:not(.gebs), .dot-video:not(.gebs)", {
+                autoAlpha: 0,
+                duration: .5,
+                ease: "power1.out"
             })
 
             gsap.to(".barca-video-wrapper", {
@@ -3994,6 +3991,12 @@ function createMapTimeline() {
                 yPercent: -100,
             })
 
+            gsap.to(".dot-normal:not(.gebs), .dot-video:not(.gebs)", {
+                autoAlpha: 1,
+                duration: .5,
+                ease: "power1.out"
+            })
+
             gsap.to(".barca-video-wrapper", {
                 autoAlpha: 0,
                 duration: 1,
@@ -4003,7 +4006,7 @@ function createMapTimeline() {
             })
 
         }
-    }, "<+=1")
+    }, "<+=2")
     mapTl.to({}, {
         duration: 1
     },)
@@ -4306,6 +4309,31 @@ function initFormAnimaton() {
     }
 
     let animationLocked = false;
+
+    //here
+    gsap.set(".section.is--form", {
+        opacity: 0,
+    })
+    const tl2 = gsap.timeline({
+        scrollTrigger: {
+            trigger: ".section.is--form",
+            start: "top center",
+            end: "bottom top",
+            scrub: true,
+            // markers: true,
+        }
+    })
+
+    // Add your animations here
+    tl2.to(".section.is--map", {
+        // your animation properties
+        opacity: 0,
+
+    })
+        .to(".section.is--form", {
+            opacity: 1,
+            duration: 1,
+        })
 
     const tl = gsap.timeline({
         scrollTrigger: {
