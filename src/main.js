@@ -5387,9 +5387,13 @@ function initMultiStepForm() {
                                 existingInfo.remove();
                             }
 
-                            // If clicked radio has data-info, display it
+                            // Check if we're in step 2-2 and "solo" is selected
+                            const isInStep2_2 = radio.closest('[data-step="2-2"]');
+                            const soloSelected = form.querySelector('input[name="formule"][value="solo"]:checked');
+
+                            // If clicked radio has data-info, display it (but not in step 2-2 if solo is selected)
                             const dataInfo = radio.getAttribute('data-info');
-                            if (dataInfo) {
+                            if (dataInfo && !(isInStep2_2 && soloSelected)) {
                                 const infoDiv = document.createElement('div');
                                 infoDiv.className = 'radio-info-text';
                                 infoDiv.textContent = dataInfo;
