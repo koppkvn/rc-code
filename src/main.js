@@ -5368,6 +5368,16 @@ function initMultiStepForm() {
                             createNavigationButtons();
                         }
 
+                        // If this is the formule radio group, toggle .price visibility
+                        if (groupName === 'formule') {
+                            const priceSpans = form.querySelectorAll('.form-field-group .price');
+                            if (radio.value === 'solo') {
+                                priceSpans.forEach(span => span.style.display = 'none');
+                            } else {
+                                priceSpans.forEach(span => span.style.display = '');
+                            }
+                        }
+
                         // NEW CODE: Handle data-info attribute
                         const rowFormRadio = radio.closest('.row-form.is--radio');
                         if (rowFormRadio) {
