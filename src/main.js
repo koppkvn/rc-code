@@ -2313,6 +2313,13 @@ function initTreeDiagram() {
                         ease: "back.out(1.7)"
                     });
 
+                    // Play video on desktop (gif-container without is--mobile)
+                    const desktopVideo = panel.querySelector(".gif-container:not(.is--mobile) video");
+                    if (desktopVideo) {
+                        desktopVideo.currentTime = 0;
+                        desktopVideo.play().catch(() => { });
+                    }
+
                     // Animate all text lines with stagger
                     gsap.to(panel.querySelectorAll("[data-split='lines'] .lineInner"), {
                         yPercent: 0,
@@ -2333,6 +2340,13 @@ function initTreeDiagram() {
                 },
                 onReverseComplete: function () {
                     const panel = document.querySelector(".timeline-panel.is--fixed.is--2");
+
+                    // Pause video when scrolling back past panel
+                    const desktopVideo = panel?.querySelector(".gif-container:not(.is--mobile) video");
+                    if (desktopVideo) {
+                        desktopVideo.pause();
+                        desktopVideo.currentTime = 0;
+                    }
 
                     // Animate out image/gif with slight rotation
                     gsap.to(panel.querySelector(".gif-container"), {
@@ -2365,6 +2379,13 @@ function initTreeDiagram() {
                 autoAlpha: 0,
                 onStart: function () {
                     const panel = document.querySelector(".timeline-panel.is--fixed.is--2");
+
+                    // Pause video when panel fades out
+                    const desktopVideo = panel?.querySelector(".gif-container:not(.is--mobile) video");
+                    if (desktopVideo) {
+                        desktopVideo.pause();
+                        desktopVideo.currentTime = 0;
+                    }
 
                     // Exit animation when panel fades out
                     gsap.to(panel.querySelector(".gif-container"), {
@@ -2417,6 +2438,13 @@ function initTreeDiagram() {
                         duration: 0.8,
                         ease: "back.out(1.7)"
                     });
+
+                    // Play video when scrolling back into panel
+                    const desktopVideo = panel.querySelector(".gif-container:not(.is--mobile) video");
+                    if (desktopVideo) {
+                        desktopVideo.currentTime = 0;
+                        desktopVideo.play().catch(() => { });
+                    }
 
                     gsap.to(panel.querySelectorAll("[data-split='lines'] .lineInner"), {
                         yPercent: 0,

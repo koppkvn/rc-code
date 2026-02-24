@@ -1081,3 +1081,38 @@ body.is-visible {
         text-align: left !important;
     }
 }
+
+// Timeline panel 2: video on desktop, image on mobile
+.section.is--timeline .timeline-panel.is--2 .gif-container {
+    // Desktop: show video container, hide mobile image
+    @media (min-width: 48rem) {
+        &:not(.is--mobile) {
+            display: block;
+
+            img {
+                display: none; // Hide img when video is used
+            }
+
+            video {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+        }
+
+        &.is--mobile {
+            display: none;
+        }
+    }
+
+    // Mobile: show image only
+    @media (max-width: 47.9375rem) {
+        &:not(.is--mobile) {
+            display: none;
+        }
+
+        &.is--mobile {
+            display: block;
+        }
+    }
+}
