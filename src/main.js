@@ -2313,11 +2313,11 @@ function initTreeDiagram() {
                         ease: "back.out(1.7)"
                     });
 
-                    // Play video on desktop (gif-container without is--mobile)
-                    const desktopVideo = panel.querySelector(".gif-container:not(.is--mobile) video");
-                    if (desktopVideo) {
-                        desktopVideo.currentTime = 0;
-                        desktopVideo.play().catch(() => { });
+                    // Play video if present
+                    const video = panel.querySelector(".gif-container video");
+                    if (video) {
+                        video.currentTime = 0;
+                        video.play().catch(() => {});
                     }
 
                     // Animate all text lines with stagger
@@ -2342,10 +2342,10 @@ function initTreeDiagram() {
                     const panel = document.querySelector(".timeline-panel.is--fixed.is--2");
 
                     // Pause video when scrolling back past panel
-                    const desktopVideo = panel?.querySelector(".gif-container:not(.is--mobile) video");
-                    if (desktopVideo) {
-                        desktopVideo.pause();
-                        desktopVideo.currentTime = 0;
+                    const video = panel?.querySelector(".gif-container video");
+                    if (video) {
+                        video.pause();
+                        video.currentTime = 0;
                     }
 
                     // Animate out image/gif with slight rotation
@@ -2381,10 +2381,10 @@ function initTreeDiagram() {
                     const panel = document.querySelector(".timeline-panel.is--fixed.is--2");
 
                     // Pause video when panel fades out
-                    const desktopVideo = panel?.querySelector(".gif-container:not(.is--mobile) video");
-                    if (desktopVideo) {
-                        desktopVideo.pause();
-                        desktopVideo.currentTime = 0;
+                    const video = panel?.querySelector(".gif-container video");
+                    if (video) {
+                        video.pause();
+                        video.currentTime = 0;
                     }
 
                     // Exit animation when panel fades out
@@ -2440,10 +2440,10 @@ function initTreeDiagram() {
                     });
 
                     // Play video when scrolling back into panel
-                    const desktopVideo = panel.querySelector(".gif-container:not(.is--mobile) video");
-                    if (desktopVideo) {
-                        desktopVideo.currentTime = 0;
-                        desktopVideo.play().catch(() => { });
+                    const video = panel.querySelector(".gif-container video");
+                    if (video) {
+                        video.currentTime = 0;
+                        video.play().catch(() => {});
                     }
 
                     gsap.to(panel.querySelectorAll("[data-split='lines'] .lineInner"), {
