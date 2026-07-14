@@ -3248,9 +3248,10 @@ function initTreeDiagram() {
         // Separate trigger for the line animation
 
 
+        const lastTimelinePanel = gsap.utils.toArray(".section.is--timeline .timeline-panel").pop();
         const timelineTl = gsap.timeline({
             scrollTrigger: {
-                trigger: ".timeline-panel.is--9",
+                trigger: lastTimelinePanel,
                 start: "50% top",
                 endTrigger: ".section.is--timeline",
                 end: "bottom 50%",
