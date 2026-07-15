@@ -449,7 +449,7 @@ function initScrollLock() {
         const waitMessage = document.querySelector('.wait-message');
         if (waitMessage) {
             // Simple scramble animation of the existing text
-            gsap.to(waitMessage, { duration: 1, color: "#fc0", scrambleText: "Parfait! Tu peux continuer." });
+            gsap.to(waitMessage, { duration: 1, color: "#D2AA62", scrambleText: "Parfait! Tu peux continuer." });
         }
 
         // Restart Lenis
@@ -2294,7 +2294,7 @@ function initAgeGate() {
         btn.addEventListener('mouseenter', () => {
             gsap.to(btn, {
                 duration: 0.5,
-                color: "#fc0",
+                color: "#D2AA62",
                 scrambleText: {
                     text: originalText,
                     chars: "upperCase", // or "alpha", "numbers", etc.
@@ -2475,7 +2475,7 @@ function initHeroAnimation() {
         btn.addEventListener('mouseenter', () => {
             gsap.to(btn, {
                 duration: 0.5,
-                color: "#fc0",
+                color: "#D2AA62",
                 scrambleText: {
                     text: originalText,
                     chars: "upperCase", // or "alpha", "numbers", etc.

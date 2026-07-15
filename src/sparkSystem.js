@@ -2,7 +2,7 @@
 export class SparkSystem {
     constructor(options = {}) {
         // Configuration
-        this.sparkColor = options.color || "#ffca1c";
+        this.sparkColor = options.color || "#D2AA62";
         this.secondaryColor = options.secondaryColor || "#ff8c00";
         this.particleCount = options.particleCount || 30;
         this.minSize = options.minSize || 1;

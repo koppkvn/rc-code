@@ -2,6 +2,58 @@
 import { ElectricBorder } from './electricBorder.js'
 import { SparkSystem } from './sparkSystem.js'
 
+const ACCENT_COLOR = "#D2AA62";
+
+function applyBrandAccent() {
+    const rootStyle = document.documentElement.style;
+    rootStyle.setProperty("--yellow", ACCENT_COLOR);
+    rootStyle.setProperty("--electric-light-color", ACCENT_COLOR);
+    rootStyle.setProperty("--electric-glow-color", ACCENT_COLOR);
+
+    if (document.getElementById("brand-accent-overrides")) return;
+
+    const accentOverrides = document.createElement("style");
+    accentOverrides.id = "brand-accent-overrides";
+    accentOverrides.textContent = `
+        .color-2 {
+            color: ${ACCENT_COLOR} !important;
+        }
+
+        .wait-message-span.is--glow {
+            background-image: linear-gradient(
+                to right,
+                rgba(173, 173, 173, 0.5),
+                rgba(176, 176, 176, 0.5) 40%,
+                rgba(210, 170, 98, 0.9) 49%,
+                rgba(210, 170, 98, 0.9) 51%,
+                rgba(176, 176, 176, 0.5) 60%,
+                rgba(173, 173, 173, 0.5)
+            );
+        }
+
+        @keyframes level-glow-pulse {
+            0%, 100% {
+                text-shadow:
+                    0 0 10px rgba(210, 170, 98, 0.8),
+                    0 0 20px rgba(210, 170, 98, 0.6),
+                    0 0 30px rgba(210, 170, 98, 0.4),
+                    0 0 40px rgba(210, 170, 98, 0.2);
+                transform: scale(1);
+            }
+
+            50% {
+                text-shadow:
+                    0 0 20px rgba(210, 170, 98, 1),
+                    0 0 30px rgba(210, 170, 98, 0.8),
+                    0 0 40px rgba(210, 170, 98, 0.6),
+                    0 0 50px rgba(210, 170, 98, 0.4);
+                transform: scale(1.05);
+            }
+        }
+    `;
+    document.head.appendChild(accentOverrides);
+}
+
 
 function initLenis() {
     window.lenis = new Lenis();
@@ -497,7 +549,7 @@ function initScrollLock() {
         const waitMessage = document.querySelector('.wait-message');
         if (waitMessage) {
             // Simple scramble animation of the existing text
-            gsap.to(waitMessage, { duration: 1, color: "#fc0", scrambleText: "Parfait! Tu peux continuer." });
+            gsap.to(waitMessage, { duration: 1, color: ACCENT_COLOR, scrambleText: "Parfait! Tu peux continuer." });
         }
 
         // Animate level up from 4 to 5
@@ -521,7 +573,7 @@ function initScrollLock() {
                 onComplete: function () {
                     // Change text to "5" immediately when "4" completely disappears
                     levelElement.textContent = "5";
-                    levelElement.style.color = "rgb(255, 204, 0)";
+                    levelElement.style.color = ACCENT_COLOR;
                     // Reset to starting state for "5" animation
                     gsap.set(levelElement, {
                         opacity: 0,
@@ -538,7 +590,7 @@ function initScrollLock() {
                     onStart: function () {
                         // Create spark system for the level element (firework burst effect)
                         levelSparkSystem = new SparkSystem({
-                            color: "#ffca1c",
+                            color: ACCENT_COLOR,
                             secondaryColor: "#ff8c00",
                             particleCount: 40,  // More particles for a big burst
                             minSize: 0.4,
@@ -2308,7 +2360,7 @@ function initTreeDiagram() {
                     const centerDot = document.querySelector(".dot-wrapper .dot");
                     if (centerDot) {
                         gsap.to(centerDot, {
-                            boxShadow: "0 0 10px #ffcc00, 0 0 20px #ffcc00",
+                            boxShadow: `0 0 10px ${ACCENT_COLOR}, 0 0 20px ${ACCENT_COLOR}`,
                             scale: 1.1,
                             duration: 0.8,
                             repeat: -1,
@@ -2316,7 +2368,7 @@ function initTreeDiagram() {
                             ease: "power2.inOut",
                             zIndex: 100
                         });
-                        centerDot.style.backgroundColor = "#ffcc00";
+                        centerDot.style.backgroundColor = ACCENT_COLOR;
                     }
                 }
             }, "timelineExit")
@@ -2608,7 +2660,7 @@ function initTreeDiagram() {
                     const centerDot = document.querySelector(".dot-wrapper .dot");
                     if (centerDot) {
                         gsap.to(centerDot, {
-                            boxShadow: "0 0 10px #fc0, 0 0 20px #fc0",
+                            boxShadow: `0 0 10px ${ACCENT_COLOR}, 0 0 20px ${ACCENT_COLOR}`,
                             scale: 1.1,
                             duration: 0.8,
                             repeat: -1,
@@ -2616,7 +2668,7 @@ function initTreeDiagram() {
                             ease: "power2.inOut",
                             zIndex: 100
                         });
-                        centerDot.style.backgroundColor = "#fc0";
+                        centerDot.style.backgroundColor = ACCENT_COLOR;
                     }
                 },
                 onReverseComplete: function () {
@@ -2686,8 +2738,8 @@ function initTreeDiagram() {
 
                             valueSpan.textContent = paddedValue;
 
-                            // Interpolate color from default to #fc0
-                            const colorInterpolate = gsap.utils.interpolate("white", "#fc0", progress);
+                            // Interpolate color from white to the brand accent.
+                            const colorInterpolate = gsap.utils.interpolate("white", ACCENT_COLOR, progress);
                             valueSpan.style.color = colorInterpolate;
                         }
                     });
@@ -2834,11 +2886,7 @@ function initTreeDiagram() {
                         const currentValue = Math.round(spotifyTarget * progress);
                         spotifyNumber.textContent = currentValue;
 
-                        // Animate color from white to #fc0 based on progress
-                        const r = 255;
-                        const g = Math.round(255 - (51 * progress));  // 255 -> 204
-                        const b = Math.round(255 - (255 * progress)); // 255 -> 0
-                        spotifyNumber.style.color = `rgb(${r}, ${g}, ${b})`;
+                        spotifyNumber.style.color = gsap.utils.interpolate("white", ACCENT_COLOR, progress);
                     }
                 }
             }, "<")
@@ -3259,7 +3307,7 @@ function initTreeDiagram() {
                         }
 
                         valueSpan.textContent = paddedValue;
-                        const colorInterpolate = gsap.utils.interpolate("white", "#fc0", progress);
+                        const colorInterpolate = gsap.utils.interpolate("white", ACCENT_COLOR, progress);
                         valueSpan.style.color = colorInterpolate;
                     }
                 });
@@ -3966,11 +4014,7 @@ function createMapTimeline() {
                     const currentValue = Math.round(spotifyTarget * progress);
                     spotifyNumber.textContent = currentValue;
 
-                    // Animate color from white to #fc0 based on progress
-                    const r = 255;
-                    const g = Math.round(255 - (51 * progress));  // 255 -> 204
-                    const b = Math.round(255 - (255 * progress)); // 255 -> 0
-                    spotifyNumber.style.color = `rgb(${r}, ${g}, ${b})`;
+                    spotifyNumber.style.color = gsap.utils.interpolate("white", ACCENT_COLOR, progress);
                 }
             }
         }, "<")
@@ -4794,7 +4838,7 @@ function initAgeGate() {
         btn.addEventListener('mouseenter', () => {
             gsap.to(btn, {
                 duration: 0.5,
-                color: "#fc0",
+                color: ACCENT_COLOR,
                 scrambleText: {
                     text: originalText,
                     chars: "upperCase", // or "alpha", "numbers", etc.
@@ -4981,7 +5025,7 @@ function initHeroAnimation() {
         btn.addEventListener('mouseenter', () => {
             gsap.to(btn, {
                 duration: 0.5,
-                color: "#fc0",
+                color: ACCENT_COLOR,
                 scrambleText: {
                     text: originalText,
                     chars: "upperCase", // or "alpha", "numbers", etc.
@@ -5668,6 +5712,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
+
+    applyBrandAccent();
 
     // let initialWidth = window.innerWidth;
 
