@@ -57,6 +57,20 @@ function applyBrandAccent() {
             animation: gold-level-shimmer 3.2s cubic-bezier(.55, 0, .25, 1) infinite;
         }
 
+        .niveaux {
+            align-items: center !important;
+        }
+
+        .niveaux .level {
+            display: inline-flex !important;
+            align-items: center;
+            justify-content: center;
+            line-height: 1 !important;
+            vertical-align: middle;
+            transform-box: border-box;
+            transform-origin: 50% 50% !important;
+        }
+
         @keyframes gold-wait-sweep {
             0%, 12% {
                 background-position: 150% 0;
@@ -486,8 +500,8 @@ function animateXpBar(xpBar, targetPercent) {
 
         gsap.to(xpBar.fill, {
             scaleX: targetPercent / 100,
-            duration: .32,
-            ease: 'power3.out',
+            duration: .22,
+            ease: 'power2.out',
             overwrite: 'auto',
             onComplete: () => {
                 xpBar.track.classList.remove('is-charging');
@@ -503,8 +517,12 @@ function animateXpBar(xpBar, targetPercent) {
 
 function resetCompletedXpBar(xpBar, trackerSection) {
     return new Promise(resolve => {
+        // Trigger the level-up on the exact frame the XP fill reaches 100%.
+        // Resetting the gauge is now purely visual and never delays progression.
+        trackerSection?.setAttribute('data-xp-cycle-complete', 'true');
+        trackerSection?.dispatchEvent(new CustomEvent('tracker-xp-cycle-complete'));
+
         if (!xpBar) {
-            trackerSection?.dispatchEvent(new CustomEvent('tracker-xp-cycle-complete'));
             resolve();
             return;
         }
@@ -520,15 +538,13 @@ function resetCompletedXpBar(xpBar, trackerSection) {
 
         gsap.to(xpBar.fill, {
             scaleX: 0,
-            duration: .35,
-            delay: .65,
+            duration: .24,
+            delay: .12,
             ease: 'power2.inOut',
             onComplete: () => {
                 xpBar.container.classList.remove('is-complete');
                 xpBar.container.setAttribute('aria-valuenow', '0');
                 xpBar.container.setAttribute('data-xp-progress', '0');
-                trackerSection?.setAttribute('data-xp-cycle-complete', 'true');
-                trackerSection?.dispatchEvent(new CustomEvent('tracker-xp-cycle-complete'));
                 resolve();
             }
         });
@@ -542,25 +558,31 @@ function initTrackerCheckboxes() {
     let completedSteps = 0;
     let xpResetStarted = false;
 
-    // Prepare the level element early to prevent shift when animation starts
-    // Set fixed width and positioning before any checkboxes are clicked
+    // Prepare a fixed square box so the number scales around its true center.
     const levelElement = document.querySelector('.niveaux .level');
     if (levelElement) {
-        const rect = levelElement.getBoundingClientRect();
         const computedStyle = window.getComputedStyle(levelElement);
-        const currentWidth = rect.width;
         const fontSize = parseFloat(computedStyle.fontSize);
-        // Use a generous width to ensure both "4" and "5" fit without shifting
-        const fixedWidth = Math.max(currentWidth, fontSize * 1.5);
+        const levelBoxSize = Math.max(20, Math.ceil(fontSize));
 
-        // Set transform origin and fixed width early to prevent reflow
         gsap.set(levelElement, {
-            transformOrigin: "center center",
-            minWidth: 20 + "px",
-            width: 20 + "px",
+            transformOrigin: "50% 50%",
+            minWidth: `${levelBoxSize}px`,
+            width: `${levelBoxSize}px`,
+            height: `${levelBoxSize}px`,
+            lineHeight: `${levelBoxSize}px`,
             textAlign: "center",
-            display: "inline-block",
-            boxSizing: "border-box"
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            verticalAlign: "middle",
+            boxSizing: "border-box",
+            x: 0,
+            y: 0
+        });
+
+        gsap.set(levelElement.parentElement, {
+            alignItems: "center"
         });
     }
 
@@ -703,10 +725,18 @@ function initScrollLock() {
             // Create a timeline for the level up animation
             const levelUpTl = gsap.timeline();
 
+            gsap.set(levelElement, {
+                transformOrigin: "50% 50%",
+                x: 0,
+                y: 0
+            });
+
             // Step 1: Scale down the "4" completely and fade out
             levelUpTl.to(levelElement, {
                 scale: 0,
                 opacity: 0,
+                transformOrigin: "50% 50%",
+                y: 0,
                 duration: 0.3,
                 ease: "power2.in",
                 onComplete: function () {
@@ -717,7 +747,10 @@ function initScrollLock() {
                     // Reset to starting state for "5" animation
                     gsap.set(levelElement, {
                         opacity: 0,
-                        scale: 0
+                        scale: 0,
+                        transformOrigin: "50% 50%",
+                        x: 0,
+                        y: 0
                     });
                 }
             })
@@ -725,6 +758,8 @@ function initScrollLock() {
                 .to(levelElement, {
                     scale: 1.8,
                     opacity: 1,
+                    transformOrigin: "50% 50%",
+                    y: 0,
                     duration: 0.5,
                     ease: "back.out(2)",
                     onStart: function () {
@@ -788,6 +823,8 @@ function initScrollLock() {
                 // Step 3: Settle to final state (after bounce)
                 .to(levelElement, {
                     scale: 1,
+                    transformOrigin: "50% 50%",
+                    y: 0,
                     duration: 0.3,
                     ease: "power2.out",
                     onComplete: function () {
