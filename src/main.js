@@ -89,28 +89,116 @@ function applyBrandAccent() {
             translate: 0 -.5rem;
         }
 
+        .barcelona-date-card__calendar {
+            display: none;
+        }
+
+        @media (min-width: 48rem) {
+            .text-wrapper-date.is--date-card {
+                box-sizing: border-box;
+                align-items: flex-start;
+                gap: .2rem;
+                width: max-content;
+                max-width: none;
+                margin-left: 0;
+                padding: .85rem 1.15rem .8rem 3rem;
+                overflow: hidden;
+                border: 1px solid rgba(210, 170, 98, .45);
+                border-radius: .4rem;
+                background: linear-gradient(
+                    135deg,
+                    rgba(210, 170, 98, .1) 0%,
+                    rgba(18, 18, 18, .78) 48%,
+                    rgba(8, 8, 8, .9) 100%
+                );
+                box-shadow:
+                    inset 0 0 0 1px rgba(255, 255, 255, .025),
+                    0 .6rem 1.6rem rgba(0, 0, 0, .24);
+                backdrop-filter: blur(4px);
+            }
+
+            .text-wrapper-date.is--date-card::after {
+                content: "";
+                position: absolute;
+                inset: 0;
+                pointer-events: none;
+                background: linear-gradient(
+                    110deg,
+                    transparent 0%,
+                    rgba(247, 232, 189, .08) 38%,
+                    transparent 62%
+                );
+            }
+
+            .text-wrapper-date.is--date-card .paragraph,
+            .text-wrapper-date.is--date-card .lineInner {
+                position: relative;
+                z-index: 1;
+                text-align: left !important;
+            }
+
+            .text-wrapper-date.is--date-card .paragraph:first-of-type {
+                color: rgba(255, 255, 255, .96);
+                letter-spacing: .025em;
+            }
+
+            .text-wrapper-date.is--date-card .paragraph:last-of-type {
+                color: ${ACCENT_COLOR};
+                letter-spacing: .055em;
+            }
+
+            .text-wrapper-date.is--date-card .barcelona-date-card__calendar {
+                position: absolute;
+                z-index: 1;
+                top: 50%;
+                left: 1rem;
+                display: grid;
+                width: 1.15rem;
+                height: 1.15rem;
+                translate: 0 -50%;
+                place-items: center;
+                color: ${ACCENT_COLOR};
+                filter: drop-shadow(0 0 .2rem rgba(210, 170, 98, .3));
+            }
+
+            .text-wrapper-date.is--date-card .barcelona-date-card__calendar svg {
+                display: block;
+                width: 100%;
+                height: 100%;
+            }
+        }
+
         @media (max-width: 47.99rem) {
             .tracker-row.is--mobile-hidden {
                 display: none !important;
             }
 
-            /* Bring the mobile status block closer to the tracker frame. */
-            .tracker-wrapper > .tracker-pompes.tracker-xp-shell {
-                translate: 0 -.25rem;
+            /* Lift the habit rows and their highlight without moving the XP UI. */
+            .tracker-wrapper > .tracker-header,
+            .tracker-wrapper > .tracker-row,
+            .tracker-wrapper > .tracker-highlight {
+                translate: 0 -1.35rem;
             }
 
-            /* Keep the download badges compact, left-aligned and slightly higher. */
+            /* Give the mobile status block more air below the explanatory copy. */
+            .tracker-wrapper > .tracker-pompes.tracker-xp-shell {
+                translate: 0 1rem;
+            }
+
+            /* Keep the download badges compact, muted and close to the tracker. */
             .section.is--tracker .svg-wrapper {
                 align-self: flex-start;
                 justify-content: flex-start;
-                margin-top: 2rem;
+                margin-top: 1rem;
                 margin-left: 0;
-                translate: 0 -.5rem;
+                translate: 0 -.75rem;
             }
 
             .section.is--tracker .svg-7,
             .section.is--tracker .svg-8 {
-                width: 5rem;
+                width: 4.5rem;
+                opacity: .82;
+                filter: grayscale(1) brightness(.68);
             }
 
             .section.is--tracker .wait-message {
@@ -145,6 +233,34 @@ function applyBrandAccent() {
         }
     `;
     document.head.appendChild(accentOverrides);
+}
+
+function enhanceBarcelonaDateCard() {
+    document.querySelectorAll('.text-wrapper-date').forEach(dateWrapper => {
+        if (dateWrapper.classList.contains('is--date-card')) return;
+
+        const dateParagraphs = dateWrapper.querySelectorAll(':scope > .paragraph');
+        const dateParagraph = dateParagraphs[1];
+
+        if (dateParagraph) {
+            const dateLabel = 'Du 15.05 au 17.05';
+            dateParagraph.textContent = dateLabel;
+            dateParagraph.setAttribute('aria-label', dateLabel);
+        }
+
+        const calendarIcon = document.createElement('span');
+        calendarIcon.className = 'barcelona-date-card__calendar';
+        calendarIcon.setAttribute('aria-hidden', 'true');
+        calendarIcon.innerHTML = `
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M7 3V6M17 3V6M4.5 9H19.5M6 5H18C19.1046 5 20 5.89543 20 7V19C20 20.1046 19.1046 21 18 21H6C4.89543 21 4 20.1046 4 19V7C4 5.89543 4.89543 5 6 5Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M8 13H10M14 13H16M8 17H10M14 17H16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+        `;
+
+        dateWrapper.prepend(calendarIcon);
+        dateWrapper.classList.add('is--date-card');
+    });
 }
 
 
@@ -1073,12 +1189,22 @@ function initTreeDiagram() {
         top: "15rem"
     })
 
+    mm.add("(min-width: 48rem)", () => {
+        gsap.set(".text-wrapper-date", {
+            top: "13.5rem"
+        })
+    })
+
     gsap.set(".text-wrapper-barca .lineInner", {
         yPercent: 100,
     })
 
     gsap.set(".text-wrapper-date .lineInner", {
         yPercent: 100,
+    })
+
+    gsap.set(".text-wrapper-date.is--date-card", {
+        autoAlpha: 0,
     })
 
     gsap.set(".text-wrapper-spotify .lineInner", {
@@ -3217,6 +3343,12 @@ function initTreeDiagram() {
                     yPercent: 0,
                 })
 
+                gsap.to(".text-wrapper-date.is--date-card", {
+                    autoAlpha: 1,
+                    duration: .45,
+                    ease: "power1.out",
+                })
+
                 gsap.to(".barca-video-wrapper", {
                     autoAlpha: 1,
                     duration: 1,
@@ -3235,6 +3367,12 @@ function initTreeDiagram() {
 
                 gsap.to(".text-wrapper-barca .lineInner, .text-wrapper-date .lineInner", {
                     yPercent: 100,
+                })
+
+                gsap.to(".text-wrapper-date.is--date-card", {
+                    autoAlpha: 0,
+                    duration: .3,
+                    ease: "power1.out",
                 })
 
                 gsap.to(".barca-video-wrapper", {
@@ -4362,6 +4500,11 @@ function createMapTimeline() {
             gsap.to(".text-wrapper-barca .lineInner, .text-wrapper-date .lineInner", {
                 yPercent: 0,
             })
+            gsap.to(".text-wrapper-date.is--date-card", {
+                autoAlpha: 1,
+                duration: .45,
+                ease: "power1.out",
+            })
             gsap.to(".dot-normal:not(.gebs), .dot-video:not(.gebs)", {
                 autoAlpha: 0,
                 duration: .5,
@@ -4383,6 +4526,12 @@ function createMapTimeline() {
 
             gsap.to(".text-wrapper-barca .lineInner, .text-wrapper-date .lineInner", {
                 yPercent: -100,
+            })
+
+            gsap.to(".text-wrapper-date.is--date-card", {
+                autoAlpha: 0,
+                duration: .3,
+                ease: "power1.out",
             })
 
             gsap.to(".dot-normal:not(.gebs), .dot-video:not(.gebs)", {
@@ -6005,6 +6154,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.body.removeAttribute('data-preload');
 
     document.fonts.ready.then(() => {
+        enhanceBarcelonaDateCard();
         initSplit();
         mm = gsap.matchMedia();
         mm.add("(min-width: 768px)", () => {
