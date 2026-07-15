@@ -2053,11 +2053,15 @@ function initTreeDiagram() {
 
 
 
-        // Calculate how much to move (total width minus viewport width)
-        // const scrollDistance = totalPanelsWidth - window.innerWidth;
-        // Add extra scroll distance (e.g., 30vw) to see more of the last panel
-
-        const scrollDistance = Math.max(0, totalPanelsWidth - (window.innerWidth * 1.3));
+        // Finish with the final week aligned on the left, matching the former
+        // week 5 hand-off. Measuring its real position avoids timing drift when
+        // panels are added or removed.
+        const lastScrollingPanel = scrollingPanels[scrollingPanels.length - 1];
+        const containerRect = containerEl.getBoundingClientRect();
+        const lastPanelRect = lastScrollingPanel.getBoundingClientRect();
+        const lastPanelInitialLeft = lastPanelRect.left - containerRect.left;
+        const lastPanelTargetLeft = window.innerWidth * 0.05;
+        const scrollDistance = Math.max(0, lastPanelInitialLeft - lastPanelTargetLeft);
 
 
         document.querySelectorAll('[data-target]').forEach(el => {
@@ -2078,9 +2082,9 @@ function initTreeDiagram() {
 
         treeTlOne
             .addLabel("horizontalStart")
-            // Start the hand-off during the final moments of the horizontal
-            // movement. This stays independent from the number of weeks.
-            .addLabel("timelineExit", "horizontalStart+=38")
+            // Start the hand-off only after the horizontal movement has placed
+            // the final week on the left side of the viewport.
+            .addLabel("timelineExit", "horizontalStart+=40")
             // First, create the white progress line before the animation starts
             .to({}, {
                 duration: 0.001,
