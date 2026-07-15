@@ -211,7 +211,7 @@ function applyBrandAccent() {
             }
 
             .section.is--timeline .stats-container.is--schedule-replacement .stats-wrapper {
-                padding: 1rem 1rem 2rem 1.5rem;
+                padding: .75rem 1rem 1rem;
             }
 
             .section.is--timeline .stats-container.is--schedule-replacement .structure-container {
@@ -227,7 +227,7 @@ function applyBrandAccent() {
             }
 
             .section.is--timeline .stats-container.is--schedule-replacement .structure-title {
-                font-size: .74rem;
+                font-size: .7rem;
                 line-height: 1.1;
             }
 
@@ -275,6 +275,16 @@ function applyBrandAccent() {
 
             .container.is--map .map-wrapper.is--barcelona-focus::after {
                 opacity: 1;
+            }
+
+            .section.is--map .click-me,
+            .section.is--map .text-wrapper-spotify {
+                display: none !important;
+            }
+
+            .section.is--map .dot-video {
+                pointer-events: none !important;
+                cursor: default !important;
             }
 
             .section.is--tracker .tracker-header .tracker-wrapper-mobile > :first-child,
@@ -410,8 +420,42 @@ function replaceMobileStatsWithSchedule() {
 
     if (!statsContainer || !statsInner || !schedule) return;
 
+    const mobileScheduleTitles = [
+        'Lundi à jeudi : Cours + exercice',
+        'Vendredi : Méditation guidée',
+        'Dimanche : Purgatoire (1 à 2h)',
+    ];
+
+    schedule.querySelectorAll(':scope > .structure-wrapper').forEach((scheduleRow, index) => {
+        const title = scheduleRow.querySelector('.structure-title');
+        const description = scheduleRow.querySelector('.structure-text');
+        const mobileTitle = mobileScheduleTitles[index];
+
+        if (title && mobileTitle) {
+            title.textContent = mobileTitle;
+            title.setAttribute('aria-label', mobileTitle);
+        }
+
+        description?.remove();
+    });
+
     statsInner.replaceWith(schedule);
     statsContainer.classList.add('is--schedule-replacement');
+}
+
+function updateWeekFourFridayLabel() {
+    const weekFourModules = document.querySelectorAll(
+        '.section.is--timeline .timeline-panel.is--8 .module-container .text-block-4'
+    );
+    const fridayModule = Array.from(weekFourModules).find(module =>
+        module.textContent.trim().toLocaleLowerCase('fr').startsWith('vendredi')
+    );
+
+    if (!fridayModule) return;
+
+    const fridayLabel = 'Vendredi – Conclusion';
+    fridayModule.textContent = fridayLabel;
+    fridayModule.setAttribute('aria-label', fridayLabel);
 }
 
 
@@ -4491,100 +4535,13 @@ function createMapTimeline() {
             autoAlpha: 0,
             duration: 3,
         }, "mapDrawStart")
-        .from(".click-me", {
-            autoAlpha: 0,
-            // onStart: function () {
-            //     gsap.to(".section.is--map .map-container", {
-            //         scale: 2,
-            //         duration: 3,
-            //     })
-            // },
-            // onReverseComplete: function () {
-            //     gsap.to(".section.is--map .map-container", {
-            //         scale: 1.8,
-            //         duration: 2,
-            //         ease: "power1.out",
-            //     })
-            // }
+        .set(".click-me, .text-wrapper-spotify", {
+            display: "none",
         }, "mapDrawStart")
-
-        //SPOTIFY
-        .to(".click-me", {
-            autoAlpha: 0,
-            onComplete: function () {
-                gsap.set(".map-container .dot-video", {
-                    pointerEvents: "none",
-                })
-
-                //interrupt the dot-video animation
-                gsap.killTweensOf(".map-container .dot-video .dot-bg");
-                gsap.set(".map-container .dot-video .dot-bg", {
-                    autoAlpha: 0,
-                })
-            },
-            onReverseComplete: function () {
-                gsap.fromTo(".map-container .dot-video .dot-bg", {
-                    scale: 0,
-                    autoAlpha: 1,
-                }, {
-                    scale: 1.3,
-                    autoAlpha: 0,
-                    duration: 1,
-                    repeat: -1,
-                    ease: "power1.inOut"
-                })
-            }
-        }, "mapDrawComplete")
-        .to(".text-wrapper-spotify .lower-wrapper > *, .text-wrapper-spotify .lower-wrapper", {
-            autoAlpha: 1,
-            duration: 1,
-            ease: "power2.out",
-
-            onStart: function () {
-                gsap.to(".text-wrapper-map .lineInner", {
-                    yPercent: -100,
-                })
-                gsap.to(".text-wrapper-spotify .lineInner", {
-                    yPercent: 0,
-                })
-            },
-            onReverseComplete: function () {
-                gsap.to(".text-wrapper-map .lineInner", {
-                    yPercent: 0,
-                })
-                gsap.to(".text-wrapper-spotify .lineInner", {
-                    yPercent: 100,
-                })
-                gsap.set(".map-container .dot-video", {
-                    pointerEvents: "auto",
-                })
-            }
-        }, "mapDrawComplete")
-
-        .to(".img-spotify:not(.is--first)", {
-            autoAlpha: 1,
-            duration: 0.3,
-            stagger: 0.5,
-            ease: "linear",
-
-        }, "<")
-        // Add number counter and color animation
-        .to({}, {
-            duration: 6,
-            onUpdate: function () {
-                const progress = this.progress();
-                // console.log("progress:", progress);
-                const spotifyNumber = document.querySelector('.spotify-number');
-
-                if (spotifyNumber) {
-                    // Use the pre-captured target value
-                    const currentValue = Math.round(spotifyTarget * progress);
-                    spotifyNumber.textContent = currentValue;
-
-                    spotifyNumber.style.color = gsap.utils.interpolate("white", ACCENT_COLOR, progress);
-                }
-            }
-        }, "<")
+        .set(".map-container .dot-video", {
+            pointerEvents: "none",
+            cursor: "default",
+        }, "mapDrawStart")
 
 
     gsap.set(".map-container", {
@@ -4596,37 +4553,7 @@ function createMapTimeline() {
         scale: 2.6,
         duration: 3,
         ease: "power1.out",
-        onStart: function () {
-            gsap.to(".text-wrapper-spotify .lineInner", {
-                yPercent: -100,
-            })
-
-            gsap.to(".text-wrapper-spotify .lower-wrapper > *, .text-wrapper-spotify .lower-wrapper", {
-                autoAlpha: 0,
-            })
-
-
-
-        },
-
-        onReverseComplete: function () {
-            gsap.to(".text-wrapper-spotify .lineInner", {
-                yPercent: 0,
-            })
-
-            gsap.to(".text-wrapper-spotify .lower-wrapper > *, .text-wrapper-spotify .lower-wrapper", {
-                autoAlpha: 1,
-            })
-
-
-        }
-    }, "-=3")
-        .to(".click-me", {
-            autoAlpha: 0,
-            onReverseComplete: function () {
-
-            }
-        }, "<")
+    }, ">")
     // .to(".map-container mask rect", {
     //     xPercent: -10,
     //     yPercent: 25,
@@ -4659,9 +4586,9 @@ function createMapTimeline() {
             console.log("start")
             document.querySelector('.container.is--map .map-wrapper')
                 ?.classList.add('is--barcelona-focus');
-            // gsap.to(".text-wrapper-map .lineInner", {
-            //     yPercent: -100,
-            // })
+            gsap.to(".text-wrapper-map .lineInner", {
+                yPercent: -100,
+            })
             gsap.to(".text-wrapper-barca .lineInner, .text-wrapper-date .lineInner", {
                 yPercent: 0,
             })
@@ -4687,9 +4614,9 @@ function createMapTimeline() {
         onReverseComplete: function () {
             document.querySelector('.container.is--map .map-wrapper')
                 ?.classList.remove('is--barcelona-focus');
-            // gsap.to(".text-wrapper-map .lineInner", {
-            //     yPercent: 0,
-            // })
+            gsap.to(".text-wrapper-map .lineInner", {
+                yPercent: 0,
+            })
 
             gsap.to(".text-wrapper-barca .lineInner, .text-wrapper-date .lineInner", {
                 yPercent: -100,
@@ -4849,7 +4776,20 @@ function initVideoMap() {
         }
     });
 
+    const mobileMapVideosDisabled = window.matchMedia('(max-width: 47.99rem)').matches;
+
     document.querySelectorAll('.dot-video').forEach(dot => {
+        if (mobileMapVideosDisabled) {
+            dot.removeAttribute('data-video');
+            dot.setAttribute('aria-disabled', 'true');
+            dot.setAttribute('tabindex', '-1');
+            gsap.set(dot, {
+                cursor: "default",
+                pointerEvents: "none",
+            });
+            return;
+        }
+
         gsap.set(dot, {
             cursor: "pointer",
             pointerEvents: "auto",
@@ -6324,6 +6264,7 @@ document.addEventListener("DOMContentLoaded", () => {
         enhanceBarcelonaDateCard();
         rewriteMobileTrackerIntro();
         replaceMobileStatsWithSchedule();
+        updateWeekFourFridayLabel();
         initSplit();
         mm = gsap.matchMedia();
         mm.add("(min-width: 768px)", () => {
