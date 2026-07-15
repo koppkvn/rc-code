@@ -59,6 +59,13 @@ function applyBrandAccent() {
 
         .niveaux {
             align-items: center !important;
+            justify-content: flex-end !important;
+            left: auto !important;
+            right: .5rem !important;
+            width: auto !important;
+            text-align: right;
+            white-space: nowrap;
+            translate: 0 .45rem;
         }
 
         .niveaux .level {
@@ -500,17 +507,21 @@ function animateXpBar(xpBar, targetPercent) {
 
         gsap.to(xpBar.fill, {
             scaleX: targetPercent / 100,
-            duration: .22,
+            duration: .6,
             ease: 'power2.out',
             overwrite: 'auto',
             onComplete: () => {
                 xpBar.track.classList.remove('is-charging');
-                gsap.fromTo(xpBar.container,
-                    { scale: 1 },
-                    { scale: 1.035, duration: .12, repeat: 1, yoyo: true, ease: 'power2.out' }
-                );
                 resolve();
             }
+        });
+
+        gsap.to(xpBar.container, {
+            keyframes: [
+                { scale: 1.012, duration: .3, ease: 'sine.out' },
+                { scale: 1, duration: .3, ease: 'sine.inOut' }
+            ],
+            overwrite: 'auto'
         });
     });
 }
@@ -558,12 +569,28 @@ function initTrackerCheckboxes() {
     let completedSteps = 0;
     let xpResetStarted = false;
 
-    // Prepare a fixed square box so the number scales around its true center.
+    // Match the habit-label typography and keep the number separate so the
+    // level-up can still replace only 4 with 5.
+    const levelContainer = document.querySelector('.niveaux');
     const levelElement = document.querySelector('.niveaux .level');
-    if (levelElement) {
+    const habitLabel = document.querySelector('.tracker-row .day.is--first');
+
+    if (levelContainer && levelElement) {
+        Array.from(levelContainer.childNodes)
+            .filter(node => node.nodeType === Node.TEXT_NODE)
+            .forEach(node => node.remove());
+        levelContainer.insertBefore(document.createTextNode('Nive.'), levelElement);
+
+        if (habitLabel) {
+            const habitLabelStyle = window.getComputedStyle(habitLabel);
+            levelContainer.style.fontSize = habitLabelStyle.fontSize;
+            levelContainer.style.lineHeight = habitLabelStyle.lineHeight;
+            levelElement.style.fontSize = 'inherit';
+        }
+
         const computedStyle = window.getComputedStyle(levelElement);
         const fontSize = parseFloat(computedStyle.fontSize);
-        const levelBoxSize = Math.max(20, Math.ceil(fontSize));
+        const levelBoxSize = Math.max(14, Math.ceil(fontSize * 1.1));
 
         gsap.set(levelElement, {
             transformOrigin: "50% 50%",
