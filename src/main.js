@@ -177,6 +177,113 @@ function applyBrandAccent() {
                 font-size: 2.3rem;
             }
 
+            .big-title-section.is--timeline {
+                max-width: none;
+                font-size: clamp(1.5rem, 6.6vw, 1.65rem);
+                line-height: .95;
+                white-space: nowrap;
+            }
+
+            .section.is--timeline .timeline-panel.is--1 {
+                padding-bottom: .5rem;
+            }
+
+            .section.is--timeline .timeline-panel.is--2.is--fixed {
+                padding-top: 0;
+            }
+
+            .section.is--timeline .timeline-panel.is--2 .div-block-3 {
+                gap: .4rem;
+                margin-bottom: 0;
+            }
+
+            .section.is--timeline .timeline-panel.is--2 .div-block-3 > .text-block-4:first-child,
+            .section.is--timeline .timeline-panel.is--2 .big-title-section.is--timeline.materiel.is--mobile {
+                display: none !important;
+            }
+
+            .section.is--timeline .timeline-panel.is--2 .gif-container.is--mobile {
+                margin-top: 0;
+            }
+
+            .section.is--timeline .timeline-panel.is--2 .lower-block {
+                margin-top: .25rem;
+            }
+
+            .section.is--timeline .stats-container.is--schedule-replacement .stats-wrapper {
+                padding: 1rem 1rem 2rem 1.5rem;
+            }
+
+            .section.is--timeline .stats-container.is--schedule-replacement .structure-container {
+                gap: .3rem;
+                width: 100%;
+                max-width: none;
+            }
+
+            .section.is--timeline .stats-container.is--schedule-replacement .structure-wrapper {
+                gap: .2rem;
+                width: 100%;
+                padding-bottom: .4rem;
+            }
+
+            .section.is--timeline .stats-container.is--schedule-replacement .structure-title {
+                font-size: .74rem;
+                line-height: 1.1;
+            }
+
+            .section.is--timeline .stats-container.is--schedule-replacement .structure-text {
+                width: 100%;
+                font-size: .6rem;
+                line-height: 1.25;
+            }
+
+            .container.is--map .map-wrapper::after {
+                content: "";
+                position: absolute;
+                z-index: 30;
+                top: 0;
+                right: 0;
+                left: 0;
+                height: 68%;
+                pointer-events: none;
+                opacity: 0;
+                background: linear-gradient(
+                    to bottom,
+                    rgba(13, 13, 13, .78) 0%,
+                    rgba(13, 13, 13, .58) 36%,
+                    rgba(13, 13, 13, .24) 68%,
+                    rgba(13, 13, 13, 0) 100%
+                );
+                -webkit-backdrop-filter: blur(14px);
+                backdrop-filter: blur(14px);
+                -webkit-mask-image: linear-gradient(
+                    to bottom,
+                    #000 0%,
+                    #000 28%,
+                    rgba(0, 0, 0, .72) 58%,
+                    transparent 100%
+                );
+                mask-image: linear-gradient(
+                    to bottom,
+                    #000 0%,
+                    #000 28%,
+                    rgba(0, 0, 0, .72) 58%,
+                    transparent 100%
+                );
+                transition: opacity .75s ease-out;
+            }
+
+            .container.is--map .map-wrapper.is--barcelona-focus::after {
+                opacity: 1;
+            }
+
+            .section.is--tracker .tracker-header .tracker-wrapper-mobile > :first-child,
+            .section.is--tracker .tracker-row .tracker-wrapper-mobile > :first-child {
+                visibility: hidden !important;
+                opacity: 0 !important;
+                pointer-events: none !important;
+            }
+
             .tracker-row.is--mobile-hidden {
                 display: none !important;
             }
@@ -205,12 +312,13 @@ function applyBrandAccent() {
             .section.is--tracker .svg-7,
             .section.is--tracker .svg-8 {
                 width: 4.5rem;
-                opacity: .82;
-                filter: grayscale(1) brightness(.68);
+                opacity: 1;
+                filter: none;
             }
 
             .section.is--tracker .wait-message {
                 translate: 0 -1.25rem;
+                padding-bottom: 1.5rem;
             }
         }
 
@@ -248,7 +356,14 @@ function enhanceBarcelonaDateCard() {
         if (dateWrapper.classList.contains('is--date-card')) return;
 
         const dateParagraphs = dateWrapper.querySelectorAll(':scope > .paragraph');
+        const titleParagraph = dateParagraphs[0];
         const dateParagraph = dateParagraphs[1];
+
+        if (titleParagraph) {
+            const eventTitle = 'Barcelone 2027';
+            titleParagraph.textContent = eventTitle;
+            titleParagraph.setAttribute('aria-label', eventTitle);
+        }
 
         if (dateParagraph) {
             const dateLabel = 'Du 15.05 au 17.05';
@@ -283,6 +398,20 @@ function rewriteMobileTrackerIntro() {
     const mobileIntro = 'Renforce la structure de tes journées avec un tracker où streaks, bonus et classements te maintiennent engagé.';
     trackerIntro.textContent = mobileIntro;
     trackerIntro.setAttribute('aria-label', mobileIntro);
+}
+
+function replaceMobileStatsWithSchedule() {
+    if (!window.matchMedia('(max-width: 47.99rem)').matches) return;
+
+    const weekFourPanel = document.querySelector('.section.is--timeline .timeline-panel.is--4.is--fixed');
+    const statsContainer = weekFourPanel?.querySelector('.stats-container');
+    const statsInner = statsContainer?.querySelector('.stats-inner');
+    const schedule = weekFourPanel?.querySelector('.structure-container');
+
+    if (!statsContainer || !statsInner || !schedule) return;
+
+    statsInner.replaceWith(schedule);
+    statsContainer.classList.add('is--schedule-replacement');
 }
 
 
@@ -362,7 +491,7 @@ function initIntro() {
     });
 
     const durationPerBar = 1 / bars.length;
-    bars.forEach((bar, index) => {
+    const barTimings = bars.map((bar, index) => {
         const isLastSeven = index >= bars.length - 7;
         const duration = isLastSeven ? durationPerBar * 7 : durationPerBar;
         const delay = index === 0 ? 0 :
@@ -370,6 +499,10 @@ function initIntro() {
                 index * durationPerBar :
                 (bars.length - 7) * durationPerBar + (index - (bars.length - 7)) * durationPerBar * 7;
 
+        return { bar, duration, delay };
+    });
+
+    barTimings.forEach(({ bar, duration, delay }) => {
         barsTl.to(bar, {
             autoAlpha: 1,
             scaleY: 1,
@@ -378,15 +511,23 @@ function initIntro() {
         }, delay);
     });
 
+    const fourthBarFromEnd = barTimings[barTimings.length - 4];
+    const secondBarFromEnd = barTimings[barTimings.length - 2];
+    const titleRevealStart = fourthBarFromEnd?.delay ?? Math.max(0, barsTl.duration() - 1);
+    const titleRevealEnd = secondBarFromEnd
+        ? secondBarFromEnd.delay + secondBarFromEnd.duration
+        : titleRevealStart + 1;
+    const titleRevealDuration = Math.max(.01, titleRevealEnd - titleRevealStart);
+
     barsTl
         .to(".title-intro", {
 
             opacity: 1,
             filter: "blur(0px)",
-            duration: 1,
+            duration: titleRevealDuration,
             stagger: 0.1,
             ease: "easeOutQuart",
-        }, "-=.2")
+        }, titleRevealStart)
         .to({}, {
             onStart: function () {
                 flashAndScrambleTl.play(0);
@@ -4516,6 +4657,8 @@ function createMapTimeline() {
     mapTl.to({}, {
         onStart: function () {
             console.log("start")
+            document.querySelector('.container.is--map .map-wrapper')
+                ?.classList.add('is--barcelona-focus');
             // gsap.to(".text-wrapper-map .lineInner", {
             //     yPercent: -100,
             // })
@@ -4542,6 +4685,8 @@ function createMapTimeline() {
             })
         },
         onReverseComplete: function () {
+            document.querySelector('.container.is--map .map-wrapper')
+                ?.classList.remove('is--barcelona-focus');
             // gsap.to(".text-wrapper-map .lineInner", {
             //     yPercent: 0,
             // })
@@ -5432,7 +5577,7 @@ function initHeroAnimation() {
                 // Wait for the video to actually start playing, then fade it in
                 bgVideo.addEventListener('playing', () => {
                     gsap.to(bgVideo, {
-                        opacity: 0.6,
+                        opacity: 0.45,
                         duration: 0.5,
                         ease: "easeOutQuart"
                     });
@@ -6178,6 +6323,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.fonts.ready.then(() => {
         enhanceBarcelonaDateCard();
         rewriteMobileTrackerIntro();
+        replaceMobileStatsWithSchedule();
         initSplit();
         mm = gsap.matchMedia();
         mm.add("(min-width: 768px)", () => {
