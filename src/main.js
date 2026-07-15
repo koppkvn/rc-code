@@ -32,9 +32,9 @@ function applyBrandAccent() {
                 rgba(173, 173, 173, .48) 63%,
                 rgba(173, 173, 173, .48) 100%
             );
-            background-size: 260% 100%;
-            background-position: 150% 0;
-            animation: gold-wait-sweep 2.8s cubic-bezier(.55, 0, .25, 1) infinite;
+            background-size: 300% 100%;
+            background-position: 125% 0;
+            animation: gold-wait-sweep 2.8s linear infinite;
             filter: drop-shadow(0 0 .16rem rgba(210, 170, 98, .24));
         }
 
@@ -79,12 +79,12 @@ function applyBrandAccent() {
         }
 
         @keyframes gold-wait-sweep {
-            0%, 12% {
-                background-position: 150% 0;
+            0% {
+                background-position: 125% 0;
             }
 
-            72%, 100% {
-                background-position: -150% 0;
+            100% {
+                background-position: -125% 0;
             }
         }
 
