@@ -340,6 +340,11 @@ function applyBrandAccent() {
                 width: min(100%, 22rem);
             }
 
+            html.is--terminal-offers-locked,
+            body.is--terminal-offers-locked {
+                overscroll-behavior: none;
+            }
+
             .section.is--tracker .tracker-header .tracker-wrapper-mobile > :first-child,
             .section.is--tracker .tracker-row .tracker-wrapper-mobile > :first-child {
                 visibility: hidden !important;
@@ -4658,6 +4663,7 @@ function createMapTimeline() {
     });
 
     mapTl.to({}, {
+        duration: .3,
         onStart: function () {
             console.log("start")
             document.querySelector('.container.is--map .map-wrapper')
@@ -4715,7 +4721,7 @@ function createMapTimeline() {
         }
     }, "<+=2")
     mapTl.to({}, {
-        duration: 1
+        duration: .3
     },)
 }
 
@@ -4937,10 +4943,38 @@ function initVideoMap() {
 let hasCreatedTriggers = false;
 let offersSnapTrigger = null;
 let offersSnapInProgress = false;
+let mobileTerminalOffersLocked = false;
+
+function preventMobileTerminalScroll(event) {
+    if (!mobileTerminalOffersLocked) return;
+    event.preventDefault();
+}
+
+function preventMobileTerminalKeyboardScroll(event) {
+    if (!mobileTerminalOffersLocked) return;
+
+    const scrollKeys = ['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', 'Home', 'End', ' '];
+    if (scrollKeys.includes(event.key)) {
+        event.preventDefault();
+    }
+}
+
+function lockMobileTerminalOffers() {
+    if (mobileTerminalOffersLocked) return;
+
+    mobileTerminalOffersLocked = true;
+    document.documentElement.classList.add('is--terminal-offers-locked');
+    document.body.classList.add('is--terminal-offers-locked');
+    window.addEventListener('wheel', preventMobileTerminalScroll, { passive: false });
+    window.addEventListener('touchmove', preventMobileTerminalScroll, { passive: false });
+    window.addEventListener('keydown', preventMobileTerminalKeyboardScroll, { passive: false });
+}
 
 function initTerminalOffers() {
+    const isMobile = window.matchMedia('(max-width: 47.99rem)').matches;
     const offersSection = document.querySelector('.section.is--fields');
     const offersTitle = offersSection?.querySelector('.h2-fields');
+    const offersContent = offersSection?.querySelector('.container.is--fields');
     const faqSection = document.querySelector('.section.is--faq');
     const footerSection = document.querySelector('.section.is--footerlast');
 
@@ -4950,6 +4984,14 @@ function initTerminalOffers() {
     offersTitle.textContent = offersQuestion;
     offersTitle.setAttribute('aria-label', offersQuestion);
     offersSection.classList.add('is--terminal-offers');
+
+    if (isMobile && offersContent) {
+        gsap.set(offersContent, {
+            autoAlpha: 0,
+            yPercent: 24,
+            willChange: 'transform, opacity',
+        });
+    }
 
     [faqSection, footerSection].forEach(section => {
         if (!section) return;
@@ -4966,13 +5008,33 @@ function initTerminalOffers() {
             if (offersSnapInProgress || !window.lenis) return;
 
             offersSnapInProgress = true;
+
+            if (isMobile) {
+                lockMobileTerminalOffers();
+                if (offersContent) {
+                    gsap.to(offersContent, {
+                        autoAlpha: 1,
+                        yPercent: 0,
+                        duration: .9,
+                        ease: 'power3.out',
+                        overwrite: true,
+                        onComplete: () => {
+                            gsap.set(offersContent, { clearProps: 'willChange' });
+                        },
+                    });
+                }
+            }
+
             window.lenis.scrollTo(offersSection, {
-                duration: 1.15,
+                duration: .9,
                 immediate: false,
                 lock: true,
                 force: true,
                 onComplete: () => {
                     offersSnapInProgress = false;
+                    if (isMobile) {
+                        window.lenis.stop();
+                    }
                 },
             });
         },
