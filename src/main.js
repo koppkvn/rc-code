@@ -4276,6 +4276,26 @@ let hasCreatedTriggers = false;
 function initFormAnimaton() {
     if (hasCreatedTriggers) return;
     hasCreatedTriggers = true;
+
+    // The old application-intro section is hidden in Webflow. Its checkbox
+    // gate used to hide every section that follows, making it impossible to
+    // leave "Les rassemblements". Skip that obsolete step and continue
+    // directly to the real application section.
+    gsap.set(".section.is--form", {
+        display: "none",
+    });
+
+    gsap.set(".section.is--fields, .section.is--achat, .section.is--faq, .section.is--footerlast", {
+        display: "block",
+    });
+
+    requestAnimationFrame(() => {
+        ScrollTrigger.refresh();
+        initAccordionCSS();
+    });
+
+    return;
+
     gsap.set(".section.is--fields, .section.is--achat, .section.is--faq, .section.is--footerlast", {
         display: "none",
     })
