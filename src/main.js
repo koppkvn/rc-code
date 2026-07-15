@@ -78,6 +78,10 @@ function applyBrandAccent() {
             transform-origin: 50% 50% !important;
         }
 
+        .tracker-wrapper > :not(.iphone-wrapper):not(.niveaux) {
+            translate: 0 -.75rem;
+        }
+
         @keyframes gold-wait-sweep {
             0% {
                 background-position: 125% 0;
@@ -508,7 +512,7 @@ function animateXpBar(xpBar, targetPercent) {
         gsap.to(xpBar.fill, {
             scaleX: targetPercent / 100,
             duration: .6,
-            ease: 'power2.out',
+            ease: 'power2.inOut',
             overwrite: 'auto',
             onComplete: () => {
                 xpBar.track.classList.remove('is-charging');
@@ -518,8 +522,8 @@ function animateXpBar(xpBar, targetPercent) {
 
         gsap.to(xpBar.container, {
             keyframes: [
-                { scale: 1.012, duration: .3, ease: 'sine.out' },
-                { scale: 1, duration: .3, ease: 'sine.inOut' }
+                { scale: 1.012, duration: .3, ease: 'power2.in' },
+                { scale: 1, duration: .3, ease: 'power2.out' }
             ],
             overwrite: 'auto'
         });
@@ -579,7 +583,7 @@ function initTrackerCheckboxes() {
         Array.from(levelContainer.childNodes)
             .filter(node => node.nodeType === Node.TEXT_NODE)
             .forEach(node => node.remove());
-        levelContainer.insertBefore(document.createTextNode('Nive.'), levelElement);
+        levelContainer.insertBefore(document.createTextNode('NIV.'), levelElement);
 
         if (habitLabel) {
             const habitLabelStyle = window.getComputedStyle(habitLabel);
