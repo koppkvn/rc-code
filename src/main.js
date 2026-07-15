@@ -263,6 +263,20 @@ function enhanceBarcelonaDateCard() {
     });
 }
 
+function rewriteMobileTrackerIntro() {
+    if (!window.matchMedia('(max-width: 47.99rem)').matches) return;
+
+    const trackerIntro = document.querySelector(
+        '.section.is--tracker .wrapper-p .text-section'
+    ) || document.querySelector('.section.is--tracker .text-section');
+
+    if (!trackerIntro) return;
+
+    const mobileIntro = 'Renforce la structure de tes journées avec un tracker où streaks, bonus et classements te maintiennent engagé.';
+    trackerIntro.textContent = mobileIntro;
+    trackerIntro.setAttribute('aria-label', mobileIntro);
+}
+
 
 function initLenis() {
     window.lenis = new Lenis();
@@ -6155,6 +6169,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.fonts.ready.then(() => {
         enhanceBarcelonaDateCard();
+        rewriteMobileTrackerIntro();
         initSplit();
         mm = gsap.matchMedia();
         mm.add("(min-width: 768px)", () => {
