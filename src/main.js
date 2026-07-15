@@ -2012,7 +2012,9 @@ function initTreeDiagram() {
         gsap.set(".timeline-panel.is--1", { marginLeft: "85vw" })
         gsap.set(".timeline-panel.is--3", { marginLeft: "0vw" })
 
-        gsap.set(".timeline-panel.is--1, .timeline-panel.is--3, .timeline-panel.is--5, .timeline-panel.is--6, .timeline-panel.is--7, .timeline-panel.is--8, .timeline-panel.is--9", { minWidth: "80vw", width: "80vw" })
+        // Size every scrolling panel dynamically so adding or removing a week
+        // keeps the horizontal distance and the exit transition in sync.
+        gsap.set(".timeline-panel:not(.is--fixed)", { minWidth: "80vw", width: "80vw" })
 
         // START HORIZONTAL TIMELINE
         // const containerWidth = document.querySelector(".timeline-container").offsetWidth;
