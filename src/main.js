@@ -2065,6 +2065,9 @@ function initTreeDiagram() {
 
         treeTlOne
             .addLabel("horizontalStart")
+            // Start the hand-off during the final moments of the horizontal
+            // movement. This stays independent from the number of weeks.
+            .addLabel("timelineExit", "horizontalStart+=38")
             // First, create the white progress line before the animation starts
             .to({}, {
                 duration: 0.001,
@@ -2283,7 +2286,7 @@ function initTreeDiagram() {
                         centerDot.style.backgroundColor = "#ffcc00";
                     }
                 }
-            })
+            }, "timelineExit")
             .to(".timeline-panel.is--fixed.is--2", {
                 autoAlpha: 1,
                 onStart: function () {
@@ -2654,7 +2657,7 @@ function initTreeDiagram() {
             }, "horizontalStart+=13.7")
             .to(".timeline-panel.is--fixed.is--4", {
                 autoAlpha: 0,
-            }, "horizontalStart+=38")
+            }, "timelineExit")
             .to(".map-svg path", {
                 drawSVG: "0% 100%", // or "0 100" depending on your preference
                 duration: 5,
@@ -2675,7 +2678,7 @@ function initTreeDiagram() {
                         ease: "power2.out"
                     },)
                 }
-            }, "-=0.5")
+            }, "timelineExit")
 
             .to(".tree-right-wrapper .dot-wrapper", {
                 autoAlpha: 0,
@@ -3250,7 +3253,9 @@ function initTreeDiagram() {
         // Separate trigger for the line animation
 
 
-        const lastTimelinePanel = gsap.utils.toArray(".section.is--timeline .timeline-panel").pop();
+        // Fixed overlay panels are not weeks. Anchor the mobile exit to the
+        // final scrolling panel so week 4 now owns the former week 5 hand-off.
+        const lastTimelinePanel = gsap.utils.toArray(".section.is--timeline .timeline-panel:not(.is--fixed)").pop();
         const timelineTl = gsap.timeline({
             scrollTrigger: {
                 trigger: lastTimelinePanel,
