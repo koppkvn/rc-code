@@ -21,33 +21,65 @@ function applyBrandAccent() {
 
         .wait-message-span.is--glow {
             background-image: linear-gradient(
-                to right,
-                rgba(173, 173, 173, 0.5),
-                rgba(176, 176, 176, 0.5) 40%,
-                rgba(210, 170, 98, 0.9) 49%,
-                rgba(210, 170, 98, 0.9) 51%,
-                rgba(176, 176, 176, 0.5) 60%,
-                rgba(173, 173, 173, 0.5)
+                105deg,
+                rgba(173, 173, 173, .48) 0%,
+                rgba(173, 173, 173, .48) 37%,
+                rgba(169, 121, 47, .9) 43%,
+                ${ACCENT_COLOR} 47%,
+                #f7e8bd 50%,
+                ${ACCENT_COLOR} 53%,
+                rgba(169, 121, 47, .9) 57%,
+                rgba(173, 173, 173, .48) 63%,
+                rgba(173, 173, 173, .48) 100%
             );
+            background-size: 260% 100%;
+            background-position: 150% 0;
+            animation: gold-wait-sweep 2.8s cubic-bezier(.55, 0, .25, 1) infinite;
+            filter: drop-shadow(0 0 .16rem rgba(210, 170, 98, .24));
         }
 
-        @keyframes level-glow-pulse {
-            0%, 100% {
-                text-shadow:
-                    0 0 10px rgba(210, 170, 98, 0.8),
-                    0 0 20px rgba(210, 170, 98, 0.6),
-                    0 0 30px rgba(210, 170, 98, 0.4),
-                    0 0 40px rgba(210, 170, 98, 0.2);
-                transform: scale(1);
+        .niveaux .level.is--gold-level {
+            color: ${ACCENT_COLOR} !important;
+            background-image: linear-gradient(
+                105deg,
+                #a97932 0%,
+                ${ACCENT_COLOR} 34%,
+                #f7e8bd 48%,
+                ${ACCENT_COLOR} 60%,
+                #a97932 100%
+            );
+            background-size: 240% 100%;
+            background-position: 120% 0;
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 .22rem rgba(210, 170, 98, .5));
+            animation: gold-level-shimmer 3.2s cubic-bezier(.55, 0, .25, 1) infinite;
+        }
+
+        @keyframes gold-wait-sweep {
+            0%, 12% {
+                background-position: 150% 0;
             }
 
-            50% {
-                text-shadow:
-                    0 0 20px rgba(210, 170, 98, 1),
-                    0 0 30px rgba(210, 170, 98, 0.8),
-                    0 0 40px rgba(210, 170, 98, 0.6),
-                    0 0 50px rgba(210, 170, 98, 0.4);
-                transform: scale(1.05);
+            72%, 100% {
+                background-position: -150% 0;
+            }
+        }
+
+        @keyframes gold-level-shimmer {
+            0%, 18% {
+                background-position: 120% 0;
+                filter: drop-shadow(0 0 .18rem rgba(210, 170, 98, .38));
+            }
+
+            58% {
+                filter: drop-shadow(0 0 .3rem rgba(247, 232, 189, .65));
+            }
+
+            82%, 100% {
+                background-position: -120% 0;
+                filter: drop-shadow(0 0 .18rem rgba(210, 170, 98, .38));
             }
         }
     `;
@@ -248,6 +280,12 @@ function initTrackerSection() {
         stagger: 0.03,
     })
 
+    tl.from(".container.is--tracker .tracker-pompes", {
+        autoAlpha: 0,
+        duration: 1,
+        ease: "easeOutQuart",
+    }, "<")
+
 
     tl.to(".container.is--tracker .tracker-row .tracker-row-line", {
         xPercent: 100,
@@ -352,9 +390,9 @@ function createTrackerXpBar() {
             .tracker-pompes.tracker-xp-shell {
                 display: flex !important;
                 align-items: stretch;
-                left: 0 !important;
-                right: 0 !important;
-                width: 100% !important;
+                left: .5rem !important;
+                right: .5rem !important;
+                width: calc(100% - 1rem) !important;
                 max-width: none !important;
                 height: auto !important;
             }
@@ -371,11 +409,23 @@ function createTrackerXpBar() {
             .tracker-xp-fill {
                 position: absolute;
                 inset: 0;
-                background: ${ACCENT_COLOR};
-                box-shadow: 0 0 .55rem rgba(210, 170, 98, .9);
+                background-image: linear-gradient(
+                    100deg,
+                    #a97932 0%,
+                    ${ACCENT_COLOR} 34%,
+                    #f7e8bd 48%,
+                    ${ACCENT_COLOR} 62%,
+                    #a97932 100%
+                );
+                background-size: 220% 100%;
+                background-position: 120% 0;
+                box-shadow:
+                    0 0 .25rem rgba(247, 232, 189, .55),
+                    0 0 .65rem rgba(210, 170, 98, .75);
                 transform: scaleX(0);
                 transform-origin: left center;
                 will-change: transform;
+                animation: tracker-gold-shimmer 2.1s linear infinite;
             }
 
             .tracker-xp-track.is-charging {
@@ -383,37 +433,21 @@ function createTrackerXpBar() {
                 box-shadow: 0 0 .85rem rgba(210, 170, 98, .45);
             }
 
-            .tracker-xp-track.is-receiving {
+            .tracker-xp-shell.is-complete .tracker-xp-track {
                 border-color: ${ACCENT_COLOR};
                 box-shadow:
-                    0 0 .55rem rgba(255, 255, 255, .7),
+                    0 0 .35rem rgba(247, 232, 189, .65),
                     0 0 1rem rgba(210, 170, 98, .8);
             }
 
-            .tracker-xp-shell.is-complete .tracker-xp-track {
-                border-color: ${ACCENT_COLOR};
-                box-shadow: 0 0 1rem rgba(210, 170, 98, .8);
-            }
+            @keyframes tracker-gold-shimmer {
+                0% {
+                    background-position: 120% 0;
+                }
 
-            .tracker-xp-particle-layer {
-                position: fixed;
-                inset: 0;
-                z-index: 60;
-                pointer-events: none;
-            }
-
-            .tracker-xp-particle {
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: .2rem;
-                height: .2rem;
-                border-radius: 50%;
-                background: ${ACCENT_COLOR};
-                box-shadow:
-                    0 0 .25rem rgba(255, 255, 255, .95),
-                    0 0 .6rem rgba(210, 170, 98, .95);
-                will-change: transform, opacity;
+                100% {
+                    background-position: -120% 0;
+                }
             }
         `;
         document.head.appendChild(style);
@@ -437,78 +471,6 @@ function createTrackerXpBar() {
         track: xpContainer.querySelector('.tracker-xp-track'),
         fill: xpContainer.querySelector('.tracker-xp-fill')
     };
-}
-
-function animateXpParticles(sourceElement, targetElement) {
-    return new Promise(resolve => {
-        if (!sourceElement || !targetElement || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-            resolve();
-            return;
-        }
-
-        const sourceRect = sourceElement.getBoundingClientRect();
-        const targetRect = targetElement.getBoundingClientRect();
-        const sourceX = sourceRect.left + sourceRect.width / 2;
-        const sourceY = sourceRect.top + sourceRect.height / 2;
-        const targetX = targetRect.left + targetRect.width / 2;
-        const targetY = targetRect.top + targetRect.height / 2;
-        const particleLayer = document.createElement('div');
-        const particleCount = 4;
-        const timeline = gsap.timeline({
-            onComplete: () => {
-                targetElement.classList.add('is-receiving');
-                gsap.delayedCall(.16, () => targetElement.classList.remove('is-receiving'));
-                particleLayer.remove();
-                resolve();
-            }
-        });
-
-        particleLayer.className = 'tracker-xp-particle-layer';
-        document.body.appendChild(particleLayer);
-
-        for (let index = 0; index < particleCount; index++) {
-            const particle = document.createElement('span');
-            const delay = index * .035;
-            const direction = index % 2 === 0 ? 1 : -1;
-            const arc = direction * (18 + index * 5);
-            const midpointX = sourceX + (targetX - sourceX) * .48;
-            const midpointY = sourceY + (targetY - sourceY) * .44 + arc;
-
-            particle.className = 'tracker-xp-particle';
-            particleLayer.appendChild(particle);
-
-            gsap.set(particle, {
-                x: sourceX + direction * 2,
-                y: sourceY + (index - 1.5) * 2,
-                opacity: 0,
-                scale: .65 + index * .12
-            });
-
-            timeline
-                .to(particle, {
-                    x: midpointX,
-                    y: midpointY,
-                    opacity: 1,
-                    scale: 1.15,
-                    duration: .28,
-                    ease: 'power2.out'
-                }, delay)
-                .to(particle, {
-                    x: targetX,
-                    y: targetY,
-                    opacity: 1,
-                    scale: .6,
-                    duration: .34,
-                    ease: 'power2.in'
-                }, delay + .25)
-                .to(particle, {
-                    opacity: 0,
-                    scale: .1,
-                    duration: .1,
-                    ease: 'power1.out'
-                }, delay + .59);
-        }
-    });
 }
 
 function animateXpBar(xpBar, targetPercent) {
@@ -577,7 +539,7 @@ function initTrackerCheckboxes() {
     const trackerButtons = document.querySelectorAll('.tracker-checkbox.is--button');
     const trackerSection = document.querySelector('.section.is--tracker');
     const xpBar = createTrackerXpBar();
-    let arrivedSteps = 0;
+    let completedSteps = 0;
     let xpResetStarted = false;
 
     // Prepare the level element early to prevent shift when animation starts
@@ -663,20 +625,15 @@ function initTrackerCheckboxes() {
                 );
             }
 
-            // Every click launches its own transfer immediately. Multiple particle
-            // groups can therefore travel at the same time when users click fast.
-            animateXpParticles(this, xpBar?.track)
-                .then(() => {
-                    arrivedSteps += 1;
-                    const targetPercent = Math.min(arrivedSteps * 25, 100);
+            completedSteps += 1;
+            const targetPercent = Math.min(completedSteps * 25, 100);
 
-                    return animateXpBar(xpBar, targetPercent)
-                        .then(() => {
-                            if (targetPercent === 100 && !xpResetStarted) {
-                                xpResetStarted = true;
-                                return resetCompletedXpBar(xpBar, trackerSection);
-                            }
-                        });
+            animateXpBar(xpBar, targetPercent)
+                .then(() => {
+                    if (targetPercent === 100 && !xpResetStarted) {
+                        xpResetStarted = true;
+                        return resetCompletedXpBar(xpBar, trackerSection);
+                    }
                 });
         });
     });
@@ -756,6 +713,7 @@ function initScrollLock() {
                     // Change text to "5" immediately when "4" completely disappears
                     levelElement.textContent = "5";
                     levelElement.style.color = ACCENT_COLOR;
+                    levelElement.classList.add('is--gold-level');
                     // Reset to starting state for "5" animation
                     gsap.set(levelElement, {
                         opacity: 0,
@@ -773,7 +731,7 @@ function initScrollLock() {
                         // Create spark system for the level element (firework burst effect)
                         levelSparkSystem = new SparkSystem({
                             color: ACCENT_COLOR,
-                            secondaryColor: "#ff8c00",
+                            secondaryColor: "#f7e8bd",
                             particleCount: 40,  // More particles for a big burst
                             minSize: 0.4,
                             maxSize: 1.2,
@@ -833,15 +791,8 @@ function initScrollLock() {
                     duration: 0.3,
                     ease: "power2.out",
                     onComplete: function () {
-                        // Remove brightness filter
+                        // Let the subtle branded gold shimmer remain after the level-up.
                         levelElement.style.filter = "";
-
-                        // Gradually transition color from yellow to white over 2 seconds (faster since firework is quick)
-                        gsap.to(levelElement, {
-                            color: "white",
-                            duration: 2,
-                            ease: "power2.out"
-                        });
                     }
                 });
         }
