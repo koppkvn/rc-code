@@ -1,6 +1,5 @@
 // import './styles/main.scss'
 import { ElectricBorder } from './electricBorder.js'
-import { SparkSystem } from './sparkSystem.js'
 
 const ACCENT_COLOR = "#D2AA62";
 
@@ -79,7 +78,13 @@ function applyBrandAccent() {
         }
 
         .tracker-wrapper > :not(.iphone-wrapper):not(.niveaux) {
-            translate: 0 -.75rem;
+            translate: 0 -1rem;
+        }
+
+        @media (max-width: 47.99rem) {
+            .tracker-row.is--mobile-hidden {
+                display: none !important;
+            }
         }
 
         @keyframes gold-wait-sweep {
@@ -429,6 +434,9 @@ function createTrackerXpBar() {
                 overflow: hidden;
                 border: 1px solid rgba(255, 255, 255, .35);
                 background: rgba(255, 255, 255, .08);
+                transition:
+                    border-color .4s ease-out,
+                    box-shadow .4s ease-out;
             }
 
             .tracker-xp-fill {
@@ -496,6 +504,73 @@ function createTrackerXpBar() {
         track: xpContainer.querySelector('.tracker-xp-track'),
         fill: xpContainer.querySelector('.tracker-xp-fill')
     };
+}
+
+function configureTrackerRows() {
+    const rows = document.querySelectorAll('.tracker-row');
+
+    rows.forEach(row => {
+        const label = row.querySelector('.day.is--first');
+        const normalizedLabel = label?.textContent.trim().toLocaleLowerCase('fr');
+
+        if (normalizedLabel === 'planifier le lendemain') {
+            row.classList.add('is--mobile-hidden');
+        }
+    });
+}
+
+function getActiveTrackerButtons() {
+    const isMobile = window.matchMedia('(max-width: 47.99rem)').matches;
+
+    return Array.from(document.querySelectorAll('.tracker-checkbox.is--button'))
+        .filter(button => {
+            const row = button.closest('.tracker-row');
+            return !isMobile || !row?.classList.contains('is--mobile-hidden');
+        });
+}
+
+function compactTrackerHighlight() {
+    const highlight = document.querySelector('.tracker-highlight');
+    const highlightedDay = document.querySelector('.tracker-header .day.the-day');
+    const highlightedCheckboxes = getActiveTrackerButtons();
+    const bottomCheckbox = highlightedCheckboxes[highlightedCheckboxes.length - 1];
+
+    if (!highlight || !highlightedDay || !bottomCheckbox) return;
+
+    const highlightRect = highlight.getBoundingClientRect();
+    const dayRect = highlightedDay.getBoundingClientRect();
+    const bottomCheckboxRect = bottomCheckbox.getBoundingClientRect();
+    const topGap = dayRect.top - highlightRect.top;
+    const bottomGap = highlightRect.bottom - bottomCheckboxRect.bottom;
+
+    if (topGap <= 0 || bottomGap <= 0) return;
+
+    // Halve the top gap and apply the exact same inset to the bottom edge.
+    const symmetricInset = Math.min(topGap / 2, bottomGap - 1);
+    if (symmetricInset <= 0) return;
+
+    const currentTop = highlight.offsetTop;
+    const currentHeight = highlight.offsetHeight;
+
+    highlight.style.top = `${currentTop + symmetricInset}px`;
+    highlight.style.bottom = 'auto';
+    highlight.style.height = `${currentHeight - symmetricInset * 2}px`;
+}
+
+function positionTrackerLevelOnMobile(levelContainer, xpContainer) {
+    if (!levelContainer || !xpContainer || !window.matchMedia('(max-width: 47.99rem)').matches) return;
+
+    const levelRect = levelContainer.getBoundingClientRect();
+    const xpRect = xpContainer.getBoundingClientRect();
+    const mobileGap = 8;
+    const requiredShift = xpRect.top - mobileGap - levelRect.bottom;
+    const computedTranslate = window.getComputedStyle(levelContainer).translate;
+    const translateValues = computedTranslate && computedTranslate !== 'none'
+        ? computedTranslate.split(' ')
+        : [];
+    const currentTranslateY = parseFloat(translateValues[1]) || 0;
+
+    levelContainer.style.translate = `0 ${currentTranslateY + requiredShift}px`;
 }
 
 function animateXpBar(xpBar, targetPercent) {
@@ -567,7 +642,9 @@ function resetCompletedXpBar(xpBar, trackerSection) {
 }
 
 function initTrackerCheckboxes() {
-    const trackerButtons = document.querySelectorAll('.tracker-checkbox.is--button');
+    configureTrackerRows();
+
+    const trackerButtons = getActiveTrackerButtons();
     const trackerSection = document.querySelector('.section.is--tracker');
     const xpBar = createTrackerXpBar();
     let completedSteps = 0;
@@ -616,6 +693,9 @@ function initTrackerCheckboxes() {
             alignItems: "center"
         });
     }
+
+    compactTrackerHighlight();
+    positionTrackerLevelOnMobile(levelContainer, xpBar?.container);
 
     trackerButtons.forEach(button => {
         // Add hover animations
@@ -679,7 +759,10 @@ function initTrackerCheckboxes() {
             }
 
             completedSteps += 1;
-            const targetPercent = Math.min(completedSteps * 25, 100);
+            const isLastStep = completedSteps >= trackerButtons.length;
+            const targetPercent = isLastStep
+                ? 100
+                : completedSteps * (100 / trackerButtons.length);
 
             animateXpBar(xpBar, targetPercent)
                 .then(() => {
@@ -698,7 +781,7 @@ function initScrollLock() {
         // Get all sections that appear after the tracker in the DOM
         return section.compareDocumentPosition(trackerSection) & Node.DOCUMENT_POSITION_PRECEDING;
     });
-    const trackerButtons = document.querySelectorAll('.tracker-checkbox.is--button');
+    const trackerButtons = getActiveTrackerButtons();
 
     // Flag to track if content has been unlocked
     let contentUnlocked = false;
@@ -750,21 +833,21 @@ function initScrollLock() {
             // Element is already prepared with fixed width from initTrackerCheckboxes()
             // No need to set width/positioning here to avoid shift
 
-            // Create a spark system for the level element
-            let levelSparkSystem = null;
-
             // Create a timeline for the level up animation
             const levelUpTl = gsap.timeline();
 
             gsap.set(levelElement, {
                 transformOrigin: "50% 50%",
+                scaleX: 1,
+                scaleY: 1,
                 x: 0,
                 y: 0
             });
 
             // Step 1: Scale down the "4" completely and fade out
             levelUpTl.to(levelElement, {
-                scale: 0,
+                scaleX: 0,
+                scaleY: 0,
                 opacity: 0,
                 transformOrigin: "50% 50%",
                 y: 0,
@@ -778,7 +861,8 @@ function initScrollLock() {
                     // Reset to starting state for "5" animation
                     gsap.set(levelElement, {
                         opacity: 0,
-                        scale: 0,
+                        scaleX: 0,
+                        scaleY: 0,
                         transformOrigin: "50% 50%",
                         x: 0,
                         y: 0
@@ -787,76 +871,21 @@ function initScrollLock() {
             })
                 // Step 2: Scale up "5" with bounce effect, fade in immediately
                 .to(levelElement, {
-                    scale: 1.8,
+                    scaleX: 1.35,
+                    scaleY: 1.35,
                     opacity: 1,
                     transformOrigin: "50% 50%",
-                    y: 0,
-                    duration: 0.5,
-                    ease: "back.out(2)",
-                    onStart: function () {
-                        // Create spark system for the level element (firework burst effect)
-                        levelSparkSystem = new SparkSystem({
-                            color: ACCENT_COLOR,
-                            secondaryColor: "#f7e8bd",
-                            particleCount: 40,  // More particles for a big burst
-                            minSize: 0.4,
-                            maxSize: 1.2,
-                            minSpeed: 1,        // Faster initial speed for explosion feel
-                            maxSpeed: 2.5,
-                            gravity: 0.08,
-                            fadeSpeed: 0.025,   // Faster fade so effect lasts ~1 second
-                            emissionRate: 0,    // No continuous emission
-                            spreadAngle: 360
-                        });
-
-                        // Override emitSparks to do a single burst of all particles at once
-                        levelSparkSystem.emitBurst = function () {
-                            // Emit from level element
-                            const rect = levelElement.getBoundingClientRect();
-                            const centerX = rect.left + rect.width / 2;
-                            const centerY = rect.top + rect.height / 2;
-                            const elementRadius = Math.max(rect.width, rect.height) / 2 + 2;
-
-                            // Create all particles at once for firework burst effect
-                            for (let i = 0; i < this.particleCount; i++) {
-                                const angle = (Math.PI * 2 * i / this.particleCount) + (Math.random() - 0.5) * 0.3;
-                                const startX = centerX + Math.cos(angle) * elementRadius;
-                                const startY = centerY + Math.sin(angle) * elementRadius;
-
-                                const speed = this.minSpeed + Math.random() * (this.maxSpeed - this.minSpeed);
-                                const particle = {
-                                    x: startX,
-                                    y: startY,
-                                    vx: Math.cos(angle) * speed,
-                                    vy: Math.sin(angle) * speed,
-                                    size: this.minSize + Math.random() * (this.maxSize - this.minSize),
-                                    life: 1,
-                                    color: Math.random() > 0.5 ? this.sparkColor : this.secondaryColor,
-                                    trail: []
-                                };
-                                this.particles.push(particle);
-                            }
-                        };
-
-                        // Start the spark system and emit burst immediately
-                        levelSparkSystem.start();
-                        levelSparkSystem.emitBurst();
-
-                        // Stop emitting new particles after burst, let existing ones fade naturally
-                        // System will auto-stop when all particles are gone
-                        setTimeout(() => {
-                            if (levelSparkSystem) {
-                                levelSparkSystem.stop();
-                            }
-                        }, 1200); // Stop after ~1.2 seconds
-                    }
+                    y: -1,
+                    duration: 0.38,
+                    ease: "back.out(1.25)"
                 })
                 // Step 3: Settle to final state (after bounce)
                 .to(levelElement, {
-                    scale: 1,
+                    scaleX: 1,
+                    scaleY: 1,
                     transformOrigin: "50% 50%",
                     y: 0,
-                    duration: 0.3,
+                    duration: 0.24,
                     ease: "power2.out",
                     onComplete: function () {
                         // Let the subtle branded gold shimmer remain after the level-up.
