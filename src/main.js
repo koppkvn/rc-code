@@ -674,11 +674,13 @@ function initTreeDiagram() {
 
         gsap.set("section.is--timeline .timeline-container", {
             width: "200vw",
+            overflow: "visible",
 
         })
 
         gsap.set("section.is--timeline .timeline-panels-wrapper", {
-            flexDirection: "row"
+            flexDirection: "row",
+            overflow: "visible",
         })
         // gsap.set(".tree-container.is--timeline", {
         //     width: "260vw",
@@ -2032,6 +2034,7 @@ function initTreeDiagram() {
         const scrollingPanels = gsap.utils.toArray(".timeline-panel:not(.is--fixed)");
         const containerEl = document.querySelector(".timeline-container");
         const panelsWrapper = document.querySelector(".timeline-panels-wrapper");
+        const horizontalDuration = 44;
 
         const wrapperStyles = window.getComputedStyle(panelsWrapper);
         const panelGap = parseFloat(wrapperStyles.columnGap || wrapperStyles.gap) || 0;
@@ -2060,7 +2063,7 @@ function initTreeDiagram() {
         const containerRect = containerEl.getBoundingClientRect();
         const lastPanelRect = lastScrollingPanel.getBoundingClientRect();
         const lastPanelInitialLeft = lastPanelRect.left - containerRect.left;
-        const lastPanelTargetLeft = window.innerWidth * 0.05;
+        const lastPanelTargetLeft = window.innerWidth * -0.05;
         const scrollDistance = Math.max(0, lastPanelInitialLeft - lastPanelTargetLeft);
 
 
@@ -2084,7 +2087,7 @@ function initTreeDiagram() {
             .addLabel("horizontalStart")
             // Start the hand-off only after the horizontal movement has placed
             // the final week on the left side of the viewport.
-            .addLabel("timelineExit", "horizontalStart+=40")
+            .addLabel("timelineExit", `horizontalStart+=${horizontalDuration}`)
             // First, create the white progress line before the animation starts
             .to({}, {
                 duration: 0.001,
@@ -2133,7 +2136,7 @@ function initTreeDiagram() {
             .to(".section.is--timeline .timeline-container", {
                 x: -scrollDistance,
                 ease: "none",
-                duration: 40,
+                duration: horizontalDuration,
 
                 onUpdate: function (self) {
                     // Get the progress directly from the tween (0 to 1)
@@ -2236,7 +2239,7 @@ function initTreeDiagram() {
             .to(".timeline-panel.is--fixed", {
                 x: scrollDistance, // Exact opposite of -50
                 ease: "none",
-                duration: 40, // Same duration as container
+                duration: horizontalDuration, // Same duration as container
             }, "<") // Use same label to sync perfectly
 
             // Now you can animate it properly
@@ -2251,7 +2254,9 @@ function initTreeDiagram() {
                     console.log(element);
 
                     gsap.to(element, {
-                        autoAlpha: 0
+                        autoAlpha: 0,
+                        duration: 2,
+                        ease: "power2.inOut",
                     })
 
                     // Fade out the subtle effects when reaching the end
@@ -2677,8 +2682,10 @@ function initTreeDiagram() {
                     });
                 }
             }, "horizontalStart+=13.7")
-            .to(".timeline-panel.is--fixed.is--4", {
+            .to(".section.is--timeline .timeline-panel, .section.is--timeline .line-container, .section.is--timeline .grey-line-new", {
                 autoAlpha: 0,
+                duration: 2,
+                ease: "power2.inOut",
             }, "timelineExit")
             .to(".map-svg path", {
                 drawSVG: "0% 100%", // or "0 100" depending on your preference
