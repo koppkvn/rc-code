@@ -81,6 +81,14 @@ function applyBrandAccent() {
             translate: 0 -1rem;
         }
 
+        .tracker-row .day.is--first {
+            color: rgba(255, 255, 255, .55) !important;
+        }
+
+        .section.is--tracker .wait-message {
+            translate: 0 -.5rem;
+        }
+
         @media (max-width: 47.99rem) {
             .tracker-row.is--mobile-hidden {
                 display: none !important;
