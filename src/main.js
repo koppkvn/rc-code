@@ -1892,6 +1892,13 @@ function initTreeDiagram() {
 
         initFormAnimaton();
 
+        // The map sits behind the pinned sections and must be revealed
+        // explicitly during the timeline hand-off. Without this initial state,
+        // fading the timeline out can leave only the black page background.
+        gsap.set(".section.is--map", {
+            autoAlpha: 0,
+        });
+
         treeTlOne
             .to(".tree-wrapper.is--compare", {
                 // Set transform origin with the offset
@@ -2019,16 +2026,23 @@ function initTreeDiagram() {
         // START HORIZONTAL TIMELINE
         // const containerWidth = document.querySelector(".timeline-container").offsetWidth;
         // const containerMovement = containerWidth * 0.5; // 50% of container width
-        // Get all panels and calculate total width
-        const panels = gsap.utils.toArray(".timeline-panel");
+        // Fixed overlays move in the opposite direction but do not occupy
+        // horizontal layout space. Counting them here makes the container
+        // overshoot into an empty black area once the final week is removed.
+        const scrollingPanels = gsap.utils.toArray(".timeline-panel:not(.is--fixed)");
         const containerEl = document.querySelector(".timeline-container");
         const panelsWrapper = document.querySelector(".timeline-panels-wrapper");
 
-        // Calculate total panels width
-        let totalPanelsWidth = 0;
-        panels.forEach(panel => {
-            totalPanelsWidth += panel.offsetWidth;
-        });
+        const wrapperStyles = window.getComputedStyle(panelsWrapper);
+        const panelGap = parseFloat(wrapperStyles.columnGap || wrapperStyles.gap) || 0;
+        const totalPanelsWidth = scrollingPanels.reduce((total, panel) => {
+            const panelStyles = window.getComputedStyle(panel);
+            const marginLeft = parseFloat(panelStyles.marginLeft) || 0;
+            const marginRight = parseFloat(panelStyles.marginRight) || 0;
+
+            return total + panel.offsetWidth + marginLeft + marginRight;
+        }, panelGap * Math.max(0, scrollingPanels.length - 1));
+
         // Set container width to match content
         gsap.set(containerEl, {
             width: totalPanelsWidth + "px"
@@ -2043,8 +2057,7 @@ function initTreeDiagram() {
         // const scrollDistance = totalPanelsWidth - window.innerWidth;
         // Add extra scroll distance (e.g., 30vw) to see more of the last panel
 
-        const scrollDistance = totalPanelsWidth - (window.innerWidth * 1.3);
-        const scrollPercentage = (scrollDistance / totalPanelsWidth) * 100;
+        const scrollDistance = Math.max(0, totalPanelsWidth - (window.innerWidth * 1.3));
 
 
         document.querySelectorAll('[data-target]').forEach(el => {
@@ -2286,6 +2299,11 @@ function initTreeDiagram() {
                         centerDot.style.backgroundColor = "#ffcc00";
                     }
                 }
+            }, "timelineExit")
+            .to(".section.is--map", {
+                autoAlpha: 1,
+                duration: 2,
+                ease: "power2.inOut",
             }, "timelineExit")
             .to(".timeline-panel.is--fixed.is--2", {
                 autoAlpha: 1,
