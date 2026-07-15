@@ -93,6 +93,49 @@ function applyBrandAccent() {
             display: none;
         }
 
+        .section.is--fields.is--terminal-offers {
+            display: grid !important;
+            width: 100%;
+            height: 100svh;
+            min-height: 100svh;
+            overflow: hidden;
+            place-items: center;
+        }
+
+        .section.is--fields.is--terminal-offers .container.is--fields {
+            display: flex;
+            width: 100%;
+            min-height: 100%;
+            box-sizing: border-box;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1.25rem;
+            text-align: center;
+        }
+
+        .section.is--fields.is--terminal-offers .h2-fields {
+            width: min(100%, 48rem);
+            margin: 0 0 1.5rem;
+            font-size: clamp(2.5rem, 4vw, 4rem);
+            line-height: 1.02;
+            text-align: center;
+        }
+
+        .section.is--fields.is--terminal-offers .link-container {
+            width: min(100%, 28rem);
+            margin: 0;
+        }
+
+        .section.is--fields.is--terminal-offers .div-2,
+        .section.is--fields.is--terminal-offers .form-field-icon,
+        .section.is--fields.is--terminal-offers .form-group,
+        .section.is--fields.is--terminal-offers .form-notifcation,
+        .section.is--faq.is--terminal-hidden,
+        .section.is--footerlast.is--terminal-hidden {
+            display: none !important;
+        }
+
         @media (min-width: 48rem) {
             .text-wrapper-date.is--date-card {
                 box-sizing: border-box;
@@ -233,8 +276,9 @@ function applyBrandAccent() {
 
             .section.is--timeline .stats-container.is--schedule-replacement .structure-text {
                 width: 100%;
-                font-size: .6rem;
-                line-height: 1.25;
+                color: rgba(255, 255, 255, .5);
+                font-size: .56rem;
+                line-height: 1.3;
             }
 
             .container.is--map .map-wrapper::after {
@@ -285,6 +329,15 @@ function applyBrandAccent() {
             .section.is--map .dot-video {
                 pointer-events: none !important;
                 cursor: default !important;
+            }
+
+            .section.is--fields.is--terminal-offers .h2-fields {
+                width: min(100%, 22rem);
+                font-size: clamp(1.75rem, 8vw, 2.25rem);
+            }
+
+            .section.is--fields.is--terminal-offers .link-container {
+                width: min(100%, 22rem);
             }
 
             .section.is--tracker .tracker-header .tracker-wrapper-mobile > :first-child,
@@ -436,7 +489,13 @@ function replaceMobileStatsWithSchedule() {
             title.setAttribute('aria-label', mobileTitle);
         }
 
-        description?.remove();
+        if (index === 2 && description) {
+            const sundayDescription = 'Réunion avec les membres de ton groupe. Si tu ne peux pas libérer 1-2h le dimanche, opte pour la formule solo.';
+            description.textContent = sundayDescription;
+            description.setAttribute('aria-label', sundayDescription);
+        } else {
+            description?.remove();
+        }
     });
 
     statsInner.replaceWith(schedule);
@@ -4533,7 +4592,7 @@ function createMapTimeline() {
 
             },
             autoAlpha: 0,
-            duration: 3,
+            duration: 1,
         }, "mapDrawStart")
         .set(".click-me, .text-wrapper-spotify", {
             display: "none",
@@ -4542,6 +4601,9 @@ function createMapTimeline() {
             pointerEvents: "none",
             cursor: "default",
         }, "mapDrawStart")
+        .to({}, {
+            duration: 1,
+        }, "mapDrawComplete")
 
 
     gsap.set(".map-container", {
@@ -4551,8 +4613,22 @@ function createMapTimeline() {
         yPercent: -85,
         xPercent: 45,
         scale: 2.6,
-        duration: 3,
+        duration: 2.1,
         ease: "power1.out",
+        onStart: function () {
+            gsap.to(".text-wrapper-map .lineInner", {
+                yPercent: -100,
+                duration: .45,
+                ease: "power1.out",
+            })
+        },
+        onReverseComplete: function () {
+            gsap.to(".text-wrapper-map .lineInner", {
+                yPercent: 0,
+                duration: .45,
+                ease: "power1.out",
+            })
+        },
     }, ">")
     // .to(".map-container mask rect", {
     //     xPercent: -10,
@@ -4574,7 +4650,7 @@ function createMapTimeline() {
 
         mapTl.add(
             Flip.fit(dot, barcelonaDot, {
-                duration: 2, // needed for Flip to work but overwritten by scrub
+                duration: 1.25, // Faster convergence once the hold is complete.
                 ease: "none"
             }), "<+=.03"
             // add all tweens at the same point in the timeline
@@ -4586,9 +4662,6 @@ function createMapTimeline() {
             console.log("start")
             document.querySelector('.container.is--map .map-wrapper')
                 ?.classList.add('is--barcelona-focus');
-            gsap.to(".text-wrapper-map .lineInner", {
-                yPercent: -100,
-            })
             gsap.to(".text-wrapper-barca .lineInner, .text-wrapper-date .lineInner", {
                 yPercent: 0,
             })
@@ -4614,9 +4687,6 @@ function createMapTimeline() {
         onReverseComplete: function () {
             document.querySelector('.container.is--map .map-wrapper')
                 ?.classList.remove('is--barcelona-focus');
-            gsap.to(".text-wrapper-map .lineInner", {
-                yPercent: 0,
-            })
 
             gsap.to(".text-wrapper-barca .lineInner, .text-wrapper-date .lineInner", {
                 yPercent: -100,
@@ -4865,6 +4935,53 @@ function initVideoMap() {
     });
 }
 let hasCreatedTriggers = false;
+let offersSnapTrigger = null;
+let offersSnapInProgress = false;
+
+function initTerminalOffers() {
+    const offersSection = document.querySelector('.section.is--fields');
+    const offersTitle = offersSection?.querySelector('.h2-fields');
+    const faqSection = document.querySelector('.section.is--faq');
+    const footerSection = document.querySelector('.section.is--footerlast');
+
+    if (!offersSection || !offersTitle) return;
+
+    const offersQuestion = 'Quelle formule te parle le plus ?';
+    offersTitle.textContent = offersQuestion;
+    offersTitle.setAttribute('aria-label', offersQuestion);
+    offersSection.classList.add('is--terminal-offers');
+
+    [faqSection, footerSection].forEach(section => {
+        if (!section) return;
+        section.setAttribute('aria-hidden', 'true');
+        section.classList.add('is--terminal-hidden');
+        gsap.set(section, { display: 'none' });
+    });
+
+    offersSnapTrigger?.kill();
+    offersSnapTrigger = ScrollTrigger.create({
+        trigger: offersSection,
+        start: 'top 98%',
+        onEnter: () => {
+            if (offersSnapInProgress || !window.lenis) return;
+
+            offersSnapInProgress = true;
+            window.lenis.scrollTo(offersSection, {
+                duration: 1.15,
+                immediate: false,
+                lock: true,
+                force: true,
+                onComplete: () => {
+                    offersSnapInProgress = false;
+                },
+            });
+        },
+        onLeaveBack: () => {
+            offersSnapInProgress = false;
+        },
+    });
+}
+
 function initFormAnimaton() {
     if (hasCreatedTriggers) return;
     hasCreatedTriggers = true;
@@ -4882,9 +4999,9 @@ function initFormAnimaton() {
     });
 
     requestAnimationFrame(() => {
-        // These sections are hidden in Webflow until the animated journey is
-        // ready. Recalculate both smooth-scroll limits and ScrollTrigger
-        // positions after revealing them so the FAQ remains reachable.
+        // Turn the offers block into the terminal screen, then recalculate the
+        // smooth-scroll limits and ScrollTrigger positions for the new ending.
+        initTerminalOffers();
         if (window.lenis && typeof window.lenis.resize === "function") {
             window.lenis.resize();
         }
