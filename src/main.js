@@ -4312,7 +4312,13 @@ function initFormAnimaton() {
     });
 
     requestAnimationFrame(() => {
-        ScrollTrigger.refresh();
+        // These sections are hidden in Webflow until the animated journey is
+        // ready. Recalculate both smooth-scroll limits and ScrollTrigger
+        // positions after revealing them so the FAQ remains reachable.
+        if (window.lenis && typeof window.lenis.resize === "function") {
+            window.lenis.resize();
+        }
+        ScrollTrigger.refresh(true);
         initAccordionCSS();
     });
 
@@ -5730,7 +5736,12 @@ window.addEventListener('load', () => {
         document.body.style.width = `${initialWidth}px`;
         document.body.style.minWidth = `${initialWidth}px`;
         document.body.style.maxWidth = `${initialWidth}px`;
-        document.body.style.overflow = 'hidden'; // Prevent horizontal scroll
+        // Only clip horizontal overflow. Using the shorthand `overflow:
+        // hidden` also blocks the vertical journey and makes the FAQ
+        // unreachable after the offers section.
+        document.body.style.overflowX = 'clip';
+        document.body.style.overflowY = 'visible';
+        document.documentElement.style.overflowX = 'clip';
 
         ScrollTrigger.config({
             autoRefreshEvents: "visibilitychange,DOMContentLoaded,load"
