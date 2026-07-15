@@ -169,6 +169,14 @@ function applyBrandAccent() {
         }
 
         @media (max-width: 47.99rem) {
+            .title-intro {
+                font-size: 2.2rem;
+            }
+
+            .big-title-section {
+                font-size: 2.3rem;
+            }
+
             .tracker-row.is--mobile-hidden {
                 display: none !important;
             }
