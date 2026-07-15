@@ -93,6 +93,29 @@ function applyBrandAccent() {
             .tracker-row.is--mobile-hidden {
                 display: none !important;
             }
+
+            /* Bring the mobile status block closer to the tracker frame. */
+            .tracker-wrapper > .tracker-pompes.tracker-xp-shell {
+                translate: 0 -.25rem;
+            }
+
+            /* Keep the download badges compact, left-aligned and slightly higher. */
+            .section.is--tracker .svg-wrapper {
+                align-self: flex-start;
+                justify-content: flex-start;
+                margin-top: 2rem;
+                margin-left: 0;
+                translate: 0 -.5rem;
+            }
+
+            .section.is--tracker .svg-7,
+            .section.is--tracker .svg-8 {
+                width: 5rem;
+            }
+
+            .section.is--tracker .wait-message {
+                translate: 0 -1.25rem;
+            }
         }
 
         @keyframes gold-wait-sweep {
