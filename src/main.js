@@ -341,13 +341,267 @@ function initTrackerSection() {
 
 }
 
+function createTrackerXpBar() {
+    const xpContainer = document.querySelector('.tracker-pompes');
+    if (!xpContainer) return null;
+
+    if (!document.getElementById('tracker-xp-styles')) {
+        const style = document.createElement('style');
+        style.id = 'tracker-xp-styles';
+        style.textContent = `
+            .tracker-pompes.tracker-xp-shell {
+                display: flex !important;
+                flex-direction: column;
+                align-items: stretch;
+                gap: .35rem;
+                width: clamp(9rem, 14vw, 13rem) !important;
+                height: auto !important;
+                font-variant-numeric: tabular-nums;
+            }
+
+            .tracker-xp-meta {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                color: rgba(255, 255, 255, .72);
+                font-size: .72em;
+                letter-spacing: .12em;
+                line-height: 1;
+                text-transform: uppercase;
+            }
+
+            .tracker-xp-value {
+                color: ${ACCENT_COLOR};
+            }
+
+            .tracker-xp-track {
+                position: relative;
+                width: 100%;
+                height: .32rem;
+                overflow: hidden;
+                border: 1px solid rgba(255, 255, 255, .35);
+                background: rgba(255, 255, 255, .08);
+            }
+
+            .tracker-xp-fill {
+                position: absolute;
+                inset: 0;
+                background: ${ACCENT_COLOR};
+                box-shadow: 0 0 .55rem rgba(210, 170, 98, .9);
+                transform: scaleX(0);
+                transform-origin: left center;
+                will-change: transform;
+            }
+
+            .tracker-xp-track.is-charging {
+                border-color: rgba(210, 170, 98, .9);
+                box-shadow: 0 0 .85rem rgba(210, 170, 98, .45);
+            }
+
+            .tracker-xp-shell.is-complete .tracker-xp-track {
+                border-color: ${ACCENT_COLOR};
+                box-shadow: 0 0 1rem rgba(210, 170, 98, .8);
+            }
+
+            .tracker-xp-particle-layer {
+                position: fixed;
+                inset: 0;
+                z-index: 60;
+                pointer-events: none;
+            }
+
+            .tracker-xp-particle {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: .2rem;
+                height: .2rem;
+                border-radius: 50%;
+                background: ${ACCENT_COLOR};
+                box-shadow:
+                    0 0 .25rem rgba(255, 255, 255, .95),
+                    0 0 .6rem rgba(210, 170, 98, .95);
+                will-change: transform, opacity;
+            }
+
+            @media (max-width: 47.99rem) {
+                .tracker-pompes.tracker-xp-shell {
+                    width: clamp(8rem, 38vw, 11rem) !important;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
+    xpContainer.classList.add('tracker-xp-shell');
+    xpContainer.setAttribute('role', 'progressbar');
+    xpContainer.setAttribute('aria-label', 'Progression XP');
+    xpContainer.setAttribute('aria-valuemin', '0');
+    xpContainer.setAttribute('aria-valuemax', '100');
+    xpContainer.setAttribute('aria-valuenow', '0');
+    xpContainer.innerHTML = `
+        <div class="tracker-xp-meta" aria-hidden="true">
+            <span>XP</span>
+            <span class="tracker-xp-value">0%</span>
+        </div>
+        <div class="tracker-xp-track">
+            <div class="tracker-xp-fill"></div>
+        </div>
+    `;
+
+    return {
+        container: xpContainer,
+        track: xpContainer.querySelector('.tracker-xp-track'),
+        fill: xpContainer.querySelector('.tracker-xp-fill'),
+        value: xpContainer.querySelector('.tracker-xp-value')
+    };
+}
+
+function animateXpParticles(sourceElement, targetElement, targetPercent) {
+    return new Promise(resolve => {
+        if (!sourceElement || !targetElement || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            resolve();
+            return;
+        }
+
+        const sourceRect = sourceElement.getBoundingClientRect();
+        const targetRect = targetElement.getBoundingClientRect();
+        const sourceX = sourceRect.left + sourceRect.width / 2;
+        const sourceY = sourceRect.top + sourceRect.height / 2;
+        const targetX = targetRect.left + targetRect.width * (targetPercent / 100);
+        const targetY = targetRect.top + targetRect.height / 2;
+        const particleLayer = document.createElement('div');
+        const particleCount = 18;
+        const timeline = gsap.timeline({
+            onComplete: () => {
+                particleLayer.remove();
+                resolve();
+            }
+        });
+
+        particleLayer.className = 'tracker-xp-particle-layer';
+        document.body.appendChild(particleLayer);
+
+        for (let index = 0; index < particleCount; index++) {
+            const particle = document.createElement('span');
+            const delay = index * .018 + Math.random() * .08;
+            const direction = index % 2 === 0 ? 1 : -1;
+            const arc = direction * (24 + Math.random() * 42);
+            const midpointX = sourceX + (targetX - sourceX) * (.38 + Math.random() * .12);
+            const midpointY = sourceY + (targetY - sourceY) * .42 + arc;
+            const endX = targetX + (Math.random() - .5) * 8;
+            const endY = targetY + (Math.random() - .5) * 4;
+
+            particle.className = 'tracker-xp-particle';
+            particleLayer.appendChild(particle);
+
+            gsap.set(particle, {
+                x: sourceX + (Math.random() - .5) * 8,
+                y: sourceY + (Math.random() - .5) * 8,
+                opacity: 0,
+                scale: .35 + Math.random() * .8
+            });
+
+            timeline
+                .to(particle, {
+                    x: midpointX,
+                    y: midpointY,
+                    opacity: 1,
+                    scale: 1 + Math.random() * .8,
+                    duration: .28 + Math.random() * .12,
+                    ease: 'power2.out'
+                }, delay)
+                .to(particle, {
+                    x: endX,
+                    y: endY,
+                    opacity: 0,
+                    scale: .15,
+                    duration: .38 + Math.random() * .14,
+                    ease: 'power2.in'
+                }, delay + .25);
+        }
+    });
+}
+
+function animateXpBar(xpBar, targetPercent) {
+    return new Promise(resolve => {
+        if (!xpBar) {
+            resolve();
+            return;
+        }
+
+        const startPercent = Number.parseInt(xpBar.value.textContent, 10) || 0;
+        xpBar.track.classList.add('is-charging');
+        xpBar.container.setAttribute('aria-valuenow', String(targetPercent));
+
+        gsap.to(xpBar.fill, {
+            scaleX: targetPercent / 100,
+            duration: .45,
+            ease: 'power3.out',
+            onUpdate: function () {
+                const displayedPercent = startPercent + (targetPercent - startPercent) * this.progress();
+                xpBar.value.textContent = `${Math.round(displayedPercent)}%`;
+            },
+            onComplete: () => {
+                xpBar.value.textContent = `${targetPercent}%`;
+                xpBar.track.classList.remove('is-charging');
+                gsap.fromTo(xpBar.container,
+                    { scale: 1 },
+                    { scale: 1.035, duration: .12, repeat: 1, yoyo: true, ease: 'power2.out' }
+                );
+                resolve();
+            }
+        });
+    });
+}
+
+function resetCompletedXpBar(xpBar, trackerSection) {
+    return new Promise(resolve => {
+        if (!xpBar) {
+            trackerSection?.dispatchEvent(new CustomEvent('tracker-xp-cycle-complete'));
+            resolve();
+            return;
+        }
+
+        xpBar.container.classList.add('is-complete');
+        gsap.to(xpBar.container, {
+            scale: 1.055,
+            duration: .2,
+            repeat: 1,
+            yoyo: true,
+            ease: 'power2.out'
+        });
+
+        gsap.to(xpBar.fill, {
+            scaleX: 0,
+            duration: .35,
+            delay: .65,
+            ease: 'power2.inOut',
+            onStart: () => {
+                gsap.to(xpBar.value, {
+                    opacity: 0,
+                    duration: .15
+                });
+            },
+            onComplete: () => {
+                xpBar.container.classList.remove('is-complete');
+                xpBar.container.setAttribute('aria-valuenow', '0');
+                xpBar.value.textContent = '0%';
+                gsap.set(xpBar.value, { opacity: 1 });
+                trackerSection?.setAttribute('data-xp-cycle-complete', 'true');
+                trackerSection?.dispatchEvent(new CustomEvent('tracker-xp-cycle-complete'));
+                resolve();
+            }
+        });
+    });
+}
+
 function initTrackerCheckboxes() {
     const trackerButtons = document.querySelectorAll('.tracker-checkbox.is--button');
-    const pompeCounterEl = document.querySelector('.tracker-pompes .color');
-    let pompeCount = 0; // Initial count
-
-    // Object to use for GSAP animation of the counter
-    let counterObj = { value: pompeCount };
+    const trackerSection = document.querySelector('.section.is--tracker');
+    const xpBar = createTrackerXpBar();
+    let xpStep = 0;
+    let xpAnimationQueue = Promise.resolve();
 
     // Prepare the level element early to prevent shift when animation starts
     // Set fixed width and positioning before any checkboxes are clicked
@@ -369,43 +623,6 @@ function initTrackerCheckboxes() {
             display: "inline-block",
             boxSizing: "border-box"
         });
-    }
-
-    // Set up the counter with a fixed width container for the number
-    if (pompeCounterEl) {
-        // Create and insert a span for the number with fixed width
-        const originalText = pompeCounterEl.textContent;
-        const numberMatch = originalText.match(/\d+/);
-
-        if (numberMatch) {
-            // Extract the prefix and suffix text
-            const beforeNumber = originalText.substring(0, numberMatch.index);
-            const afterNumber = originalText.substring(numberMatch.index + numberMatch[0].length);
-
-            // Clear the original content
-            pompeCounterEl.textContent = '';
-
-            // Add the prefix text
-            if (beforeNumber) {
-                pompeCounterEl.appendChild(document.createTextNode(beforeNumber));
-            }
-
-            // Create a fixed-width span for the number
-            const numberSpan = document.createElement('span');
-            numberSpan.style.display = 'inline-block';
-            numberSpan.style.minWidth = '1.1em'; // Adjust width as needed
-            numberSpan.style.textAlign = 'center';
-            numberSpan.textContent = pompeCount; // Start at 0
-
-            // Add a data attribute to easily find this span later
-            numberSpan.setAttribute('data-pompe-counter', 'true');
-            pompeCounterEl.appendChild(numberSpan);
-
-            // Add the suffix text
-            if (afterNumber) {
-                pompeCounterEl.appendChild(document.createTextNode(afterNumber));
-            }
-        }
     }
 
     trackerButtons.forEach(button => {
@@ -469,33 +686,17 @@ function initTrackerCheckboxes() {
                 );
             }
 
-            // Increase push-up count by 10
-            // Store the starting value
-            const startValue = pompeCount;
-            // Calculate target value (increase by 10)
-            const targetValue = pompeCount + 10;
+            xpStep += 1;
+            const targetPercent = Math.min(xpStep * 25, 100);
 
-            // Update the actual count
-            pompeCount = targetValue;
+            xpAnimationQueue = xpAnimationQueue
+                .then(() => animateXpParticles(this, xpBar?.track, targetPercent))
+                .then(() => animateXpBar(xpBar, targetPercent));
 
-            // Reset the counter object to the start value
-            counterObj.value = startValue;
-
-            // Animate the counter up
-            gsap.to(counterObj, {
-                value: targetValue,
-                duration: .8,
-                ease: "easeOutQuart",
-                onUpdate: function () {
-                    // Update the display with the rounded current value
-                    const currentValue = Math.round(counterObj.value);
-                    // Find the number span we created
-                    const numberSpan = document.querySelector('[data-pompe-counter="true"]');
-                    if (numberSpan) {
-                        numberSpan.textContent = currentValue;
-                    }
-                }
-            });
+            if (targetPercent === 100) {
+                xpAnimationQueue = xpAnimationQueue
+                    .then(() => resetCompletedXpBar(xpBar, trackerSection));
+            }
         });
     });
 }
@@ -687,7 +888,12 @@ function initScrollLock() {
         button.addEventListener('click', function () {
             // Only check completion if content hasn't been unlocked yet
             if (!contentUnlocked && checkTrackerComplete()) {
-                unlockContent();
+                if (trackerSection?.getAttribute('data-xp-cycle-complete') === 'true') {
+                    unlockContent();
+                    return;
+                }
+
+                trackerSection?.addEventListener('tracker-xp-cycle-complete', unlockContent, { once: true });
             }
         });
     });
