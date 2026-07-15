@@ -351,27 +351,12 @@ function createTrackerXpBar() {
         style.textContent = `
             .tracker-pompes.tracker-xp-shell {
                 display: flex !important;
-                flex-direction: column;
                 align-items: stretch;
-                gap: .35rem;
-                width: clamp(9rem, 14vw, 13rem) !important;
+                left: 0 !important;
+                right: 0 !important;
+                width: 100% !important;
+                max-width: none !important;
                 height: auto !important;
-                font-variant-numeric: tabular-nums;
-            }
-
-            .tracker-xp-meta {
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                color: rgba(255, 255, 255, .72);
-                font-size: .72em;
-                letter-spacing: .12em;
-                line-height: 1;
-                text-transform: uppercase;
-            }
-
-            .tracker-xp-value {
-                color: ${ACCENT_COLOR};
             }
 
             .tracker-xp-track {
@@ -396,6 +381,13 @@ function createTrackerXpBar() {
             .tracker-xp-track.is-charging {
                 border-color: rgba(210, 170, 98, .9);
                 box-shadow: 0 0 .85rem rgba(210, 170, 98, .45);
+            }
+
+            .tracker-xp-track.is-receiving {
+                border-color: ${ACCENT_COLOR};
+                box-shadow:
+                    0 0 .55rem rgba(255, 255, 255, .7),
+                    0 0 1rem rgba(210, 170, 98, .8);
             }
 
             .tracker-xp-shell.is-complete .tracker-xp-track {
@@ -423,12 +415,6 @@ function createTrackerXpBar() {
                     0 0 .6rem rgba(210, 170, 98, .95);
                 will-change: transform, opacity;
             }
-
-            @media (max-width: 47.99rem) {
-                .tracker-pompes.tracker-xp-shell {
-                    width: clamp(8rem, 38vw, 11rem) !important;
-                }
-            }
         `;
         document.head.appendChild(style);
     }
@@ -439,11 +425,8 @@ function createTrackerXpBar() {
     xpContainer.setAttribute('aria-valuemin', '0');
     xpContainer.setAttribute('aria-valuemax', '100');
     xpContainer.setAttribute('aria-valuenow', '0');
+    xpContainer.setAttribute('data-xp-progress', '0');
     xpContainer.innerHTML = `
-        <div class="tracker-xp-meta" aria-hidden="true">
-            <span>XP</span>
-            <span class="tracker-xp-value">0%</span>
-        </div>
         <div class="tracker-xp-track">
             <div class="tracker-xp-fill"></div>
         </div>
@@ -452,12 +435,11 @@ function createTrackerXpBar() {
     return {
         container: xpContainer,
         track: xpContainer.querySelector('.tracker-xp-track'),
-        fill: xpContainer.querySelector('.tracker-xp-fill'),
-        value: xpContainer.querySelector('.tracker-xp-value')
+        fill: xpContainer.querySelector('.tracker-xp-fill')
     };
 }
 
-function animateXpParticles(sourceElement, targetElement, targetPercent) {
+function animateXpParticles(sourceElement, targetElement) {
     return new Promise(resolve => {
         if (!sourceElement || !targetElement || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
             resolve();
@@ -468,12 +450,14 @@ function animateXpParticles(sourceElement, targetElement, targetPercent) {
         const targetRect = targetElement.getBoundingClientRect();
         const sourceX = sourceRect.left + sourceRect.width / 2;
         const sourceY = sourceRect.top + sourceRect.height / 2;
-        const targetX = targetRect.left + targetRect.width * (targetPercent / 100);
+        const targetX = targetRect.left + targetRect.width / 2;
         const targetY = targetRect.top + targetRect.height / 2;
         const particleLayer = document.createElement('div');
-        const particleCount = 18;
+        const particleCount = 4;
         const timeline = gsap.timeline({
             onComplete: () => {
+                targetElement.classList.add('is-receiving');
+                gsap.delayedCall(.16, () => targetElement.classList.remove('is-receiving'));
                 particleLayer.remove();
                 resolve();
             }
@@ -484,22 +468,20 @@ function animateXpParticles(sourceElement, targetElement, targetPercent) {
 
         for (let index = 0; index < particleCount; index++) {
             const particle = document.createElement('span');
-            const delay = index * .018 + Math.random() * .08;
+            const delay = index * .035;
             const direction = index % 2 === 0 ? 1 : -1;
-            const arc = direction * (24 + Math.random() * 42);
-            const midpointX = sourceX + (targetX - sourceX) * (.38 + Math.random() * .12);
-            const midpointY = sourceY + (targetY - sourceY) * .42 + arc;
-            const endX = targetX + (Math.random() - .5) * 8;
-            const endY = targetY + (Math.random() - .5) * 4;
+            const arc = direction * (18 + index * 5);
+            const midpointX = sourceX + (targetX - sourceX) * .48;
+            const midpointY = sourceY + (targetY - sourceY) * .44 + arc;
 
             particle.className = 'tracker-xp-particle';
             particleLayer.appendChild(particle);
 
             gsap.set(particle, {
-                x: sourceX + (Math.random() - .5) * 8,
-                y: sourceY + (Math.random() - .5) * 8,
+                x: sourceX + direction * 2,
+                y: sourceY + (index - 1.5) * 2,
                 opacity: 0,
-                scale: .35 + Math.random() * .8
+                scale: .65 + index * .12
             });
 
             timeline
@@ -507,18 +489,24 @@ function animateXpParticles(sourceElement, targetElement, targetPercent) {
                     x: midpointX,
                     y: midpointY,
                     opacity: 1,
-                    scale: 1 + Math.random() * .8,
-                    duration: .28 + Math.random() * .12,
+                    scale: 1.15,
+                    duration: .28,
                     ease: 'power2.out'
                 }, delay)
                 .to(particle, {
-                    x: endX,
-                    y: endY,
-                    opacity: 0,
-                    scale: .15,
-                    duration: .38 + Math.random() * .14,
+                    x: targetX,
+                    y: targetY,
+                    opacity: 1,
+                    scale: .6,
+                    duration: .34,
                     ease: 'power2.in'
-                }, delay + .25);
+                }, delay + .25)
+                .to(particle, {
+                    opacity: 0,
+                    scale: .1,
+                    duration: .1,
+                    ease: 'power1.out'
+                }, delay + .59);
         }
     });
 }
@@ -530,20 +518,16 @@ function animateXpBar(xpBar, targetPercent) {
             return;
         }
 
-        const startPercent = Number.parseInt(xpBar.value.textContent, 10) || 0;
         xpBar.track.classList.add('is-charging');
         xpBar.container.setAttribute('aria-valuenow', String(targetPercent));
+        xpBar.container.setAttribute('data-xp-progress', String(targetPercent));
 
         gsap.to(xpBar.fill, {
             scaleX: targetPercent / 100,
-            duration: .45,
+            duration: .32,
             ease: 'power3.out',
-            onUpdate: function () {
-                const displayedPercent = startPercent + (targetPercent - startPercent) * this.progress();
-                xpBar.value.textContent = `${Math.round(displayedPercent)}%`;
-            },
+            overwrite: 'auto',
             onComplete: () => {
-                xpBar.value.textContent = `${targetPercent}%`;
                 xpBar.track.classList.remove('is-charging');
                 gsap.fromTo(xpBar.container,
                     { scale: 1 },
@@ -577,17 +561,10 @@ function resetCompletedXpBar(xpBar, trackerSection) {
             duration: .35,
             delay: .65,
             ease: 'power2.inOut',
-            onStart: () => {
-                gsap.to(xpBar.value, {
-                    opacity: 0,
-                    duration: .15
-                });
-            },
             onComplete: () => {
                 xpBar.container.classList.remove('is-complete');
                 xpBar.container.setAttribute('aria-valuenow', '0');
-                xpBar.value.textContent = '0%';
-                gsap.set(xpBar.value, { opacity: 1 });
+                xpBar.container.setAttribute('data-xp-progress', '0');
                 trackerSection?.setAttribute('data-xp-cycle-complete', 'true');
                 trackerSection?.dispatchEvent(new CustomEvent('tracker-xp-cycle-complete'));
                 resolve();
@@ -600,8 +577,8 @@ function initTrackerCheckboxes() {
     const trackerButtons = document.querySelectorAll('.tracker-checkbox.is--button');
     const trackerSection = document.querySelector('.section.is--tracker');
     const xpBar = createTrackerXpBar();
-    let xpStep = 0;
-    let xpAnimationQueue = Promise.resolve();
+    let arrivedSteps = 0;
+    let xpResetStarted = false;
 
     // Prepare the level element early to prevent shift when animation starts
     // Set fixed width and positioning before any checkboxes are clicked
@@ -686,17 +663,21 @@ function initTrackerCheckboxes() {
                 );
             }
 
-            xpStep += 1;
-            const targetPercent = Math.min(xpStep * 25, 100);
+            // Every click launches its own transfer immediately. Multiple particle
+            // groups can therefore travel at the same time when users click fast.
+            animateXpParticles(this, xpBar?.track)
+                .then(() => {
+                    arrivedSteps += 1;
+                    const targetPercent = Math.min(arrivedSteps * 25, 100);
 
-            xpAnimationQueue = xpAnimationQueue
-                .then(() => animateXpParticles(this, xpBar?.track, targetPercent))
-                .then(() => animateXpBar(xpBar, targetPercent));
-
-            if (targetPercent === 100) {
-                xpAnimationQueue = xpAnimationQueue
-                    .then(() => resetCompletedXpBar(xpBar, trackerSection));
-            }
+                    return animateXpBar(xpBar, targetPercent)
+                        .then(() => {
+                            if (targetPercent === 100 && !xpResetStarted) {
+                                xpResetStarted = true;
+                                return resetCompletedXpBar(xpBar, trackerSection);
+                            }
+                        });
+                });
         });
     });
 }
