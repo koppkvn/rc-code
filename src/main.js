@@ -2035,6 +2035,10 @@ function initTreeDiagram() {
         const containerEl = document.querySelector(".timeline-container");
         const panelsWrapper = document.querySelector(".timeline-panels-wrapper");
         const horizontalDuration = 44;
+        const mapPathDuration = 5;
+        const mapPathStagger = 0.05;
+        const mapPathCount = gsap.utils.toArray(".map-svg path").length;
+        const mapDrawDuration = mapPathDuration + Math.max(0, mapPathCount - 1) * mapPathStagger;
 
         const wrapperStyles = window.getComputedStyle(panelsWrapper);
         const panelGap = parseFloat(wrapperStyles.columnGap || wrapperStyles.gap) || 0;
@@ -2088,6 +2092,9 @@ function initTreeDiagram() {
             // Start the hand-off only after the horizontal movement has placed
             // the final week on the left side of the viewport.
             .addLabel("timelineExit", `horizontalStart+=${horizontalDuration}`)
+            // Testimonials start as soon as the complete staggered map drawing
+            // finishes, without waiting for the longer dot reveal sequence.
+            .addLabel("mapDrawComplete", `timelineExit+=${mapDrawDuration}`)
             // First, create the white progress line before the animation starts
             .to({}, {
                 duration: 0.001,
@@ -2689,8 +2696,8 @@ function initTreeDiagram() {
             }, "timelineExit")
             .to(".map-svg path", {
                 drawSVG: "0% 100%", // or "0 100" depending on your preference
-                duration: 5,
-                stagger: 0.05,
+                duration: mapPathDuration,
+                stagger: mapPathStagger,
                 ease: "power1.inOut",
                 onStart: function () {
                     gsap.set(".map-svg", { autoAlpha: 1 });
@@ -2764,37 +2771,42 @@ function initTreeDiagram() {
                         ease: "power1.inOut"
                     })
                 }
-            })
+            }, "mapDrawComplete")
             .to({}, {
-
-
+                duration: 0.8,
                 onStart: function () {
 
                     gsap.to(".text-wrapper-spotify .lower-wrapper > *", {
                         autoAlpha: 1,
+                        duration: 0.8,
                     })
                     gsap.to(".text-wrapper-map .lineInner", {
                         yPercent: -100,
+                        duration: 0.8,
                     })
                     gsap.to(".text-wrapper-spotify .lineInner", {
                         yPercent: 0,
+                        duration: 0.8,
                     })
                 },
                 onReverseComplete: function () {
                     gsap.to(".text-wrapper-spotify .lower-wrapper > *", {
                         autoAlpha: 0,
+                        duration: 0.8,
                     })
                     gsap.to(".text-wrapper-map .lineInner", {
                         yPercent: 0,
+                        duration: 0.8,
                     })
                     gsap.to(".text-wrapper-spotify .lineInner", {
                         yPercent: 100,
+                        duration: 0.8,
                     })
                     gsap.set(".map-container .dot-video", {
                         pointerEvents: "auto",
                     })
                 }
-            })
+            }, "mapDrawComplete")
 
             // Add this NEW animation to sequentially reveal images
             .to(".img-spotify:not(.is--first)", {
@@ -2804,7 +2816,7 @@ function initTreeDiagram() {
                 ease: "power2.inOut",
 
 
-            }, "+=0.5")  // Start 0.5s after the previous animation
+            }, "mapDrawComplete+=1.3")
             // Add number counter and color animation
 
             .to({}, {
@@ -3821,7 +3833,9 @@ function createMapTimeline() {
         scale: 2,
         willChange: "transform",
     })
-    mapTl.from(".map-svg", {
+    mapTl
+        .addLabel("mapDrawStart")
+        .from(".map-svg", {
         opacity: 0,
 
         onStart: function () {
@@ -3838,7 +3852,8 @@ function createMapTimeline() {
                 ease: "power2.out"
             },)
         }
-    })
+    }, "mapDrawStart")
+        .addLabel("mapDrawComplete", "mapDrawStart+=1")
 
         .from(".map-container .dot-normal, .map-container .dot-video", {
             onStart: function () {
@@ -3856,7 +3871,7 @@ function createMapTimeline() {
             },
             autoAlpha: 0,
             duration: 3,
-        }, "<")
+        }, "mapDrawStart")
         .from(".click-me", {
             autoAlpha: 0,
             // onStart: function () {
@@ -3872,7 +3887,7 @@ function createMapTimeline() {
             //         ease: "power1.out",
             //     })
             // }
-        }, "<")
+        }, "mapDrawStart")
 
         //SPOTIFY
         .to(".click-me", {
@@ -3900,7 +3915,7 @@ function createMapTimeline() {
                     ease: "power1.inOut"
                 })
             }
-        }, "<+=2")
+        }, "mapDrawComplete")
         .to(".text-wrapper-spotify .lower-wrapper > *, .text-wrapper-spotify .lower-wrapper", {
             autoAlpha: 1,
             duration: 1,
@@ -3925,7 +3940,7 @@ function createMapTimeline() {
                     pointerEvents: "auto",
                 })
             }
-        }, "<")
+        }, "mapDrawComplete")
 
         .to(".img-spotify:not(.is--first)", {
             autoAlpha: 1,
