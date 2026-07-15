@@ -2035,6 +2035,7 @@ function initTreeDiagram() {
         const containerEl = document.querySelector(".timeline-container");
         const panelsWrapper = document.querySelector(".timeline-panels-wrapper");
         const horizontalDuration = 44;
+        const timelineFadeDuration = 2;
         const mapPathDuration = 5;
         const mapPathStagger = 0.05;
         const mapPathCount = gsap.utils.toArray(".map-svg path").length;
@@ -2092,9 +2093,12 @@ function initTreeDiagram() {
             // Start the hand-off only after the horizontal movement has placed
             // the final week on the left side of the viewport.
             .addLabel("timelineExit", `horizontalStart+=${horizontalDuration}`)
+            // Wait until every timeline element and line has fully faded before
+            // revealing or drawing any part of the map.
+            .addLabel("mapRevealStart", `timelineExit+=${timelineFadeDuration}`)
             // Testimonials start as soon as the complete staggered map drawing
             // finishes, without waiting for the longer dot reveal sequence.
-            .addLabel("mapDrawComplete", `timelineExit+=${mapDrawDuration}`)
+            .addLabel("mapDrawComplete", `mapRevealStart+=${mapDrawDuration}`)
             // First, create the white progress line before the animation starts
             .to({}, {
                 duration: 0.001,
@@ -2252,7 +2256,7 @@ function initTreeDiagram() {
             // Now you can animate it properly
             .to(".section.is--timeline, .section.is--compare", {
                 autoAlpha: 0,
-                duration: 2,
+                duration: timelineFadeDuration,
                 ease: "power2.inOut",
 
                 onStart: function () {
@@ -2262,7 +2266,7 @@ function initTreeDiagram() {
 
                     gsap.to(element, {
                         autoAlpha: 0,
-                        duration: 2,
+                        duration: timelineFadeDuration,
                         ease: "power2.inOut",
                     })
 
@@ -2320,7 +2324,7 @@ function initTreeDiagram() {
                 autoAlpha: 1,
                 duration: 2,
                 ease: "power2.inOut",
-            }, "timelineExit")
+            }, "mapRevealStart")
             .to(".timeline-panel.is--fixed.is--2", {
                 autoAlpha: 1,
                 onStart: function () {
@@ -2691,7 +2695,7 @@ function initTreeDiagram() {
             }, "horizontalStart+=13.7")
             .to(".section.is--timeline .timeline-panel, .section.is--timeline .line-container, .section.is--timeline .grey-line-new", {
                 autoAlpha: 0,
-                duration: 2,
+                duration: timelineFadeDuration,
                 ease: "power2.inOut",
             }, "timelineExit")
             .to(".map-svg path", {
@@ -2714,7 +2718,7 @@ function initTreeDiagram() {
                         ease: "power2.out"
                     },)
                 }
-            }, "timelineExit")
+            }, "mapRevealStart")
 
             .to(".tree-right-wrapper .dot-wrapper", {
                 autoAlpha: 0,
