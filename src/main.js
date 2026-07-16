@@ -3408,7 +3408,10 @@ function initTreeDiagram() {
             }
         })
 
-        .addLabel("focusSection", "+=1")
+        // The lower branch finishes drawing four seconds after "equal", then
+        // “Ce que tu veux vraiment” completes its one-second scramble. Start
+        // the white-diagram pass on that exact frame, without a dead pause.
+        .addLabel("compareWhiteStart", "equal+=5")
 
         // white line is coming in
         .from(".tree-container.is--compare .tree-left-side .line-clr", {
@@ -3417,7 +3420,7 @@ function initTreeDiagram() {
             transformOrigin: window.innerWidth <= 767 ? "top" : "left",
             duration: 1.5,
             ease: "linear",
-        }, "focusSection")
+        }, "compareWhiteStart")
 
 
         .from(".tree-container.is--compare .tree-left-side .line-vertical-clr", {
@@ -5842,6 +5845,11 @@ function initTerminalOffers() {
     const footerSection = document.querySelector('.section.is--footerlast');
 
     if (!offersSection || !offersTitle) return;
+
+    offersSection.querySelectorAll('.link-container .link-pay').forEach(link => {
+        link.setAttribute('target', '_blank');
+        link.setAttribute('rel', 'noopener noreferrer');
+    });
 
     const offersQuestion = 'Quelle formule te parle le plus ?';
     offersTitle.textContent = offersQuestion;
