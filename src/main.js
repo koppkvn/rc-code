@@ -294,7 +294,9 @@ function applyBrandAccent() {
             .section.is--timeline .timeline-access-preparation__image {
                 width: 100%;
                 height: clamp(10rem, 25vh, 15rem);
+                box-sizing: border-box;
                 justify-content: center;
+                border: 1px solid rgba(255, 255, 255, .22);
             }
 
             .section.is--timeline .timeline-access-preparation__image img {
