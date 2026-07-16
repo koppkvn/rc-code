@@ -946,52 +946,53 @@ function alignMobileAccessPreparationToTimelineDot() {
     });
 }
 
-function balanceMobileWeekOneSpacing() {
+function normalizeMobileTimelinePanelSpacing() {
     if (!window.matchMedia('(max-width: 47.99rem)').matches) return;
 
     const accessLastText = document.querySelector(
         '.section.is--timeline .timeline-access-preparation__text:last-child'
     );
-    const weekOnePanel = document.querySelector(
-        '.section.is--timeline .timeline-panel.is--5'
-    );
-    const weekOneTitle = weekOnePanel?.querySelector(
-        '.big-title-section.is--timeline'
-    );
-    const weekOneLastModule = weekOnePanel?.querySelector(
-        '.module-container .text-block-4:last-child'
-    );
-    const weekTwoTitle = document.querySelector(
-        '.section.is--timeline .timeline-panel.is--6 .big-title-section.is--timeline'
-    );
+    const weekPanels = [5, 6, 7, 8]
+        .map(index => document.querySelector(
+            `.section.is--timeline .timeline-panel.is--${index}`
+        ))
+        .filter(Boolean);
 
-    if (
-        !accessLastText
-        || !weekOnePanel
-        || !weekOneTitle
-        || !weekOneLastModule
-        || !weekTwoTitle
-    ) return;
+    if (!accessLastText || weekPanels.length !== 4) return;
 
-    // Reset before measuring so refreshes never accumulate the correction.
-    gsap.set(weekOnePanel, { y: 0 });
+    const getPanelParts = panel => ({
+        panel,
+        content: panel.querySelector(':scope > .div-block-3') || panel,
+        title: panel.querySelector('.big-title-section.is--timeline'),
+    });
+    const panelParts = weekPanels.map(getPanelParts);
 
-    const accessBottom = accessLastText.getBoundingClientRect().bottom;
-    const weekOneTop = weekOneTitle.getBoundingClientRect().top;
-    const weekOneBottom = weekOneLastModule.getBoundingClientRect().bottom;
-    const weekTwoTop = weekTwoTitle.getBoundingClientRect().top;
-    const gapBeforeWeekOne = weekOneTop - accessBottom;
-    const gapAfterWeekOne = weekTwoTop - weekOneBottom;
+    if (panelParts.some(({ title }) => !title)) return;
 
-    // Moving week one upward reduces the first gap and increases the second
-    // by the same amount. Half their difference makes both gaps identical.
-    const upwardShift = Math.max(
-        0,
-        (gapBeforeWeekOne - gapAfterWeekOne) / 2
+    // Restore the natural flow before measuring so refreshes never accumulate
+    // either the former transform correction or the new margin correction.
+    panelParts.forEach(({ panel }) => {
+        gsap.set(panel, { clearProps: 'transform' });
+        panel.style.marginTop = '0px';
+    });
+
+    const weekThree = panelParts[2];
+    const weekFour = panelParts[3];
+    const referenceGap = (
+        weekFour.title.getBoundingClientRect().top
+        - weekThree.content.getBoundingClientRect().bottom
     );
+    const targetGap = Math.max(0, referenceGap * 0.6);
 
-    gsap.set(weekOnePanel, {
-        y: -upwardShift,
+    // Apply a real flow-space correction rather than a visual translation.
+    // Every complete block therefore keeps the same reduced gap and the
+    // timeline/map hand-off remains based on the updated document height.
+    let previousBottom = accessLastText.getBoundingClientRect().bottom;
+
+    panelParts.forEach(({ panel, content, title }) => {
+        const currentGap = title.getBoundingClientRect().top - previousBottom;
+        panel.style.marginTop = `${targetGap - currentGap}px`;
+        previousBottom = content.getBoundingClientRect().bottom;
     });
 }
 
@@ -1025,7 +1026,7 @@ function alignMobileTimelineDotToCompareDot() {
 
     // The first timeline content uses this same point as its vertical anchor.
     alignMobileAccessPreparationToTimelineDot();
-    balanceMobileWeekOneSpacing();
+    normalizeMobileTimelinePanelSpacing();
 }
 
 function replaceMobileStatsWithSchedule() {
@@ -4554,7 +4555,7 @@ function initTreeDiagram() {
         })
 
         alignMobileAccessPreparationToTimelineDot();
-        balanceMobileWeekOneSpacing();
+        normalizeMobileTimelinePanelSpacing();
 
 
         // Only set styles for second text if enabled
