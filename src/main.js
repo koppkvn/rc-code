@@ -6420,17 +6420,25 @@ function initHeroAnimation() {
         autoAlpha: 0,
     })
 
+    gsap.set(".hero-content .title--1, .hero-content .p-hero", {
+        autoAlpha: 0,
+        y: 12,
+    });
+    gsap.set(".hero-content .title--1 .lineInner, .hero-content .p-hero .lineInner", {
+        yPercent: 0,
+    });
+
     gsap.set(bgVideo, { opacity: 0 });
 
     let tl = gsap.timeline({ paused: true })
 
 
 
-    tl.from(".hero-content [data-split='lines'] .lineInner", {
-        yPercent: 100,
-        duration: 1,
-        ease: "easeOutQuart",
-        stagger: 0.1,
+    tl.to(".hero-content .title--1, .hero-content .p-hero", {
+        autoAlpha: 1,
+        y: 0,
+        duration: 2.15,
+        ease: "none",
         onStart: function () {
             gsap.set(".button.button--secondary, .hero-video", {
                 autoAlpha: 1,
