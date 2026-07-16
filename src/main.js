@@ -471,8 +471,8 @@ function applyBrandAccent() {
                 position: absolute;
                 left: 50%;
                 translate: -50% 0;
-                font-size: .86rem;
-                line-height: 1.12;
+                font-size: 1rem;
+                line-height: 1.2;
                 letter-spacing: .025em;
                 text-align: center;
                 white-space: nowrap;
