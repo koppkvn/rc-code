@@ -346,6 +346,14 @@ function applyBrandAccent() {
                 line-height: 1.1;
             }
 
+            .section.is--timeline .stats-container.is--schedule-replacement .structure-day {
+                color: #fff;
+            }
+
+            .section.is--timeline .stats-container.is--schedule-replacement .structure-detail {
+                color: rgba(255, 255, 255, .5);
+            }
+
             .section.is--timeline .stats-container.is--schedule-replacement .structure-text {
                 width: 100%;
                 color: rgba(255, 255, 255, .5);
@@ -932,19 +940,28 @@ function replaceMobileStatsWithSchedule() {
     if (!statsContainer || !statsInner || !schedule) return;
 
     const mobileScheduleTitles = [
-        'Lundi à jeudi : Cours + exercice',
-        'Vendredi : Méditation guidée',
-        'Dimanche : Purgatoire (1 à 2h)',
+        ['Lundi à jeudi :', 'Cours + exercice'],
+        ['Vendredi :', 'Méditation guidée'],
+        ['Dimanche :', 'Purgatoire (1 à 2h)'],
     ];
 
     schedule.querySelectorAll(':scope > .structure-wrapper').forEach((scheduleRow, index) => {
         const title = scheduleRow.querySelector('.structure-title');
         const description = scheduleRow.querySelector('.structure-text');
-        const mobileTitle = mobileScheduleTitles[index];
+        const mobileTitleParts = mobileScheduleTitles[index];
 
-        if (title && mobileTitle) {
-            title.textContent = mobileTitle;
-            title.setAttribute('aria-label', mobileTitle);
+        if (title && mobileTitleParts) {
+            const [dayLabel, detailLabel] = mobileTitleParts;
+            const day = document.createElement('span');
+            const detail = document.createElement('span');
+
+            day.className = 'structure-day';
+            day.textContent = dayLabel;
+            detail.className = 'structure-detail';
+            detail.textContent = ` ${detailLabel}`;
+
+            title.replaceChildren(day, detail);
+            title.setAttribute('aria-label', `${dayLabel} ${detailLabel}`);
         }
 
         if (index === 2 && description) {
@@ -5339,26 +5356,28 @@ function createMapTimeline() {
         scale: 2,
         willChange: "transform",
     })
+    gsap.set(".section.is--map .text-wrapper-map .t-inner-wrapper", {
+        autoAlpha: 0,
+        y: 12,
+    });
+    gsap.set(".section.is--map .text-wrapper-map [data-split='lines'] .lineInner", {
+        yPercent: 0,
+    });
+
     mapTl
         .addLabel("mapDrawStart")
         .from(".map-svg", {
-        opacity: 0,
-
-        onStart: function () {
-            gsap.to(".section.is--map .text-wrapper-map [data-split='lines'] .lineInner", {
-                yPercent: 0,
-                duration: 1,
-                ease: "power2.out"
-            },)
-        },
-        onReverseComplete: function () {
-            gsap.to(".section.is--map .text-wrapper-map [data-split='lines'] .lineInner", {
-                yPercent: 100,
-                duration: 1,
-                ease: "power2.out"
-            },)
-        }
-    }, "mapDrawStart")
+            opacity: 0,
+        }, "mapDrawStart")
+        // Same natural fade used by “Une expérience de groupe” and
+        // “Deux formules”: title and paragraph appear together while the map
+        // is being revealed, with no separate line-by-line jump.
+        .to(".section.is--map .text-wrapper-map .t-inner-wrapper", {
+            autoAlpha: 1,
+            y: 0,
+            duration: 1,
+            ease: "none",
+        }, "mapDrawStart")
         .addLabel("mapDrawComplete", "mapDrawStart+=1")
 
         .from(".map-container .dot-normal, .map-container .dot-video", {
