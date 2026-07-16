@@ -2229,6 +2229,7 @@ function initScrollLock() {
         const trackerPlaceholder = document.querySelector(
             '.mobile-tracker-placeholder'
         );
+        let shouldNudgeMobileScroll = false;
         if (
             trackerSection?.getAttribute('data-mobile-tracker-overlay') ===
             'true' &&
@@ -2242,14 +2243,35 @@ function initScrollLock() {
                 immediate: true,
                 force: true,
             });
+            window.scrollTo(0, trackerTop);
             trackerPlaceholder.replaceWith(trackerSection);
+            trackerSection.removeAttribute('data-mobile-tracker-overlay');
+            shouldNudgeMobileScroll = true;
         }
-        trackerSection?.removeAttribute('data-mobile-tracker-overlay');
 
         initTreeDiagramWrapper(); // on page load
         window.lenis?.resize?.();
         ScrollTrigger.refresh();
         window.lenis?.start();
+
+        if (shouldNudgeMobileScroll) {
+            requestAnimationFrame(() => {
+                const nudgeDistance = Math.min(
+                    48,
+                    window.innerHeight * .045
+                );
+                window.lenis?.scrollTo(
+                    window.scrollY + nudgeDistance,
+                    {
+                        duration: .85,
+                        force: true,
+                        easing: progress => (
+                            1 - Math.pow(1 - progress, 3)
+                        ),
+                    }
+                );
+            });
+        }
     }
 
     // Check on each button click if tracker is complete
