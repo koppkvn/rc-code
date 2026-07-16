@@ -306,7 +306,7 @@ function applyBrandAccent() {
                 width: 100%;
                 height: 100svh;
                 overflow: hidden;
-                background: #000;
+                background-color: var(--black);
             }
 
             .section.is--tracker[data-mobile-tracker-overlay="true"]
@@ -1597,9 +1597,11 @@ function initTrackerSection() {
             autoAlpha: 0,
         });
         ScrollTrigger.create({
-            trigger: ".section.is--intro .ici-wrapper",
-            start: "bottom top",
-            pinnedContainer: ".section.is--intro",
+            // Wait until the complete intro screen has naturally left the
+            // viewport. Using the tracker's placeholder prevents the fixed
+            // overlay from covering the final intro elements prematurely.
+            trigger: trackerPlaceholder,
+            start: "top top",
             onEnter: () => {
                 window.lenis?.stop();
                 gsap.set(trackerSection, {
@@ -2250,12 +2252,18 @@ function initScrollLock() {
         }
 
         initTreeDiagramWrapper(); // on page load
-        window.lenis?.resize?.();
-        ScrollTrigger.refresh();
-        window.lenis?.start();
-
-        if (shouldNudgeMobileScroll) {
+        requestAnimationFrame(() => {
             requestAnimationFrame(() => {
+                // The following sections and GSAP pin spacers now exist in
+                // the rendered layout. Recalculate both systems only at this
+                // point so Lenis receives the real, unlocked page height.
+                window.lenis?.resize?.();
+                ScrollTrigger.refresh(true);
+                window.lenis?.resize?.();
+                window.lenis?.start();
+
+                if (!shouldNudgeMobileScroll) return;
+
                 const nudgeDistance = Math.min(
                     48,
                     window.innerHeight * .045
@@ -2271,7 +2279,7 @@ function initScrollLock() {
                     }
                 );
             });
-        }
+        });
     }
 
     // Check on each button click if tracker is complete
