@@ -1548,10 +1548,17 @@ function initTrackerSection() {
         autoAlpha: isMobile ? 1 : 0,
     })
 
-    gsap.set(isMobile ? mobileTrackerContent : trackerCopy, {
-        autoAlpha: 0,
-        y: 12,
-    });
+    if (isMobile) {
+        gsap.set(mobileTrackerContent, {
+            autoAlpha: 0,
+            y: 0,
+        });
+    } else {
+        gsap.set(trackerCopy, {
+            autoAlpha: 0,
+            y: 12,
+        });
+    }
     gsap.set(".section.is--tracker .big-title-section .lineInner, .section.is--tracker .wrapper-p .lineInner", {
         yPercent: 0,
     });
@@ -1560,13 +1567,10 @@ function initTrackerSection() {
         const trackerContainer = document.querySelector(
             '.section.is--tracker .container.is--tracker'
         );
-        const trackerTitle = document.querySelector(
-            trackerTitleSelector
-        );
+        const trackerSection = document.querySelector('.section.is--tracker');
         const trackerCopyReveal = gsap.timeline({ paused: true })
             .to(mobileTrackerContent, {
                 autoAlpha: 1,
-                y: 0,
                 duration: 2.15,
                 ease: "none",
                 onStart: () => {
@@ -1581,23 +1585,31 @@ function initTrackerSection() {
             start: "bottom top",
             pinnedContainer: ".section.is--intro",
             onEnter: () => {
-                if (trackerContainer && trackerTitle) {
-                    // Measure the final title position as “Tu es ici” leaves,
-                    // then move the complete tracker section to a lower mobile
-                    // anchor than the diagram headings.
-                    gsap.set(mobileTrackerContent, { y: 0 });
+                if (trackerContainer && trackerSection) {
+                    // Place the tracker on its real final screen as soon as
+                    // “Tu es ici” leaves. The 8svh container padding matches
+                    // the mobile diagram headings, so no measured transform is
+                    // needed and the content cannot drift with another scroll.
                     gsap.set(trackerContainer, { y: 0 });
+                    gsap.set(mobileTrackerContent, { y: 0 });
 
-                    const desiredTop = window.innerHeight * 0.12;
-                    const titleTop = trackerTitle.getBoundingClientRect().top;
+                    const trackerTop = (
+                        trackerSection.getBoundingClientRect().top +
+                        window.scrollY
+                    );
 
-                    gsap.set(trackerContainer, {
-                        y: desiredTop - titleTop,
+                    window.lenis?.scrollTo(trackerTop, {
+                        immediate: true,
+                        force: true,
                     });
-                    gsap.set(mobileTrackerContent, { y: 12 });
+                    window.lenis?.stop();
+                    trackerSection.setAttribute(
+                        'data-mobile-scroll-locked',
+                        'true'
+                    );
                 }
 
-                trackerCopyReveal.play();
+                trackerCopyReveal.restart();
             },
             onLeaveBack: () => trackerCopyReveal.reverse(),
             markers: false,
@@ -2127,10 +2139,9 @@ function initScrollLock() {
         section.style.display = 'none';
     });
 
-    // Recalculate the natural page limit after hiding the following sections.
-    // There is deliberately no programmatic scroll or temporary input lock:
-    // the user's current gesture can continue uninterrupted until the real
-    // bottom of the tracker.
+    // Recalculate the page limit after hiding the following sections. On
+    // mobile, initTrackerSection then lands on the tracker's final screen and
+    // pauses Lenis there until the habits unlock the rest of the page.
     requestAnimationFrame(() => {
         window.lenis?.resize?.();
         ScrollTrigger.refresh();
@@ -2159,6 +2170,7 @@ function initScrollLock() {
 
         // Set flag to true to prevent future executions
         contentUnlocked = true;
+        trackerSection?.removeAttribute('data-mobile-scroll-locked');
 
         // Show all sections after tracker
         allSectionsAfterTracker.forEach(section => {
