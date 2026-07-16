@@ -450,6 +450,13 @@ function applyBrandAccent() {
                 text-align: left;
             }
 
+            /* The redesigned TOI remains the single visible label throughout
+               the hand-off and the complete comparison-diagram drawing. */
+            .section.is--compare .label.color.is--compare {
+                visibility: hidden !important;
+                opacity: 0 !important;
+            }
+
             .mobile-tree-redesign__diagram {
                 position: absolute;
                 top: 39svh;
@@ -2340,22 +2347,10 @@ function initTreeDiagram() {
                 })
                 .to({}, { duration: .5 })
 
-                // Prepare the invisible hand-off target before TOI starts
-                // moving. The formula copy remains fully visible until here.
-                .set(".tree-container.is--three", {
-                    autoAlpha: 1,
-                })
-                .set(".tree-container.is--three > *", {
-                    autoAlpha: 0,
-                })
-                .set(".tree-container.is--three .tree-child-wrapper.is--one", {
-                    autoAlpha: 1,
-                    yPercent: -564,
-                })
-                .set(".tree-container.is--three .tree-child-wrapper.is--one .line", {
-                    autoAlpha: 0,
-                })
-                .set(".tree-container.is--three .tree-child-wrapper.is--one .label", {
+                // The old intermediate TOI is no longer used for the hand-off.
+                // Keep it hidden and target the actual TOI anchor of the
+                // comparison diagram instead.
+                .set(".tree-container.is--three .tree-child-wrapper.is--one.is--toi .label", {
                     autoAlpha: 0,
                 })
                 .addLabel("mobileToiLift")
@@ -2385,7 +2380,7 @@ function initTreeDiagram() {
                     x: function () {
                         const source = document.querySelector(".mobile-tree-redesign__toi");
                         const target = document.querySelector(
-                            ".tree-container.is--three .tree-child-wrapper.is--one.is--toi .label"
+                            ".tree-container.is--compare .tree-left-side .label.color.is--compare"
                         );
                         if (!source || !target) return 0;
 
@@ -2397,7 +2392,7 @@ function initTreeDiagram() {
                     y: function () {
                         const source = document.querySelector(".mobile-tree-redesign__toi");
                         const target = document.querySelector(
-                            ".tree-container.is--three .tree-child-wrapper.is--one.is--toi .label"
+                            ".tree-container.is--compare .tree-left-side .label.color.is--compare"
                         );
                         if (!source || !target) return 0;
 
@@ -2412,7 +2407,7 @@ function initTreeDiagram() {
                 // Keep the redesigned TOI itself visible after it reaches the
                 // exact anchor. The historical label stays hidden, so there is
                 // never a duplicate or a one-frame visibility gap.
-                .set(".tree-container.is--three .tree-child-wrapper.is--one.is--toi .label", {
+                .set(".tree-container.is--compare .tree-left-side .label.color.is--compare", {
                     autoAlpha: 0,
                 });
         }
