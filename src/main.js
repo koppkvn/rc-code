@@ -296,6 +296,47 @@ function applyBrandAccent() {
                 margin-top: var(--mobile-section-copy-gap);
             }
 
+            .section.is--tracker .mobile-tracker-copy {
+                display: flex;
+                width: min(calc(100% - 2.5rem), 25rem);
+                margin: 0 auto 0 0;
+                padding: 0;
+                flex-direction: column;
+                align-items: flex-start;
+                text-align: left;
+            }
+
+            .section.is--tracker .mobile-tracker-copy > .big-title-section {
+                width: 100%;
+                margin: 0;
+                padding: 0;
+                color: rgba(255, 255, 255, .96);
+                font-size: 2.3rem;
+                font-weight: inherit;
+                line-height: .95;
+                text-align: left;
+                text-transform: uppercase;
+            }
+
+            .section.is--tracker .mobile-tracker-copy > .wrapper-p {
+                width: 100%;
+                margin: var(--mobile-section-copy-gap) 0 0;
+                padding: 0;
+            }
+
+            .section.is--tracker
+            .mobile-tracker-copy > .wrapper-p .text-section {
+                width: 100%;
+                margin: 0;
+                padding: 0;
+                color: #fff;
+                font-size: .9375rem;
+                line-height: 1.25;
+                letter-spacing: 0;
+                text-align: left;
+                text-transform: uppercase;
+            }
+
             .section.is--tracker .container.is--tracker {
                 box-sizing: border-box;
                 padding-top: var(--mobile-section-title-top);
@@ -1594,14 +1635,19 @@ function initTrackerSection() {
         const trackerTitle = trackerContainer?.querySelector(
             ':scope > .big-title-section'
         );
-        const sectionReference = document.querySelector(
-            '.mobile-tree-redesign__copy'
+        const trackerParagraph = trackerContainer?.querySelector(
+            ':scope > .wrapper-p'
         );
-        const trackerHeading = (
-            ".section.is--tracker .container.is--tracker > " +
-            ".big-title-section, " +
-            ".section.is--tracker .container.is--tracker > .wrapper-p"
+        let trackerCopyGroup = trackerContainer?.querySelector(
+            ':scope > .mobile-tracker-copy'
         );
+        if (!trackerCopyGroup && trackerTitle && trackerParagraph) {
+            trackerCopyGroup = document.createElement('div');
+            trackerCopyGroup.className = 'mobile-tracker-copy';
+            trackerContainer.insertBefore(trackerCopyGroup, trackerTitle);
+            trackerCopyGroup.append(trackerTitle, trackerParagraph);
+        }
+        const trackerHeading = ".section.is--tracker .mobile-tracker-copy";
         const trackerDetails = (
             ".section.is--tracker .container.is--tracker > .svg-wrapper, " +
             ".section.is--tracker .container.is--tracker > " +
@@ -1640,27 +1686,10 @@ function initTrackerSection() {
                 gsap.set(trackerSection, {
                     autoAlpha: 1,
                 });
-                // Measure the actual final heading positions instead of relying
-                // on the native Webflow spacing of two different containers.
-                // This makes the tracker title finish at the exact same height
-                // as "Une structure en deux sections".
-                gsap.set(trackerHeading, { y: 0 });
-                const trackerTitleTop = (
-                    trackerTitle?.getBoundingClientRect().top || 0
-                );
-                const referenceTop = (
-                    sectionReference?.getBoundingClientRect().top
-                    || trackerTitleTop
-                );
-                const trackerHeadingFinalY = referenceTop - trackerTitleTop;
-                gsap.set(trackerHeading, {
-                    autoAlpha: 0,
-                    y: trackerHeadingFinalY + 12,
-                });
                 gsap.timeline()
                     .to(trackerHeading, {
                         autoAlpha: 1,
-                        y: trackerHeadingFinalY,
+                        y: 0,
                         duration: 2.15,
                         ease: "none",
                         overwrite: true,
