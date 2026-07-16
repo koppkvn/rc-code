@@ -289,10 +289,14 @@ function applyBrandAccent() {
             }
 
             .section.is--tracker .big-title-section {
+                position: relative;
+                top: -1rem;
                 margin-top: 0;
             }
 
             .section.is--tracker .wrapper-p {
+                position: relative;
+                top: -1rem;
                 margin-top: var(--mobile-section-copy-gap);
             }
 
