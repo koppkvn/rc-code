@@ -297,6 +297,11 @@ function applyBrandAccent() {
             }
 
             .section.is--tracker .mobile-tracker-copy {
+                position: absolute;
+                z-index: 4;
+                top: var(--mobile-section-title-top);
+                right: 0;
+                left: 0;
                 display: flex;
                 width: 100%;
                 margin: 0 auto 0 0;
@@ -338,6 +343,7 @@ function applyBrandAccent() {
             }
 
             .section.is--tracker .container.is--tracker {
+                position: relative;
                 box-sizing: border-box;
                 padding-top: var(--mobile-section-title-top);
                 border-top: 0 !important;
