@@ -860,6 +860,14 @@ function applyBrandAccent() {
                 display: none !important;
             }
 
+            .section.is--tracker .mobile-tracker-details > .tracker-container {
+                margin-top: 0 !important;
+            }
+
+            .section.is--tracker .tracker-highlight {
+                display: none !important;
+            }
+
             /* Lift the habit rows and their highlight without moving the XP UI. */
             .tracker-wrapper > .tracker-header,
             .tracker-wrapper > .tracker-row,
@@ -890,30 +898,38 @@ function applyBrandAccent() {
                 display: none !important;
             }
 
-            .section.is--tracker .tracker-checkbox.is--button.is--glow {
-                border: .0625rem solid #fff !important;
-                background-color: #2f2f2f !important;
-                box-shadow: none !important;
+            .section.is--tracker .tracker-checkbox.is--button {
+                border: .0625rem solid ${ACCENT_COLOR} !important;
+                background-color: transparent !important;
                 transform: none !important;
-                animation: none !important;
             }
 
-            .section.is--tracker .tracker-checkbox.is--button.is--glow::before {
+            .section.is--tracker
+            .tracker-checkbox.is--button:not([data-clicked="true"]) {
+                animation:
+                    tracker-gold-border-pulse 2.8s ease-in-out infinite
+                    !important;
+            }
+
+            .section.is--tracker .tracker-checkbox.is--button::before {
                 display: none !important;
                 content: none !important;
                 animation: none !important;
             }
 
-            .section.is--tracker .tracker-checkbox.is--button.is--glow
+            .section.is--tracker .tracker-checkbox.is--button
             .tracker-checkbox-inside.is--button {
-                background-color: #fff !important;
-                animation: tracker-center-square-pulse 2.1s ease-in-out infinite;
+                visibility: hidden !important;
+                opacity: 0 !important;
+                background: transparent !important;
+                box-shadow: none !important;
+                animation: none !important;
             }
 
             .section.is--tracker[data-xp-cycle-complete="true"]
             .tracker-checkbox.is--button {
                 border-color: ${ACCENT_COLOR} !important;
-                background-color: rgba(210, 170, 98, .16) !important;
+                background-color: transparent !important;
                 box-shadow:
                     0 0 .25rem rgba(247, 232, 189, .42),
                     0 0 .65rem rgba(210, 170, 98, .38) !important;
@@ -926,20 +942,25 @@ function applyBrandAccent() {
             .section.is--tracker[data-xp-cycle-complete="true"]
             .tracker-checkbox.is--button
             .tracker-checkbox-inside.is--button {
-                opacity: 1 !important;
-                background-color: ${ACCENT_COLOR} !important;
-                box-shadow: 0 0 .4rem rgba(247, 232, 189, .65);
+                visibility: hidden !important;
+                opacity: 0 !important;
+                background: transparent !important;
+                box-shadow: none !important;
                 animation: none !important;
             }
 
-            @keyframes tracker-center-square-pulse {
+            @keyframes tracker-gold-border-pulse {
                 0%,
                 100% {
-                    opacity: .28;
+                    border-color: rgba(210, 170, 98, .58);
+                    box-shadow: 0 0 .16rem rgba(210, 170, 98, .18);
                 }
 
                 50% {
-                    opacity: 1;
+                    border-color: ${ACCENT_COLOR};
+                    box-shadow:
+                        0 0 .28rem rgba(247, 232, 189, .42),
+                        0 0 .7rem rgba(210, 170, 98, .42);
                 }
             }
         }
@@ -1717,7 +1738,7 @@ function initTrackerSection() {
                     const containerRect = trackerContainer.getBoundingClientRect();
                     const copyRect = trackerCopyGroup.getBoundingClientRect();
                     trackerDetailsGroup.style.top = `${
-                        copyRect.bottom - containerRect.top + 24
+                        copyRect.bottom - containerRect.top + 8
                     }px`;
                 }
                 gsap.timeline()
@@ -2119,6 +2140,7 @@ function initTrackerCheckboxes() {
     configureTrackerRows();
 
     const trackerButtons = getActiveTrackerButtons();
+    const isMobile = window.matchMedia('(max-width: 47.99rem)').matches;
     const trackerSection = document.querySelector('.section.is--tracker');
     const xpBar = createTrackerXpBar();
     let completedSteps = 0;
@@ -2212,8 +2234,10 @@ function initTrackerCheckboxes() {
             // Mark as clicked
             this.setAttribute('data-clicked', 'true');
 
-            // Toggle white border on the button
-            this.style.border = '.0625rem solid white';
+            // Keep the new mobile gold outline after validation.
+            this.style.border = `.0625rem solid ${
+                isMobile ? ACCENT_COLOR : 'white'
+            }`;
 
             // Remove any hover effects when clicked
             gsap.to(this, {
@@ -2224,7 +2248,7 @@ function initTrackerCheckboxes() {
 
             // Find the inside div and set its opacity to 1
             const inside = this.querySelector('.tracker-checkbox-inside');
-            if (inside) {
+            if (inside && !isMobile) {
                 // Animate the inside div with GSAP
                 gsap.fromTo(inside,
                     { opacity: 0, scale: 1.6 },
