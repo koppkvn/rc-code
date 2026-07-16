@@ -136,28 +136,49 @@ function applyBrandAccent() {
 
         .section.is--fields.is--terminal-offers {
             display: grid !important;
+            position: relative;
+            z-index: 1000;
             width: 100%;
             height: 100svh;
             min-height: 100svh;
             overflow: hidden;
+            background: #0d0d0d;
             place-items: center;
+            isolation: isolate;
+        }
+
+        .section.is--fields.is--terminal-offers.is--terminal-active {
+            position: fixed !important;
+            z-index: 2147483000 !important;
+            inset: 0 !important;
+            width: 100vw !important;
+            height: 100dvh !important;
+            min-height: 100dvh !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            background: #0d0d0d !important;
         }
 
         .section.is--fields.is--terminal-offers .container.is--fields {
             display: flex;
             width: 100%;
+            height: 100%;
             min-height: 100%;
+            max-height: 100%;
             box-sizing: border-box;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 2rem 1.25rem;
+            gap: 1.5rem;
+            margin: 0;
+            padding: 1.5rem 1.25rem;
             text-align: center;
         }
 
         .section.is--fields.is--terminal-offers .h2-fields {
             width: min(100%, 48rem);
-            margin: 0 0 1.5rem;
+            margin: 0;
+            padding: 0;
             font-size: clamp(2.5rem, 4vw, 4rem);
             line-height: 1.02;
             text-align: center;
@@ -165,7 +186,8 @@ function applyBrandAccent() {
 
         .section.is--fields.is--terminal-offers .link-container {
             width: min(100%, 28rem);
-            margin: 0;
+            justify-content: center;
+            margin: 0 auto;
         }
 
         .section.is--fields.is--terminal-offers .div-2,
@@ -713,11 +735,6 @@ function applyBrandAccent() {
                 width: min(100%, 22rem);
             }
 
-            html.is--terminal-offers-locked,
-            body.is--terminal-offers-locked {
-                overscroll-behavior: none;
-            }
-
             .section.is--tracker .tracker-header .tracker-wrapper-mobile > :first-child,
             .section.is--tracker .tracker-row .tracker-wrapper-mobile > :first-child {
                 visibility: hidden !important;
@@ -754,6 +771,12 @@ function applyBrandAccent() {
                 translate: 0 -1.25rem;
                 padding-bottom: 1.5rem;
             }
+        }
+
+        html.is--terminal-offers-locked,
+        body.is--terminal-offers-locked {
+            overflow: hidden !important;
+            overscroll-behavior: none;
         }
 
         @keyframes gold-wait-sweep {
@@ -5859,33 +5882,31 @@ function initTerminalOffers() {
             if (offersSnapInProgress || !window.lenis) return;
 
             offersSnapInProgress = true;
+            const offersTop = window.scrollY + offersSection.getBoundingClientRect().top;
+            offersSection.classList.add('is--terminal-active');
 
-            if (isMobile) {
-                lockMobileTerminalOffers();
-                if (offersContent) {
-                    gsap.to(offersContent, {
-                        autoAlpha: 1,
-                        yPercent: 0,
-                        duration: .9,
-                        ease: 'power3.out',
-                        overwrite: true,
-                        onComplete: () => {
-                            gsap.set(offersContent, { clearProps: 'willChange' });
-                        },
-                    });
-                }
+            if (offersContent) {
+                gsap.to(offersContent, {
+                    autoAlpha: 1,
+                    yPercent: 0,
+                    duration: .9,
+                    ease: 'power3.out',
+                    overwrite: true,
+                    onComplete: () => {
+                        gsap.set(offersContent, { clearProps: 'willChange' });
+                    },
+                });
             }
 
-            window.lenis.scrollTo(offersSection, {
+            window.lenis.scrollTo(offersTop, {
                 duration: .9,
                 immediate: false,
                 lock: true,
                 force: true,
                 onComplete: () => {
                     offersSnapInProgress = false;
-                    if (isMobile) {
-                        window.lenis.stop();
-                    }
+                    lockMobileTerminalOffers();
+                    window.lenis.stop();
                 },
             });
         },
