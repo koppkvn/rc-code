@@ -296,7 +296,7 @@ function applyBrandAccent() {
 
             .mobile-tree-redesign {
                 position: absolute;
-                z-index: 12;
+                z-index: 30;
                 inset: 0;
                 display: block;
                 width: 100%;
@@ -311,25 +311,28 @@ function applyBrandAccent() {
                 z-index: 2;
                 top: 8%;
                 right: 1.25rem;
-                left: 1.25rem;
-                text-align: center;
+                left: auto;
+                width: min(calc(100% - 2.5rem), 25rem);
+                text-align: right;
             }
 
             .mobile-tree-redesign__copy-title {
                 margin: 0;
                 color: rgba(255, 255, 255, .96);
-                font-size: clamp(1.65rem, 7.5vw, 2.1rem);
+                font-size: 2.3rem;
                 font-weight: inherit;
-                line-height: .98;
+                line-height: .95;
+                text-align: right;
                 text-transform: uppercase;
             }
 
             .mobile-tree-redesign__copy-text {
-                width: min(100%, 25rem);
-                margin: .85rem auto 0;
+                width: 100%;
+                margin: .85rem 0 0 auto;
                 color: rgba(255, 255, 255, .62);
                 font-size: .75rem;
                 line-height: 1.4;
+                text-align: right;
                 text-transform: uppercase;
             }
 
@@ -338,25 +341,28 @@ function applyBrandAccent() {
                 z-index: 3;
                 top: 7%;
                 right: 1.25rem;
-                left: 1.25rem;
-                text-align: center;
+                left: auto;
+                width: min(calc(100% - 2.5rem), 25rem);
+                text-align: right;
             }
 
             .mobile-tree-redesign__formula-title {
                 margin: 0 0 .85rem;
                 color: rgba(255, 255, 255, .96);
-                font-size: clamp(1.65rem, 7.5vw, 2.1rem);
+                font-size: 2.3rem;
                 font-weight: inherit;
-                line-height: .98;
+                line-height: .95;
+                text-align: right;
                 text-transform: uppercase;
             }
 
             .mobile-tree-redesign__formula-text {
-                width: min(100%, 25rem);
-                margin: .65rem auto 0;
+                width: 100%;
+                margin: .65rem 0 0 auto;
                 color: rgba(255, 255, 255, .62);
                 font-size: .7rem;
                 line-height: 1.35;
+                text-align: right;
                 text-transform: uppercase;
             }
 
@@ -1503,6 +1509,7 @@ function initTrackerCheckboxes() {
 
 function initScrollLock() {
     const trackerSection = document.querySelector('.section.is--tracker');
+    const isMobile = window.matchMedia('(max-width: 47.99rem)').matches;
     const allSectionsAfterTracker = Array.from(document.querySelectorAll('.section, .parent-section')).filter(section => {
         // Get all sections that appear after the tracker in the DOM
         return section.compareDocumentPosition(trackerSection) & Node.DOCUMENT_POSITION_PRECEDING;
@@ -1516,6 +1523,37 @@ function initScrollLock() {
     allSectionsAfterTracker.forEach(section => {
         section.style.display = 'none';
     });
+
+    if (isMobile && trackerSection) {
+        let trackerLandingCompleted = false;
+
+        requestAnimationFrame(() => {
+            window.lenis?.resize?.();
+            ScrollTrigger.refresh();
+
+            ScrollTrigger.create({
+                trigger: trackerSection,
+                start: 'top 12%',
+                once: true,
+                onEnter: () => {
+                    if (trackerLandingCompleted || contentUnlocked || !window.lenis) return;
+
+                    trackerLandingCompleted = true;
+                    const lockedTrackerBottom = Math.max(
+                        0,
+                        document.documentElement.scrollHeight - window.innerHeight
+                    );
+
+                    window.lenis.scrollTo(lockedTrackerBottom, {
+                        duration: .65,
+                        immediate: false,
+                        lock: true,
+                        force: true,
+                    });
+                },
+            });
+        });
+    }
 
     // Function to check if all buttons clicked and counter is zero
     function checkTrackerComplete() {
@@ -2048,10 +2086,23 @@ function initTreeDiagram() {
             treeTlOne
                 // Step 1: Reboot Camp splits into Chaos and Cosmos. No centre
                 // branch exists until the following scroll phase.
+                .addLabel("mobileFirstDiagramDraw")
                 .to(".mobile-tree-redesign__first-trunk", {
                     scaleY: 1,
                     duration: .55,
-                })
+                }, "mobileFirstDiagramDraw")
+                .to(mobileSectionCopy, {
+                    autoAlpha: 1,
+                    y: 0,
+                    duration: 2.15,
+                    ease: "none",
+                }, "mobileFirstDiagramDraw")
+                .to(mobileSectionHeader, {
+                    autoAlpha: 1,
+                    y: 0,
+                    duration: 2.15,
+                    ease: "none",
+                }, "mobileFirstDiagramDraw")
                 .to(".mobile-tree-redesign__first-horizontal", {
                     scaleX: 1,
                     duration: .65,
@@ -2064,18 +2115,6 @@ function initTreeDiagram() {
                     autoAlpha: 1,
                     duration: .4,
                 })
-                .to(mobileSectionCopy, {
-                    autoAlpha: 1,
-                    y: 0,
-                    duration: .55,
-                    ease: "power1.out",
-                }, "<")
-                .to(mobileSectionHeader, {
-                    autoAlpha: 1,
-                    y: 0,
-                    duration: .55,
-                    ease: "power1.out",
-                }, "<")
                 .to({}, { duration: .65 })
 
                 // Step 2: the missing centre branch grows and reveals the
@@ -2120,11 +2159,25 @@ function initTreeDiagram() {
                 .to({}, { duration: .45 })
 
                 // Step 4: the group and solo branches draw, and their current
-                // explanatory copy appears at exactly the same moment.
+                // explanatory copy fades throughout the complete drawing.
+                .addLabel("mobileFormulaDiagramDraw")
                 .to(".mobile-tree-redesign__second-trunk", {
                     scaleY: 1,
                     duration: .55,
-                })
+                }, "mobileFormulaDiagramDraw")
+                .to(mobileGroupCopy, {
+                    autoAlpha: 1,
+                    y: 0,
+                    duration: 2.15,
+                    stagger: .04,
+                    ease: "none",
+                }, "mobileFormulaDiagramDraw")
+                .to(mobileGroupHeader, {
+                    autoAlpha: 1,
+                    y: 0,
+                    duration: 2.15,
+                    ease: "none",
+                }, "mobileFormulaDiagramDraw")
                 .to(".mobile-tree-redesign__second-horizontal", {
                     scaleX: 1,
                     duration: .65,
@@ -2137,35 +2190,10 @@ function initTreeDiagram() {
                     autoAlpha: 1,
                     duration: .4,
                 })
-                .to(mobileGroupCopy, {
-                    autoAlpha: 1,
-                    y: 0,
-                    duration: .55,
-                    stagger: .08,
-                    ease: "power1.out",
-                }, "<")
-                .to(mobileGroupHeader, {
-                    autoAlpha: 1,
-                    y: 0,
-                    duration: .55,
-                    ease: "power1.out",
-                }, "<")
                 .to({}, { duration: .65 })
 
                 // Step 5: Toi appears in the centre, then hands off to the
                 // existing transition without changing its choreography.
-                .to(mobileGroupCopy, {
-                    autoAlpha: 0,
-                    y: -10,
-                    duration: .45,
-                    stagger: .04,
-                    ease: "power1.in",
-                })
-                .to(mobileGroupHeader, {
-                    autoAlpha: 0,
-                    y: -10,
-                    duration: .35,
-                }, "<")
                 .to(".mobile-tree-redesign__toi-line", {
                     scaleY: 1,
                     duration: .7,
@@ -2176,14 +2204,8 @@ function initTreeDiagram() {
                 })
                 .to({}, { duration: .5 })
 
-                // Keep TOI visible. Only its parent diagram disappears, then
-                // TOI travels to the exact position used by the existing
-                // "ce que tu veux" transition.
-                .to(".mobile-tree-redesign__current, .mobile-tree-redesign__second-trunk, .mobile-tree-redesign__second-horizontal, .mobile-tree-redesign__second-leg, .mobile-tree-redesign__choice-label, .mobile-tree-redesign__toi-line", {
-                    autoAlpha: 0,
-                    duration: .45,
-                    ease: "power1.inOut",
-                })
+                // Prepare the invisible hand-off target before TOI starts
+                // moving. The formula copy remains fully visible until here.
                 .set(".tree-container.is--three", {
                     autoAlpha: 1,
                 })
@@ -2200,11 +2222,34 @@ function initTreeDiagram() {
                 .set(".tree-container.is--three .tree-child-wrapper.is--one .label", {
                     autoAlpha: 0,
                 })
+                .addLabel("mobileToiLift")
+
+                // Same transition as the previous step: when TOI starts
+                // rising, its parent diagram and explanatory copy fade
+                // together, directly controlled by the scroll.
+                .to(".mobile-tree-redesign__current, .mobile-tree-redesign__second-trunk, .mobile-tree-redesign__second-horizontal, .mobile-tree-redesign__second-leg, .mobile-tree-redesign__choice-label, .mobile-tree-redesign__toi-line", {
+                    autoAlpha: 0,
+                    duration: .45,
+                    ease: "power1.inOut",
+                }, "mobileToiLift")
+                .to(mobileGroupCopy, {
+                    autoAlpha: 0,
+                    y: -10,
+                    duration: .45,
+                    stagger: .04,
+                    ease: "power1.in",
+                }, "mobileToiLift")
+                .to(mobileGroupHeader, {
+                    autoAlpha: 0,
+                    y: -10,
+                    duration: .35,
+                    ease: "power1.in",
+                }, "mobileToiLift")
                 .to(".mobile-tree-redesign__toi", {
                     x: function () {
                         const source = document.querySelector(".mobile-tree-redesign__toi");
                         const target = document.querySelector(
-                            ".tree-container.is--three .tree-child-wrapper.is--one.is--toi .label, .tree-container.is--three .tree-child-wrapper.is--one .label"
+                            ".tree-container.is--three .tree-child-wrapper.is--one.is--toi .label"
                         );
                         if (!source || !target) return 0;
 
@@ -2216,7 +2261,7 @@ function initTreeDiagram() {
                     y: function () {
                         const source = document.querySelector(".mobile-tree-redesign__toi");
                         const target = document.querySelector(
-                            ".tree-container.is--three .tree-child-wrapper.is--one.is--toi .label, .tree-container.is--three .tree-child-wrapper.is--one .label"
+                            ".tree-container.is--three .tree-child-wrapper.is--one.is--toi .label"
                         );
                         if (!source || !target) return 0;
 
@@ -2227,14 +2272,11 @@ function initTreeDiagram() {
                     },
                     duration: .85,
                     ease: "power2.inOut",
-                })
-                .set(".tree-container.is--three .tree-child-wrapper.is--one .label", {
-                    autoAlpha: 1,
-                })
-                .set(".mobile-tree-redesign__toi", {
-                    autoAlpha: 0,
-                })
-                .set(mobileTree, {
+                }, "mobileToiLift")
+                // Keep the redesigned TOI itself visible after it reaches the
+                // exact anchor. The historical label stays hidden, so there is
+                // never a duplicate or a one-frame visibility gap.
+                .set(".tree-container.is--three .tree-child-wrapper.is--one.is--toi .label", {
                     autoAlpha: 0,
                 });
         }
@@ -3148,7 +3190,7 @@ function initTreeDiagram() {
         // .to({}, {
         //     duration: 2,
         // })
-        .to(".tree-container.is--three .label", {
+        .to(".tree-container.is--three .label, .mobile-tree-redesign__toi", {
             autoAlpha: 0,
             duration: 0.1,
         }, "<")
