@@ -289,6 +289,11 @@ function applyBrandAccent() {
                 pointer-events: none;
             }
 
+            .parent-section > .section.is--personnes .header-section,
+            .parent-section > .section.is--personnes [data-split="lines"] {
+                display: none !important;
+            }
+
             .mobile-tree-redesign {
                 position: absolute;
                 z-index: 12;
@@ -301,9 +306,67 @@ function applyBrandAccent() {
                 font-family: inherit;
             }
 
+            .mobile-tree-redesign__copy {
+                position: absolute;
+                z-index: 2;
+                top: 8%;
+                right: 1.25rem;
+                left: 1.25rem;
+                text-align: center;
+            }
+
+            .mobile-tree-redesign__copy-title {
+                margin: 0;
+                color: rgba(255, 255, 255, .96);
+                font-size: clamp(1.65rem, 7.5vw, 2.1rem);
+                font-weight: inherit;
+                line-height: .98;
+                text-transform: uppercase;
+            }
+
+            .mobile-tree-redesign__copy-text {
+                width: min(100%, 25rem);
+                margin: .85rem auto 0;
+                color: rgba(255, 255, 255, .62);
+                font-size: .75rem;
+                line-height: 1.4;
+                text-transform: uppercase;
+            }
+
+            .mobile-tree-redesign__formula-copy {
+                position: absolute;
+                z-index: 3;
+                top: 7%;
+                right: 1.25rem;
+                left: 1.25rem;
+                text-align: center;
+            }
+
+            .mobile-tree-redesign__formula-title {
+                margin: 0 0 .85rem;
+                color: rgba(255, 255, 255, .96);
+                font-size: clamp(1.65rem, 7.5vw, 2.1rem);
+                font-weight: inherit;
+                line-height: .98;
+                text-transform: uppercase;
+            }
+
+            .mobile-tree-redesign__formula-text {
+                width: min(100%, 25rem);
+                margin: .65rem auto 0;
+                color: rgba(255, 255, 255, .62);
+                font-size: .7rem;
+                line-height: 1.35;
+                text-transform: uppercase;
+            }
+
+            .mobile-tree-redesign__formula-label {
+                color: ${ACCENT_COLOR};
+            }
+
             .mobile-tree-redesign__diagram {
                 position: absolute;
-                top: 36%;
+                top: 39svh;
                 left: 50%;
                 width: min(90vw, 24rem);
                 height: 26rem;
@@ -324,6 +387,11 @@ function applyBrandAccent() {
 
             .mobile-tree-redesign__node {
                 top: 0;
+            }
+
+            .mobile-tree-redesign__root {
+                backface-visibility: hidden;
+                transform: translate3d(0, 0, 0);
             }
 
             .mobile-tree-redesign__line {
@@ -699,6 +767,21 @@ function createMobileTreeRedesign() {
     mobileTree.className = 'mobile-tree-redesign';
     mobileTree.setAttribute('aria-hidden', 'true');
     mobileTree.innerHTML = `
+        <div class="mobile-tree-redesign__copy">
+            <h2 class="mobile-tree-redesign__copy-title">Une expérience de groupe</h2>
+            <p class="mobile-tree-redesign__copy-text">Tous les membres sont affectés à une section dont ils influencent le score grâce au maintien de leurs habitudes.</p>
+        </div>
+        <div class="mobile-tree-redesign__formula-copy">
+            <h2 class="mobile-tree-redesign__formula-title">Deux formules</h2>
+            <p class="mobile-tree-redesign__formula-text">
+                <span class="mobile-tree-redesign__formula-label">Solo :</span>
+                tu démarres quand tu veux, sans engagement vis-à-vis d’un groupe.
+            </p>
+            <p class="mobile-tree-redesign__formula-text">
+                <span class="mobile-tree-redesign__formula-label">Groupe :</span>
+                tu avances avec ton groupe et participes au visio obligatoire du dimanche.
+            </p>
+        </div>
         <div class="mobile-tree-redesign__diagram">
             <div class="mobile-tree-redesign__node mobile-tree-redesign__root">REBOOT CAMP</div>
             <span class="mobile-tree-redesign__line is--vertical mobile-tree-redesign__first-trunk"></span>
@@ -708,7 +791,7 @@ function createMobileTreeRedesign() {
 
             <div class="mobile-tree-redesign__label mobile-tree-redesign__section-label is--left">
                 <span class="mobile-tree-redesign__label-prefix">SECTION</span>
-                <span class="mobile-tree-redesign__label-accent">CHAOS</span>
+                <span class="mobile-tree-redesign__label-accent">KAOS</span>
             </div>
             <div class="mobile-tree-redesign__label mobile-tree-redesign__section-label is--right">
                 <span class="mobile-tree-redesign__label-prefix">SECTION</span>
@@ -1473,65 +1556,38 @@ function initScrollLock() {
         // Animate level up from 4 to 5
         const levelElement = document.querySelector('.niveaux .level');
         if (levelElement) {
-            // Element is already prepared with fixed width from initTrackerCheckboxes()
-            // No need to set width/positioning here to avoid shift
-
-            // Create a timeline for the level up animation
-            const levelUpTl = gsap.timeline();
-
+            // Replace 4 with 5 synchronously on the exact frame the gauge
+            // reaches 100%. The animation now enhances the new value instead
+            // of delaying its appearance with a scale-out of the old one.
+            levelElement.textContent = "5";
+            levelElement.style.color = ACCENT_COLOR;
+            levelElement.classList.add('is--gold-level');
             gsap.set(levelElement, {
                 transformOrigin: "50% 50%",
                 scaleX: 1,
                 scaleY: 1,
+                opacity: 1,
                 x: 0,
                 y: 0
             });
 
-            // Step 1: Scale down the "4" completely and fade out
-            levelUpTl.to(levelElement, {
-                scaleX: 0,
-                scaleY: 0,
-                opacity: 0,
-                transformOrigin: "50% 50%",
-                y: 0,
-                duration: 0.3,
-                ease: "power2.in",
-                onComplete: function () {
-                    // Change text to "5" immediately when "4" completely disappears
-                    levelElement.textContent = "5";
-                    levelElement.style.color = ACCENT_COLOR;
-                    levelElement.classList.add('is--gold-level');
-                    // Reset to starting state for "5" animation
-                    gsap.set(levelElement, {
-                        opacity: 0,
-                        scaleX: 0,
-                        scaleY: 0,
-                        transformOrigin: "50% 50%",
-                        x: 0,
-                        y: 0
-                    });
-                }
-            })
-                // Step 2: Scale up "5" with bounce effect, fade in immediately
+            gsap.timeline()
                 .to(levelElement, {
                     scaleX: 1.35,
                     scaleY: 1.35,
-                    opacity: 1,
                     transformOrigin: "50% 50%",
-                    y: -1,
-                    duration: 0.38,
-                    ease: "back.out(1.25)"
+                    y: 0,
+                    duration: 0.24,
+                    ease: "power2.out"
                 })
-                // Step 3: Settle to final state (after bounce)
                 .to(levelElement, {
                     scaleX: 1,
                     scaleY: 1,
                     transformOrigin: "50% 50%",
                     y: 0,
-                    duration: 0.24,
+                    duration: 0.22,
                     ease: "power2.out",
                     onComplete: function () {
-                        // Let the subtle branded gold shimmer remain after the level-up.
                         levelElement.style.filter = "";
                     }
                 });
@@ -1950,10 +2006,10 @@ function initTreeDiagram() {
 
     if (isMobile) {
         const mobileTree = createMobileTreeRedesign();
-        const mobileSectionCopy = ".section.is--section [data-split='lines'] .lineInner";
-        const mobileSectionHeader = ".section.is--section .header-title, .section.is--section .header-number";
-        const mobileGroupCopy = ".section.is--groupe h2[data-split='lines'] .lineInner, .section.is--groupe p[data-split='lines'].is--first .lineInner";
-        const mobileGroupHeader = ".section.is--groupe .header-title, .section.is--groupe .header-number";
+        const mobileSectionCopy = ".mobile-tree-redesign__copy-text";
+        const mobileSectionHeader = ".mobile-tree-redesign__copy-title";
+        const mobileGroupCopy = ".mobile-tree-redesign__formula-text";
+        const mobileGroupHeader = ".mobile-tree-redesign__formula-title";
 
         gsap.set(".tree-container.is--first, .tree-container.is--second, .tree-container.is--three", {
             autoAlpha: 0,
@@ -1964,6 +2020,11 @@ function initTreeDiagram() {
 
         if (mobileTree) {
             gsap.set(mobileTree, { autoAlpha: 1 });
+            gsap.set(".mobile-tree-redesign__root", {
+                y: 0,
+                yPercent: 0,
+                force3D: false,
+            });
             gsap.set(".mobile-tree-redesign__first-trunk, .mobile-tree-redesign__first-leg, .mobile-tree-redesign__center-line, .mobile-tree-redesign__second-trunk, .mobile-tree-redesign__second-leg, .mobile-tree-redesign__toi-line", {
                 scaleY: 0,
                 transformOrigin: "top",
@@ -1974,6 +2035,14 @@ function initTreeDiagram() {
             });
             gsap.set(".mobile-tree-redesign__section-label, .mobile-tree-redesign__current, .mobile-tree-redesign__choice-label, .mobile-tree-redesign__toi", {
                 autoAlpha: 0,
+            });
+            gsap.set(".mobile-tree-redesign__copy-title, .mobile-tree-redesign__copy-text", {
+                autoAlpha: 0,
+                y: 12,
+            });
+            gsap.set(".mobile-tree-redesign__formula-title, .mobile-tree-redesign__formula-text", {
+                autoAlpha: 0,
+                y: 12,
             });
 
             treeTlOne
@@ -1996,13 +2065,14 @@ function initTreeDiagram() {
                     duration: .4,
                 })
                 .to(mobileSectionCopy, {
-                    yPercent: 0,
+                    autoAlpha: 1,
+                    y: 0,
                     duration: .55,
-                    stagger: .04,
                     ease: "power1.out",
                 }, "<")
                 .to(mobileSectionHeader, {
                     autoAlpha: 1,
+                    y: 0,
                     duration: .55,
                     ease: "power1.out",
                 }, "<")
@@ -2031,14 +2101,14 @@ function initTreeDiagram() {
                     ease: "power2.inOut",
                 }, "mobileSectionLift")
                 .to(mobileSectionCopy, {
-                    yPercent: -100,
                     autoAlpha: 0,
+                    y: -10,
                     duration: .3,
-                    stagger: .02,
                     ease: "power1.in",
                 }, "mobileSectionLift")
                 .to(mobileSectionHeader, {
                     autoAlpha: 0,
+                    y: -10,
                     duration: .3,
                     ease: "power1.in",
                 }, "mobileSectionLift")
@@ -2068,13 +2138,15 @@ function initTreeDiagram() {
                     duration: .4,
                 })
                 .to(mobileGroupCopy, {
-                    yPercent: 0,
+                    autoAlpha: 1,
+                    y: 0,
                     duration: .55,
-                    stagger: .04,
+                    stagger: .08,
                     ease: "power1.out",
                 }, "<")
                 .to(mobileGroupHeader, {
                     autoAlpha: 1,
+                    y: 0,
                     duration: .55,
                     ease: "power1.out",
                 }, "<")
@@ -2083,13 +2155,15 @@ function initTreeDiagram() {
                 // Step 5: Toi appears in the centre, then hands off to the
                 // existing transition without changing its choreography.
                 .to(mobileGroupCopy, {
-                    yPercent: -100,
+                    autoAlpha: 0,
+                    y: -10,
                     duration: .45,
-                    stagger: .03,
+                    stagger: .04,
                     ease: "power1.in",
                 })
                 .to(mobileGroupHeader, {
                     autoAlpha: 0,
+                    y: -10,
                     duration: .35,
                 }, "<")
                 .to(".mobile-tree-redesign__toi-line", {
