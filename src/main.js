@@ -5428,10 +5428,10 @@ function createMapTimeline() {
         .to(".section.is--map .text-wrapper-map .t-inner-wrapper", {
             autoAlpha: 1,
             y: 0,
-            duration: 1,
+            duration: .5,
             ease: "none",
         }, "mapDrawStart")
-        .addLabel("mapDrawComplete", "mapDrawStart+=1")
+        .addLabel("mapDrawComplete", "mapDrawStart+=.5")
 
         .from(".map-container .dot-normal, .map-container .dot-video", {
             onStart: function () {
@@ -5448,7 +5448,7 @@ function createMapTimeline() {
 
             },
             autoAlpha: 0,
-            duration: 1,
+            duration: .5,
         }, "mapDrawStart")
         .set(".click-me, .text-wrapper-spotify", {
             display: "none",
@@ -5458,7 +5458,7 @@ function createMapTimeline() {
             cursor: "default",
         }, "mapDrawStart")
         .to({}, {
-            duration: 1,
+            duration: .5,
         }, "mapDrawComplete")
 
 
