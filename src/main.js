@@ -95,6 +95,45 @@ function applyBrandAccent() {
             display: none;
         }
 
+        .section.is--timeline .timeline-panel.is--1 .timeline-access-preparation {
+            display: flex;
+            width: min(68vw, 56rem);
+            box-sizing: border-box;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .section.is--timeline .timeline-access-preparation__title {
+            margin: 0 0 .25rem;
+        }
+
+        .section.is--timeline .timeline-access-preparation__text {
+            width: min(100%, 52rem);
+            margin: 0;
+        }
+
+        .section.is--timeline .timeline-access-preparation__image {
+            display: flex;
+            width: min(100%, 35rem);
+            height: clamp(12rem, 32vh, 22rem);
+            align-items: center;
+            justify-content: flex-start;
+            overflow: hidden;
+        }
+
+        .section.is--timeline .timeline-access-preparation__image img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            object-position: left center;
+        }
+
+        .section.is--timeline .timeline-panel.is--2.is--merged-source {
+            display: none !important;
+        }
+
         .section.is--fields.is--terminal-offers {
             display: grid !important;
             width: 100%;
@@ -231,6 +270,30 @@ function applyBrandAccent() {
 
             .section.is--timeline .timeline-panel.is--1 {
                 padding-bottom: .5rem;
+            }
+
+            .section.is--timeline .timeline-panel.is--1 .timeline-access-preparation {
+                width: 88vw;
+                gap: .7rem;
+            }
+
+            .section.is--timeline .timeline-access-preparation__title {
+                margin-bottom: .1rem;
+            }
+
+            .section.is--timeline .timeline-access-preparation__text {
+                font-size: clamp(.72rem, 3.15vw, .82rem);
+                line-height: 1.35;
+            }
+
+            .section.is--timeline .timeline-access-preparation__image {
+                width: 100%;
+                height: clamp(10rem, 25vh, 15rem);
+                justify-content: center;
+            }
+
+            .section.is--timeline .timeline-access-preparation__image img {
+                object-position: center;
             }
 
             .section.is--timeline .timeline-panel.is--2.is--fixed {
@@ -704,6 +767,60 @@ function rewriteMobileTrackerIntro() {
     const mobileIntro = 'Renforce la structure de tes journées avec un tracker où streaks, bonus et classements te maintiennent engagé.';
     trackerIntro.textContent = mobileIntro;
     trackerIntro.setAttribute('aria-label', mobileIntro);
+}
+
+function mergeTimelineAccessAndPreparation() {
+    if (!window.matchMedia('(max-width: 47.99rem)').matches) return;
+
+    const timelineSection = document.querySelector('.section.is--timeline');
+    const accessPanel = timelineSection?.querySelector('.timeline-panel.is--1');
+    const materialPanel = timelineSection?.querySelector('.timeline-panel.is--2.is--fixed');
+    const preparationPanel = timelineSection?.querySelector('.timeline-panel.is--3');
+    const accessContent = accessPanel?.querySelector('.div-block-3');
+
+    if (!timelineSection || !accessPanel || !materialPanel || !accessContent) return;
+    if (accessContent.classList.contains('timeline-access-preparation')) return;
+
+    const sourceImage = materialPanel.querySelector(
+        '.gif-container.is--mobile img, .gif-container img'
+    );
+    if (!sourceImage) return;
+
+    const title = document.createElement('div');
+    title.className = 'big-title-section is--timeline timeline-access-preparation__title';
+    title.textContent = 'Accès et préparation';
+    title.setAttribute('aria-label', title.textContent);
+
+    const firstText = document.createElement('div');
+    firstText.className = 'text-block-4 is--short timeline-access-preparation__text';
+    firstText.textContent = 'Après ton inscription, tu reçois le coffret du Reboot Camp par la poste. À l’intérieur, tu trouveras ta carte d’accès, l’agenda du Reboot Camp, une lettre à ouvrir le jour J et une fiole en verre.';
+    firstText.setAttribute('aria-label', firstText.textContent);
+
+    const imageWrapper = document.createElement('div');
+    imageWrapper.className = 'timeline-access-preparation__image';
+    const image = sourceImage.cloneNode(true);
+    image.classList.remove('is--mobile');
+    image.loading = 'eager';
+    imageWrapper.appendChild(image);
+
+    const secondText = document.createElement('div');
+    secondText.className = 'text-block-4 is--short timeline-access-preparation__text';
+    secondText.textContent = 'Grâce à ta carte d’accès, tu rejoins la plateforme, télécharges l’application du tracker et découvres un premier contenu pour préparer ton départ du lundi suivant.';
+    secondText.setAttribute('aria-label', secondText.textContent);
+
+    accessContent.replaceChildren(title, firstText, imageWrapper, secondText);
+    accessContent.classList.add('timeline-access-preparation');
+
+    // The image source stays in the DOM because the existing GSAP sequence
+    // references this fixed panel. Hiding it avoids duplicated content without
+    // breaking those callbacks.
+    materialPanel.classList.add('is--merged-source');
+    materialPanel.setAttribute('aria-hidden', 'true');
+
+    // Removing the obsolete preparation panel also removes its horizontal
+    // footprint; the existing dynamic width calculation then keeps every
+    // following week and the map hand-off aligned.
+    preparationPanel?.remove();
 }
 
 function replaceMobileStatsWithSchedule() {
@@ -1509,7 +1626,6 @@ function initTrackerCheckboxes() {
 
 function initScrollLock() {
     const trackerSection = document.querySelector('.section.is--tracker');
-    const isMobile = window.matchMedia('(max-width: 47.99rem)').matches;
     const allSectionsAfterTracker = Array.from(document.querySelectorAll('.section, .parent-section')).filter(section => {
         // Get all sections that appear after the tracker in the DOM
         return section.compareDocumentPosition(trackerSection) & Node.DOCUMENT_POSITION_PRECEDING;
@@ -1524,7 +1640,7 @@ function initScrollLock() {
         section.style.display = 'none';
     });
 
-    if (isMobile && trackerSection) {
+    if (trackerSection) {
         let trackerLandingCompleted = false;
 
         requestAnimationFrame(() => {
@@ -1533,7 +1649,10 @@ function initScrollLock() {
 
             ScrollTrigger.create({
                 trigger: trackerSection,
-                start: 'top 12%',
+                // Start the controlled landing while the tracker is entering
+                // the viewport. Waiting until its top reached 12% created a
+                // perceptible first stop before the actual locked position.
+                start: 'top 72%',
                 once: true,
                 onEnter: () => {
                     if (trackerLandingCompleted || contentUnlocked || !window.lenis) return;
@@ -1545,7 +1664,7 @@ function initScrollLock() {
                     );
 
                     window.lenis.scrollTo(lockedTrackerBottom, {
-                        duration: .65,
+                        duration: .8,
                         immediate: false,
                         lock: true,
                         force: true,
@@ -7034,6 +7153,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.fonts.ready.then(() => {
         enhanceBarcelonaDateCard();
+        mergeTimelineAccessAndPreparation();
         rewriteMobileTrackerIntro();
         replaceMobileStatsWithSchedule();
         updateWeekFourFridayLabel();
