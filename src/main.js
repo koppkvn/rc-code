@@ -298,7 +298,7 @@ function applyBrandAccent() {
 
             .section.is--tracker .mobile-tracker-copy {
                 display: flex;
-                width: min(calc(100% - 2.5rem), 25rem);
+                width: 100%;
                 margin: 0 auto 0 0;
                 padding: 0;
                 flex-direction: column;
