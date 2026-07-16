@@ -365,23 +365,16 @@ function applyBrandAccent() {
 
             /* Give the mobile status block more air below the explanatory copy. */
             .tracker-wrapper > .tracker-pompes.tracker-xp-shell {
-                translate: 0 1rem;
+                translate: 0 1.5rem;
             }
 
-            /* Keep the download badges compact, muted and close to the tracker. */
+            .section.is--tracker .niveaux {
+                translate: 0 .95rem;
+            }
+
+            /* The download badges are intentionally removed from mobile. */
             .section.is--tracker .svg-wrapper {
-                align-self: flex-start;
-                justify-content: flex-start;
-                margin-top: 1rem;
-                margin-left: 0;
-                translate: 0 -.75rem;
-            }
-
-            .section.is--tracker .svg-7,
-            .section.is--tracker .svg-8 {
-                width: 4.5rem;
-                opacity: 1;
-                filter: none;
+                display: none !important;
             }
 
             .section.is--tracker .wait-message {
@@ -991,9 +984,10 @@ function positionTrackerLevelOnMobile(levelContainer, xpContainer) {
     levelContainer.style.translate = `0 ${currentTranslateY + requiredShift}px`;
 }
 
-function animateXpBar(xpBar, targetPercent) {
+function animateXpBar(xpBar, targetPercent, onTargetReached) {
     return new Promise(resolve => {
         if (!xpBar) {
+            onTargetReached?.();
             resolve();
             return;
         }
@@ -1008,6 +1002,9 @@ function animateXpBar(xpBar, targetPercent) {
             ease: 'power2.inOut',
             overwrite: 'auto',
             onComplete: () => {
+                // Run the level-up synchronously in the exact frame where the
+                // fill reaches the end of the gauge.
+                onTargetReached?.();
                 xpBar.track.classList.remove('is-charging');
                 resolve();
             }
@@ -1182,13 +1179,12 @@ function initTrackerCheckboxes() {
                 ? 100
                 : completedSteps * (100 / trackerButtons.length);
 
-            animateXpBar(xpBar, targetPercent)
-                .then(() => {
-                    if (targetPercent === 100 && !xpResetStarted) {
-                        xpResetStarted = true;
-                        return resetCompletedXpBar(xpBar, trackerSection);
-                    }
-                });
+            animateXpBar(xpBar, targetPercent, () => {
+                if (targetPercent !== 100 || xpResetStarted) return;
+
+                xpResetStarted = true;
+                resetCompletedXpBar(xpBar, trackerSection);
+            });
         });
     });
 }
