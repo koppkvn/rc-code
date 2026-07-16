@@ -373,10 +373,10 @@ function applyBrandAccent() {
                 position: absolute;
                 z-index: 2;
                 top: 8%;
-                right: 1.25rem;
-                left: auto;
+                right: auto;
+                left: 1.25rem;
                 width: min(calc(100% - 2.5rem), 25rem);
-                text-align: right;
+                text-align: left;
             }
 
             .mobile-tree-redesign__copy-title {
@@ -385,28 +385,28 @@ function applyBrandAccent() {
                 font-size: 2.3rem;
                 font-weight: inherit;
                 line-height: .95;
-                text-align: right;
+                text-align: left;
                 text-transform: uppercase;
             }
 
             .mobile-tree-redesign__copy-text {
                 width: 100%;
-                margin: .85rem 0 0 auto;
+                margin: .85rem auto 0 0;
                 color: rgba(255, 255, 255, .62);
                 font-size: .75rem;
                 line-height: 1.4;
-                text-align: right;
+                text-align: left;
                 text-transform: uppercase;
             }
 
             .mobile-tree-redesign__formula-copy {
                 position: absolute;
                 z-index: 3;
-                top: 7%;
-                right: 1.25rem;
-                left: auto;
+                top: 8%;
+                right: auto;
+                left: 1.25rem;
                 width: min(calc(100% - 2.5rem), 25rem);
-                text-align: right;
+                text-align: left;
             }
 
             .mobile-tree-redesign__formula-title {
@@ -415,22 +415,39 @@ function applyBrandAccent() {
                 font-size: 2.3rem;
                 font-weight: inherit;
                 line-height: .95;
-                text-align: right;
+                text-align: left;
                 text-transform: uppercase;
             }
 
             .mobile-tree-redesign__formula-text {
                 width: 100%;
-                margin: .65rem 0 0 auto;
+                margin: .65rem auto 0 0;
                 color: rgba(255, 255, 255, .62);
                 font-size: .7rem;
                 line-height: 1.35;
-                text-align: right;
+                text-align: left;
                 text-transform: uppercase;
             }
 
             .mobile-tree-redesign__formula-label {
                 color: ${ACCENT_COLOR};
+            }
+
+            .section.is--compare .header-pres.is--compare {
+                position: absolute;
+                z-index: 4;
+                top: 8%;
+                right: auto;
+                left: 1.25rem;
+                width: min(calc(100% - 2.5rem), 25rem);
+                margin: 0;
+                align-items: flex-start;
+                text-align: left;
+            }
+
+            .section.is--compare .big-title-section.is--compare {
+                margin: 0;
+                text-align: left;
             }
 
             .mobile-tree-redesign__diagram {
