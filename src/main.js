@@ -284,11 +284,21 @@ function applyBrandAccent() {
             }
 
             .section.is--tracker .big-title-section {
-                margin-top: 1.2rem;
+                margin-top: 0;
             }
 
             .section.is--tracker .wrapper-p {
                 margin-top: .85rem;
+            }
+
+            .section.is--tracker .container.is--tracker {
+                box-sizing: border-box;
+                padding-top: 8svh;
+                border-top: 0 !important;
+            }
+
+            .section.is--tracker .container.is--tracker .header-line {
+                display: none !important;
             }
 
             .big-title-section.is--timeline {
@@ -430,6 +440,10 @@ function applyBrandAccent() {
                 line-height: .95;
                 text-align: left;
                 text-transform: uppercase;
+            }
+
+            .mobile-tree-redesign__copy-title-accent {
+                color: ${ACCENT_COLOR};
             }
 
             .mobile-tree-redesign__copy-text {
@@ -1235,7 +1249,9 @@ function createMobileTreeRedesign() {
     mobileTree.setAttribute('aria-hidden', 'true');
     mobileTree.innerHTML = `
         <div class="mobile-tree-redesign__copy">
-            <h2 class="mobile-tree-redesign__copy-title">Une expérience de groupe</h2>
+            <h2 class="mobile-tree-redesign__copy-title">
+                Une structure en <span class="mobile-tree-redesign__copy-title-accent">deux sections</span>
+            </h2>
             <p class="mobile-tree-redesign__copy-text">Tous les membres sont affectés à une section dont ils influencent le score grâce au maintien de leurs habitudes.</p>
         </div>
         <div class="mobile-tree-redesign__formula-copy">
@@ -1450,6 +1466,11 @@ function initIntro() {
 function initTrackerSection() {
 
     const buttonsToGlow = document.querySelectorAll(".is--glow");
+    const trackerCopy = (
+        ".section.is--tracker .big-title-section, "
+        + ".section.is--tracker .wrapper-p"
+    );
+    const isMobile = window.matchMedia('(max-width: 47.99rem)').matches;
 
     buttonsToGlow.forEach(button => {
         button.classList.toggle("is--glow");
@@ -1463,7 +1484,7 @@ function initTrackerSection() {
         autoAlpha: 0,
     })
 
-    gsap.set(".section.is--tracker .big-title-section, .section.is--tracker .wrapper-p", {
+    gsap.set(trackerCopy, {
         autoAlpha: 0,
         y: 12,
     });
@@ -1471,18 +1492,62 @@ function initTrackerSection() {
         yPercent: 0,
     });
 
-    gsap.to(".section.is--tracker .big-title-section, .section.is--tracker .wrapper-p", {
-        autoAlpha: 1,
-        y: 0,
-        duration: 2.15,
-        ease: "none",
-        scrollTrigger: {
-            trigger: ".section.is--tracker",
-            start: "top 80%",
-            toggleActions: "play none none none",
-            markers: false
-        }
-    });
+    if (isMobile) {
+        const trackerContainer = document.querySelector(
+            '.section.is--tracker .container.is--tracker'
+        );
+        const trackerTitle = document.querySelector(
+            '.section.is--tracker .big-title-section'
+        );
+        const trackerCopyReveal = gsap.to(trackerCopy, {
+            autoAlpha: 1,
+            y: 0,
+            duration: 2.15,
+            ease: "none",
+            paused: true,
+        });
+
+        ScrollTrigger.create({
+            trigger: ".section.is--intro .ici-wrapper",
+            start: "bottom top",
+            pinnedContainer: ".section.is--intro",
+            onEnter: () => {
+                if (trackerContainer && trackerTitle) {
+                    // Measure the final, unshifted title position on the exact
+                    // frame “Tu es ici” leaves the viewport, then move the
+                    // complete tracker content so the title shares the 8svh
+                    // top anchor used by the mobile diagram headings.
+                    gsap.set(trackerCopy, { y: 0 });
+                    gsap.set(trackerContainer, { y: 0 });
+
+                    const desiredTop = window.innerHeight * 0.08;
+                    const titleTop = trackerTitle.getBoundingClientRect().top;
+
+                    gsap.set(trackerContainer, {
+                        y: desiredTop - titleTop,
+                    });
+                    gsap.set(trackerCopy, { y: 12 });
+                }
+
+                trackerCopyReveal.play();
+            },
+            onLeaveBack: () => trackerCopyReveal.reverse(),
+            markers: false,
+        });
+    } else {
+        gsap.to(trackerCopy, {
+            autoAlpha: 1,
+            y: 0,
+            duration: 2.15,
+            ease: "none",
+            scrollTrigger: {
+                trigger: ".section.is--tracker",
+                start: "top 80%",
+                toggleActions: "play none none none",
+                markers: false
+            }
+        });
+    }
 
     let tl = gsap.timeline({
         scrollTrigger: {
