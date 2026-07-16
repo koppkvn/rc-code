@@ -483,6 +483,11 @@ function applyBrandAccent() {
                 text-transform: uppercase;
             }
 
+            .mobile-tree-redesign__formula-title-accent {
+                display: block;
+                color: ${ACCENT_COLOR};
+            }
+
             .mobile-tree-redesign__formula-text {
                 width: calc(100% - .12rem);
                 margin: .65rem auto 0 0;
@@ -1255,7 +1260,10 @@ function createMobileTreeRedesign() {
             <p class="mobile-tree-redesign__copy-text">Tous les membres sont affectés à une section dont ils influencent le score grâce au maintien de leurs habitudes.</p>
         </div>
         <div class="mobile-tree-redesign__formula-copy">
-            <h2 class="mobile-tree-redesign__formula-title">Deux formules</h2>
+            <h2 class="mobile-tree-redesign__formula-title">
+                Une expérience
+                <span class="mobile-tree-redesign__formula-title-accent">Deux formules</span>
+            </h2>
             <p class="mobile-tree-redesign__formula-text">
                 <span class="mobile-tree-redesign__formula-label">Solo :</span>
                 tu démarres quand tu veux, sans engagement vis-à-vis d’un groupe.
