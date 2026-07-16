@@ -751,14 +751,71 @@ function applyBrandAccent() {
                 translate: 0 .95rem;
             }
 
-            /* The download badges are intentionally removed from mobile. */
             .section.is--tracker .svg-wrapper {
-                display: none !important;
+                display: flex !important;
+                align-items: center;
+                justify-content: flex-start;
+                gap: .5rem;
+                margin-top: 2rem;
+                color: #fff;
+                opacity: 1;
             }
 
             .section.is--tracker .wait-message {
-                translate: 0 -1.25rem;
-                padding-bottom: 1.5rem;
+                display: none !important;
+            }
+
+            .section.is--tracker .tracker-checkbox.is--button.is--glow {
+                border: .0625rem solid #fff !important;
+                background-color: #2f2f2f !important;
+                box-shadow: none !important;
+                transform: none !important;
+                animation: none !important;
+            }
+
+            .section.is--tracker .tracker-checkbox.is--button.is--glow::before {
+                display: none !important;
+                content: none !important;
+                animation: none !important;
+            }
+
+            .section.is--tracker .tracker-checkbox.is--button.is--glow
+            .tracker-checkbox-inside.is--button {
+                background-color: #fff !important;
+                animation: tracker-center-square-pulse 1.05s ease-in-out infinite;
+            }
+
+            .section.is--tracker[data-xp-cycle-complete="true"]
+            .tracker-checkbox.is--button {
+                border-color: ${ACCENT_COLOR} !important;
+                background-color: rgba(210, 170, 98, .16) !important;
+                box-shadow:
+                    0 0 .25rem rgba(247, 232, 189, .42),
+                    0 0 .65rem rgba(210, 170, 98, .38) !important;
+                transition:
+                    border-color .22s ease-out,
+                    background-color .22s ease-out,
+                    box-shadow .22s ease-out;
+            }
+
+            .section.is--tracker[data-xp-cycle-complete="true"]
+            .tracker-checkbox.is--button
+            .tracker-checkbox-inside.is--button {
+                opacity: 1 !important;
+                background-color: ${ACCENT_COLOR} !important;
+                box-shadow: 0 0 .4rem rgba(247, 232, 189, .65);
+                animation: none !important;
+            }
+
+            @keyframes tracker-center-square-pulse {
+                0%,
+                100% {
+                    opacity: .28;
+                }
+
+                50% {
+                    opacity: 1;
+                }
             }
         }
 
