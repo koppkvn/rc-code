@@ -2660,6 +2660,14 @@ function initTreeDiagram() {
             });
 
             treeTlOne
+                // Prevent the completed tracker section from bleeding through
+                // the transparent hand-offs between the mobile diagrams and
+                // the timeline. Reversing the scrub restores it naturally.
+                .to(".section.is--tracker", {
+                    autoAlpha: 0,
+                    duration: .05,
+                    ease: "none",
+                }, 0)
                 // Step 1: Reboot Camp splits into Chaos and Cosmos. No centre
                 // branch exists until the following scroll phase.
                 .addLabel("mobileFirstDiagramDraw")
