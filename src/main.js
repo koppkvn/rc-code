@@ -299,7 +299,7 @@ function applyBrandAccent() {
                 box-shadow: none !important;
             }
 
-            .section.is--tracker[data-mobile-scroll-locked="true"] {
+            .section.is--tracker[data-mobile-tracker-overlay="true"] {
                 position: fixed;
                 z-index: 40;
                 inset: 0;
@@ -309,10 +309,16 @@ function applyBrandAccent() {
                 background: #000;
             }
 
-            .section.is--tracker[data-mobile-scroll-locked="true"]
+            .section.is--tracker[data-mobile-tracker-overlay="true"]
             .container.is--tracker {
                 height: 100svh;
                 padding-top: 8svh;
+            }
+
+            .mobile-tracker-placeholder {
+                width: 100%;
+                height: 100svh;
+                pointer-events: none;
             }
 
             .section.is--tracker .header-section.is--tracker,
@@ -1545,12 +1551,6 @@ function initTrackerSection() {
         ".section.is--tracker .wrapper-p .text-section"
     );
     const trackerCopy = `${trackerTitleSelector}, ${trackerTextSelector}`;
-    const mobileTrackerContent = (
-        ".section.is--tracker .container.is--tracker > .big-title-section, " +
-        ".section.is--tracker .container.is--tracker > .wrapper-p, " +
-        ".section.is--tracker .container.is--tracker > .svg-wrapper, " +
-        ".section.is--tracker .container.is--tracker > .tracker-container"
-    );
     const isMobile = window.matchMedia('(max-width: 47.99rem)').matches;
 
     buttonsToGlow.forEach(button => {
@@ -1565,12 +1565,7 @@ function initTrackerSection() {
         autoAlpha: isMobile ? 1 : 0,
     })
 
-    if (isMobile) {
-        gsap.set(mobileTrackerContent, {
-            autoAlpha: 0,
-            y: 0,
-        });
-    } else {
+    if (!isMobile) {
         gsap.set(trackerCopy, {
             autoAlpha: 0,
             y: 12,
@@ -1585,56 +1580,39 @@ function initTrackerSection() {
             '.section.is--tracker .container.is--tracker'
         );
         const trackerSection = document.querySelector('.section.is--tracker');
+        if (!trackerContainer || !trackerSection) return;
 
+        const trackerPlaceholder = document.createElement('div');
+        trackerPlaceholder.className = 'mobile-tracker-placeholder';
+        trackerPlaceholder.setAttribute('aria-hidden', 'true');
+        trackerSection.before(trackerPlaceholder);
+        trackerSection.setAttribute(
+            'data-mobile-tracker-overlay',
+            'true'
+        );
+        gsap.set(trackerSection, {
+            autoAlpha: 0,
+        });
+        gsap.set(trackerContainer, {
+            autoAlpha: 0,
+        });
         ScrollTrigger.create({
             trigger: ".section.is--intro .ici-wrapper",
             start: "bottom top",
             pinnedContainer: ".section.is--intro",
             onEnter: () => {
-                if (trackerContainer && trackerSection) {
-                    // Overlay the tracker directly on its final mobile screen
-                    // as “Tu es ici” leaves. This avoids measuring a section
-                    // while the intro is pinned and keeps the heading on the
-                    // same 8svh anchor as the following diagram headings.
-                    gsap.set(trackerContainer, { y: 0 });
-                    gsap.set(mobileTrackerContent, { y: 0 });
-
-                    trackerSection.dataset.mobileFlowTop = String(
-                        trackerSection.getBoundingClientRect().top +
-                        window.scrollY
-                    );
-                    trackerSection.setAttribute(
-                        'data-mobile-scroll-locked',
-                        'true'
-                    );
-                    window.lenis?.stop();
-
-                    gsap.killTweensOf(mobileTrackerContent);
-                    gsap.set(trackerSection, {
-                        autoAlpha: 1,
-                    });
-                    gsap.fromTo(mobileTrackerContent, {
-                        autoAlpha: 0,
-                        y: 0,
-                    }, {
-                        autoAlpha: 1,
-                        y: 0,
-                        duration: 2.15,
-                        ease: "none",
-                        overwrite: true,
-                    });
-                    buttonsToGlow.forEach(button => {
-                        button.classList.add("is--glow");
-                    });
-                }
-            },
-            onLeaveBack: () => {
-                trackerSection?.removeAttribute(
-                    'data-mobile-scroll-locked'
-                );
-                gsap.set(mobileTrackerContent, {
-                    autoAlpha: 0,
-                    y: 0,
+                window.lenis?.stop();
+                gsap.set(trackerSection, {
+                    autoAlpha: 1,
+                });
+                gsap.to(trackerContainer, {
+                    autoAlpha: 1,
+                    duration: 2.15,
+                    ease: "none",
+                    overwrite: true,
+                });
+                buttonsToGlow.forEach(button => {
+                    button.classList.add("is--glow");
                 });
             },
             markers: false,
@@ -2165,8 +2143,8 @@ function initScrollLock() {
     });
 
     // Recalculate the page limit after hiding the following sections. On
-    // mobile, initTrackerSection then lands on the tracker's final screen and
-    // pauses Lenis there until the habits unlock the rest of the page.
+    // mobile, the tracker overlay pauses Lenis until the habits unlock the
+    // remaining sections.
     requestAnimationFrame(() => {
         window.lenis?.resize?.();
         ScrollTrigger.refresh();
@@ -2195,21 +2173,6 @@ function initScrollLock() {
 
         // Set flag to true to prevent future executions
         contentUnlocked = true;
-        const mobileFlowTop = Number(
-            trackerSection?.dataset.mobileFlowTop
-        );
-        if (
-            trackerSection?.getAttribute('data-mobile-scroll-locked') ===
-            'true' &&
-            Number.isFinite(mobileFlowTop)
-        ) {
-            window.lenis?.scrollTo(mobileFlowTop, {
-                immediate: true,
-                force: true,
-            });
-        }
-        trackerSection?.removeAttribute('data-mobile-scroll-locked');
-        trackerSection?.removeAttribute('data-mobile-flow-top');
 
         // Show all sections after tracker
         allSectionsAfterTracker.forEach(section => {
@@ -2263,22 +2226,30 @@ function initScrollLock() {
                 });
         }
 
-        // Restart Lenis
-        window.lenis.destroy();
-        initLenis();
-
-        // Here you would call functions to initialize other sections
-        // Example:
-
-        // initTreeDiagram();
+        const trackerPlaceholder = document.querySelector(
+            '.mobile-tracker-placeholder'
+        );
+        if (
+            trackerSection?.getAttribute('data-mobile-tracker-overlay') ===
+            'true' &&
+            trackerPlaceholder
+        ) {
+            const trackerTop = (
+                trackerPlaceholder.getBoundingClientRect().top +
+                window.scrollY
+            );
+            window.lenis?.scrollTo(trackerTop, {
+                immediate: true,
+                force: true,
+            });
+            trackerPlaceholder.replaceWith(trackerSection);
+        }
+        trackerSection?.removeAttribute('data-mobile-tracker-overlay');
 
         initTreeDiagramWrapper(); // on page load
-        // Hide all panels initially
-
-        // initVideoMap();
-        // initSectionTwo();
-        // initSectionThree();
-        // etc.
+        window.lenis?.resize?.();
+        ScrollTrigger.refresh();
+        window.lenis?.start();
     }
 
     // Check on each button click if tracker is complete
