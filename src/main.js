@@ -287,12 +287,6 @@ function applyBrandAccent() {
                 pointer-events: none;
             }
 
-            .parent-section .tree-container.is--first,
-            .parent-section .tree-container.is--second,
-            .parent-section .tree-container.is--three {
-                visibility: hidden;
-            }
-
             .mobile-tree-redesign {
                 position: absolute;
                 z-index: 12;
@@ -2090,26 +2084,67 @@ function initTreeDiagram() {
                     duration: .4,
                 })
                 .to({}, { duration: .5 })
-                .to(mobileTree, {
+
+                // Keep TOI visible. Only its parent diagram disappears, then
+                // TOI travels to the exact position used by the existing
+                // "ce que tu veux" transition.
+                .to(".mobile-tree-redesign__current, .mobile-tree-redesign__second-trunk, .mobile-tree-redesign__second-horizontal, .mobile-tree-redesign__second-leg, .mobile-tree-redesign__choice-label, .mobile-tree-redesign__toi-line", {
                     autoAlpha: 0,
-                    duration: .25,
-                    onStart: function () {
-                        gsap.set(".tree-container.is--three", { autoAlpha: 1 });
-                        gsap.set(".tree-container.is--three > *", { autoAlpha: 0 });
-                        gsap.set(".tree-container.is--three .tree-child-wrapper.is--one", {
-                            autoAlpha: 1,
-                            yPercent: -564,
-                        });
-                        gsap.set(".tree-container.is--three .tree-child-wrapper.is--one .line", {
-                            autoAlpha: 0,
-                        });
-                        gsap.set(".tree-container.is--three .tree-child-wrapper.is--one .label", {
-                            autoAlpha: 1,
-                        });
+                    duration: .45,
+                    ease: "power1.inOut",
+                })
+                .set(".tree-container.is--three", {
+                    autoAlpha: 1,
+                })
+                .set(".tree-container.is--three > *", {
+                    autoAlpha: 0,
+                })
+                .set(".tree-container.is--three .tree-child-wrapper.is--one", {
+                    autoAlpha: 1,
+                    yPercent: -564,
+                })
+                .set(".tree-container.is--three .tree-child-wrapper.is--one .line", {
+                    autoAlpha: 0,
+                })
+                .set(".tree-container.is--three .tree-child-wrapper.is--one .label", {
+                    autoAlpha: 0,
+                })
+                .to(".mobile-tree-redesign__toi", {
+                    x: function () {
+                        const source = document.querySelector(".mobile-tree-redesign__toi");
+                        const target = document.querySelector(
+                            ".tree-container.is--three .tree-child-wrapper.is--one.is--toi .label, .tree-container.is--three .tree-child-wrapper.is--one .label"
+                        );
+                        if (!source || !target) return 0;
+
+                        const sourceRect = source.getBoundingClientRect();
+                        const targetRect = target.getBoundingClientRect();
+                        return targetRect.left + targetRect.width / 2
+                            - (sourceRect.left + sourceRect.width / 2);
                     },
-                    onReverseComplete: function () {
-                        gsap.set(".tree-container.is--three", { autoAlpha: 0 });
+                    y: function () {
+                        const source = document.querySelector(".mobile-tree-redesign__toi");
+                        const target = document.querySelector(
+                            ".tree-container.is--three .tree-child-wrapper.is--one.is--toi .label, .tree-container.is--three .tree-child-wrapper.is--one .label"
+                        );
+                        if (!source || !target) return 0;
+
+                        const sourceRect = source.getBoundingClientRect();
+                        const targetRect = target.getBoundingClientRect();
+                        return targetRect.top + targetRect.height / 2
+                            - (sourceRect.top + sourceRect.height / 2);
                     },
+                    duration: .85,
+                    ease: "power2.inOut",
+                })
+                .set(".tree-container.is--three .tree-child-wrapper.is--one .label", {
+                    autoAlpha: 1,
+                })
+                .set(".mobile-tree-redesign__toi", {
+                    autoAlpha: 0,
+                })
+                .set(mobileTree, {
+                    autoAlpha: 0,
                 });
         }
     } else {
