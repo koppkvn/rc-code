@@ -2,6 +2,8 @@
 import { ElectricBorder } from './electricBorder.js'
 
 const ACCENT_COLOR = "#D2AA62";
+const TRACKER_XP_INITIAL_PERCENT = 40;
+const TRACKER_XP_REMAINING_PERCENT = 100 - TRACKER_XP_INITIAL_PERCENT;
 
 function applyBrandAccent() {
     const rootStyle = document.documentElement.style;
@@ -1122,18 +1124,24 @@ function createTrackerXpBar() {
     xpContainer.setAttribute('aria-label', 'Progression XP');
     xpContainer.setAttribute('aria-valuemin', '0');
     xpContainer.setAttribute('aria-valuemax', '100');
-    xpContainer.setAttribute('aria-valuenow', '0');
-    xpContainer.setAttribute('data-xp-progress', '0');
+    xpContainer.setAttribute('aria-valuenow', String(TRACKER_XP_INITIAL_PERCENT));
+    xpContainer.setAttribute('data-xp-progress', String(TRACKER_XP_INITIAL_PERCENT));
     xpContainer.innerHTML = `
         <div class="tracker-xp-track">
             <div class="tracker-xp-fill"></div>
         </div>
     `;
 
+    const track = xpContainer.querySelector('.tracker-xp-track');
+    const fill = xpContainer.querySelector('.tracker-xp-fill');
+    gsap.set(fill, {
+        scaleX: TRACKER_XP_INITIAL_PERCENT / 100,
+    });
+
     return {
         container: xpContainer,
-        track: xpContainer.querySelector('.tracker-xp-track'),
-        fill: xpContainer.querySelector('.tracker-xp-fill')
+        track,
+        fill,
     };
 }
 
@@ -1395,9 +1403,10 @@ function initTrackerCheckboxes() {
 
             completedSteps += 1;
             const isLastStep = completedSteps >= trackerButtons.length;
+            const xpPerHabit = TRACKER_XP_REMAINING_PERCENT / trackerButtons.length;
             const targetPercent = isLastStep
                 ? 100
-                : completedSteps * (100 / trackerButtons.length);
+                : TRACKER_XP_INITIAL_PERCENT + completedSteps * xpPerHabit;
 
             animateXpBar(xpBar, targetPercent, () => {
                 if (targetPercent !== 100 || xpResetStarted) return;
