@@ -3945,14 +3945,11 @@ function initTreeDiagram() {
         // the same interval. The page heading deliberately stays untouched.
         treeTlOne
             .to([
-                ".mobile-tree-redesign__toi",
                 ".tree-container.is--compare .tree-left-side .line.is--compare",
                 ".tree-container.is--compare .line.is--vertical.is--top",
                 ".tree-container.is--compare .line.is--vertical.is--bottom",
                 ".tree-container.is--compare .tree-right-wrapper .line-wrapper-top > .line",
                 ".tree-container.is--compare .tree-right-wrapper .line-wrapper-top > .label",
-                ".tree-container.is--compare .tree-right-wrapper .line-wrapper-bottom > .line",
-                ".tree-container.is--compare .tree-right-wrapper .line-wrapper-bottom > .label",
             ], {
                 autoAlpha: 0,
                 duration: .6,
@@ -3982,12 +3979,15 @@ function initTreeDiagram() {
         // .to({}, {
         //     duration: 2,
         // })
-        .to(".tree-container.is--three .label, .mobile-tree-redesign__toi", {
+        .to(".tree-container.is--three .label", {
             autoAlpha: 0,
             duration: 0.1,
         }, "<")
 
-        .addLabel("timeline", "+=1")
+        .addLabel(
+            "timeline",
+            isMobile ? "compareDotReveal+=.6" : "+=1"
+        )
 
     // desktop only
     mm.add("(min-width: 768px)", () => {
@@ -5143,71 +5143,19 @@ function initTreeDiagram() {
             autoAlpha: 0,
         })
 
-        // let mapTl = null;
+        const mobileAccessRiseDuration = 1.6;
 
-        treeTlOne.to({}, {
-            duration: 2,
-            ease: "linear",
-        })
-        treeTlOne.to({}, {
-            ease: "none",
-            // duration: 1,
-            onStart: function () {
-                console.log("start");
-                gsap.set(".parent-section", {
-                    overflow: "visible",
-                })
-                // gsap.to(".section.is--compare [data-split='lines'] .lineInner", {
-                //     yPercent: -100,
-                // })
-            },
-
-
-
-            onReverseComplete: function () {
-                // gsap.to(".section.is--compare [data-split='lines'] .lineInner", {
-                //     yPercent: 0,
-                // })
-            }
-        },)
-
-
-            // .to(".section.is--compare .is--reallywant", {
-            //     scaleY: 3,
-            //     transformOrigin: "top"
-
-            // })
-
-
-            .to(".line.is--reallywant", {
-                scaleY: 2.35,
-                duration: 2,
-                transformOrigin: "top left"
-
-            }, "<+=.5")
-            .to(".section.is--compare .label.is--compare3", {
-
-                y: "+=70dvh",
-                duration: 3,
-                transformOrigin: "top",
-                ease: "none"
-            }, "<")
-            .to(".section.is--compare .line-wrapper-top, .section.is--compare .line.is--vertical, .section.is--compare .tree-left-side", {
-                autoAlpha: 0,
-                // scale: .5
-                onComplete: function () {
-                    //HELP I wanna pin ".line-wrapper-bottom" at this moment
-
-                }
-            }, "<")
-        // gsap.set(".line-container", {
-        //     opacity: 0,
-        // })
         treeTlOne
-            .addLabel("mobileTimelineReveal", "+=1")
+            // The timeline begins on the exact frame where the right-hand
+            // diagram fade finishes: no spacer and no legacy line stretch.
+            .addLabel("mobileTimelineReveal", "compareDotReveal+=.6")
             .to(".section.is--timeline .timeline-container", {
                 autoAlpha: 1,
+                duration: .45,
                 onStart: function () {
+                    gsap.set(".parent-section", {
+                        overflow: "visible",
+                    });
                     document.body.classList.remove('is-hidden');
                     document.body.classList.add('is-visible');
                     gsap.set(".section.is--timeline .timeline-panel", {
@@ -5216,30 +5164,68 @@ function initTreeDiagram() {
                     alignMobileTimelineDotToCompareDot();
                 },
             }, "mobileTimelineReveal")
-            // Keep the comparison heading throughout the completed diagram.
-            // It only yields once "Accès et préparation" approaches during
-            // the timeline hand-off.
-            .to(".section.is--compare .header-pres.is--compare", {
-                autoAlpha: 0,
-                y: -10,
-                duration: .6,
-                ease: "power1.inOut",
-            }, "mobileTimelineReveal")
             .to(".panel [data-split='lines'] .lineInner", {
                 yPercent: 0,
-                duration: .6,
+                duration: .45,
                 ease: "power2.out",
             }, "mobileTimelineReveal")
             .to(".panel .t-inner-wrapper.is--spec", {
                 autoAlpha: 1,
                 yPercent: 0,
-                duration: .6,
+                duration: .45,
                 ease: "power2.out",
             }, "mobileTimelineReveal")
-            .to(".section.is--compare .line-wrapper-bottom > .line, .section.is--compare .line-wrapper-bottom > .label, .section.is--compare .line-wrapper-bottom > .dot-wrapper", {
+            .addLabel("mobileAccessRise", "mobileTimelineReveal+=.45")
+            .to(
+                ".section.is--timeline "
+                + ".timeline-access-preparation",
+                {
+                    y: function () {
+                        const accessContent = document.querySelector(
+                            '.section.is--timeline '
+                            + '.timeline-access-preparation'
+                        );
+                        const accessTitle = accessContent?.querySelector(
+                            '.timeline-access-preparation__title'
+                        );
+                        const compareHeading = document.querySelector(
+                            '.section.is--compare '
+                            + '.header-pres.is--compare'
+                        );
+                        if (!accessContent) return 0;
+
+                        const currentY = Number(
+                            gsap.getProperty(accessContent, 'y')
+                        ) || 0;
+                        if (!accessTitle || !compareHeading) return currentY;
+
+                        const accessRect = accessTitle.getBoundingClientRect();
+                        const headingRect = compareHeading.getBoundingClientRect();
+                        const targetTop = headingRect.bottom + 16;
+                        const remainingDistance = Math.max(
+                            0,
+                            accessRect.top - targetTop
+                        );
+
+                        return currentY - remainingDistance;
+                    },
+                    duration: mobileAccessRiseDuration,
+                    ease: "none",
+                },
+                "mobileAccessRise"
+            )
+            // The main heading stays fully opaque throughout the reveal and
+            // the first half of the access panel's rise.
+            .addLabel(
+                "mobileAccessMidpoint",
+                `mobileAccessRise+=${mobileAccessRiseDuration / 2}`
+            )
+            .to(".section.is--compare .header-pres.is--compare", {
                 autoAlpha: 0,
-                ease: "none"
-            }, "mobileTimelineReveal")
+                y: -10,
+                duration: .6,
+                ease: "power1.inOut",
+            }, "mobileAccessMidpoint");
 
 
 
