@@ -359,11 +359,11 @@ function applyBrandAccent() {
             }
 
             .section.is--timeline .stats-container.is--schedule-replacement .structure-day {
-                color: #fff;
+                color: rgba(255, 255, 255, .5);
             }
 
             .section.is--timeline .stats-container.is--schedule-replacement .structure-detail {
-                color: rgba(255, 255, 255, .5);
+                color: #fff;
             }
 
             .section.is--timeline .stats-container.is--schedule-replacement .structure-text {
@@ -922,6 +922,55 @@ function alignMobileAccessPreparationToTimelineDot() {
     });
 }
 
+function balanceMobileWeekOneSpacing() {
+    if (!window.matchMedia('(max-width: 47.99rem)').matches) return;
+
+    const accessLastText = document.querySelector(
+        '.section.is--timeline .timeline-access-preparation__text:last-child'
+    );
+    const weekOnePanel = document.querySelector(
+        '.section.is--timeline .timeline-panel.is--5'
+    );
+    const weekOneTitle = weekOnePanel?.querySelector(
+        '.big-title-section.is--timeline'
+    );
+    const weekOneLastModule = weekOnePanel?.querySelector(
+        '.module-container .text-block-4:last-child'
+    );
+    const weekTwoTitle = document.querySelector(
+        '.section.is--timeline .timeline-panel.is--6 .big-title-section.is--timeline'
+    );
+
+    if (
+        !accessLastText
+        || !weekOnePanel
+        || !weekOneTitle
+        || !weekOneLastModule
+        || !weekTwoTitle
+    ) return;
+
+    // Reset before measuring so refreshes never accumulate the correction.
+    gsap.set(weekOnePanel, { y: 0 });
+
+    const accessBottom = accessLastText.getBoundingClientRect().bottom;
+    const weekOneTop = weekOneTitle.getBoundingClientRect().top;
+    const weekOneBottom = weekOneLastModule.getBoundingClientRect().bottom;
+    const weekTwoTop = weekTwoTitle.getBoundingClientRect().top;
+    const gapBeforeWeekOne = weekOneTop - accessBottom;
+    const gapAfterWeekOne = weekTwoTop - weekOneBottom;
+
+    // Moving week one upward reduces the first gap and increases the second
+    // by the same amount. Half their difference makes both gaps identical.
+    const upwardShift = Math.max(
+        0,
+        (gapBeforeWeekOne - gapAfterWeekOne) / 2
+    );
+
+    gsap.set(weekOnePanel, {
+        y: -upwardShift,
+    });
+}
+
 function alignMobileTimelineDotToCompareDot() {
     if (!window.matchMedia('(max-width: 47.99rem)').matches) return;
 
@@ -952,6 +1001,7 @@ function alignMobileTimelineDotToCompareDot() {
 
     // The first timeline content uses this same point as its vertical anchor.
     alignMobileAccessPreparationToTimelineDot();
+    balanceMobileWeekOneSpacing();
 }
 
 function replaceMobileStatsWithSchedule() {
@@ -4493,6 +4543,7 @@ function initTreeDiagram() {
         })
 
         alignMobileAccessPreparationToTimelineDot();
+        balanceMobileWeekOneSpacing();
 
 
         // Only set styles for second text if enabled
