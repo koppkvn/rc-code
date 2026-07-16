@@ -939,9 +939,10 @@ function alignMobileAccessPreparationToTimelineDot() {
     const titleRect = accessTitle.getBoundingClientRect();
     const dotRect = timelineDot.getBoundingClientRect();
     const dotCenterY = dotRect.top + dotRect.height / 2;
+    const titleCenterY = titleRect.top + titleRect.height / 2;
 
     gsap.set(accessContent, {
-        y: dotCenterY - titleRect.top,
+        y: dotCenterY - titleCenterY,
     });
 }
 
@@ -1332,15 +1333,15 @@ function initTrackerSection() {
         autoAlpha: 0,
     })
 
-    gsap.set(".section.is--tracker .big-title-section", {
+    gsap.set(".section.is--tracker .big-title-section, .section.is--tracker .wrapper-p", {
         autoAlpha: 0,
         y: 12,
     });
-    gsap.set(".section.is--tracker .big-title-section .lineInner", {
+    gsap.set(".section.is--tracker .big-title-section .lineInner, .section.is--tracker .wrapper-p .lineInner", {
         yPercent: 0,
     });
 
-    gsap.to(".section.is--tracker .big-title-section", {
+    gsap.to(".section.is--tracker .big-title-section, .section.is--tracker .wrapper-p", {
         autoAlpha: 1,
         y: 0,
         duration: 2.15,
@@ -1352,19 +1353,6 @@ function initTrackerSection() {
             markers: false
         }
     });
-
-    gsap.from(".section.is--tracker [data-split='lines']:not(.big-title-section) .lineInner", {
-        yPercent: 100,
-        duration: 1,
-        ease: "easeOutQuart",
-        stagger: 0.1,
-        scrollTrigger: {
-            trigger: ".section.is--tracker",
-            start: "top 80%",
-            toggleActions: "play none none none",
-            markers: false
-        }
-    })
 
     let tl = gsap.timeline({
         scrollTrigger: {
