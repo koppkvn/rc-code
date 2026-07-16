@@ -275,6 +275,11 @@ function applyBrandAccent() {
         }
 
         @media (max-width: 47.99rem) {
+            .page-wrapper {
+                --mobile-section-title-top: 8svh;
+                --mobile-section-copy-gap: .85rem;
+            }
+
             .title-intro {
                 font-size: 2.2rem;
             }
@@ -288,12 +293,12 @@ function applyBrandAccent() {
             }
 
             .section.is--tracker .wrapper-p {
-                margin-top: .85rem;
+                margin-top: var(--mobile-section-copy-gap);
             }
 
             .section.is--tracker .container.is--tracker {
                 box-sizing: border-box;
-                padding-top: 8svh;
+                padding-top: var(--mobile-section-title-top);
                 border-top: 0 !important;
                 background-image: none !important;
                 box-shadow: none !important;
@@ -312,7 +317,7 @@ function applyBrandAccent() {
             .section.is--tracker[data-mobile-tracker-overlay="true"]
             .container.is--tracker {
                 height: 100svh;
-                padding-top: 8svh;
+                padding-top: var(--mobile-section-title-top);
             }
 
             .mobile-tracker-placeholder {
@@ -458,7 +463,7 @@ function applyBrandAccent() {
             .mobile-tree-redesign__copy {
                 position: absolute;
                 z-index: 2;
-                top: 8%;
+                top: var(--mobile-section-title-top);
                 right: auto;
                 left: 1.25rem;
                 display: flex;
@@ -486,7 +491,7 @@ function applyBrandAccent() {
 
             .mobile-tree-redesign__copy-text {
                 width: 100%;
-                margin: .85rem auto 0 0;
+                margin: var(--mobile-section-copy-gap) auto 0 0;
                 padding: 0;
                 color: #fff;
                 font-size: .9375rem;
@@ -499,7 +504,7 @@ function applyBrandAccent() {
             .mobile-tree-redesign__formula-copy {
                 position: absolute;
                 z-index: 3;
-                top: 8%;
+                top: var(--mobile-section-title-top);
                 right: auto;
                 left: 1.25rem;
                 display: flex;
@@ -511,7 +516,7 @@ function applyBrandAccent() {
 
             .mobile-tree-redesign__formula-title {
                 width: 100%;
-                margin: 0 0 .85rem;
+                margin: 0;
                 padding: 0;
                 color: rgba(255, 255, 255, .96);
                 font-size: 2.3rem;
@@ -538,6 +543,10 @@ function applyBrandAccent() {
                 text-transform: uppercase;
             }
 
+            .mobile-tree-redesign__formula-text:first-of-type {
+                margin-top: var(--mobile-section-copy-gap);
+            }
+
             .mobile-tree-redesign__formula-label {
                 color: ${ACCENT_COLOR};
             }
@@ -545,7 +554,7 @@ function applyBrandAccent() {
             .section.is--compare .header-pres.is--compare {
                 position: absolute;
                 z-index: 4;
-                top: 8%;
+                top: var(--mobile-section-title-top);
                 right: auto;
                 left: 1.25rem;
                 width: min(calc(100% - 2.5rem), 25rem);
@@ -3468,6 +3477,12 @@ function initTreeDiagram() {
     }
 
     treeTlOne.addLabel("focusSection", "+=1")
+    const compareGrayMainDuration = .75;
+    const compareGrayLowerDuration = 1.8;
+    const compareGrayLabelDuration = .55;
+    const compareWhiteStartOffset = (
+        compareGrayLowerDuration + compareGrayLabelDuration
+    );
 
     if (isMobile) {
         // Match the two preceding mobile headings: a long, natural opacity
@@ -3485,7 +3500,7 @@ function initTreeDiagram() {
     treeTlOne.from(".tree-left-side .line", {
         scaleX: window.innerWidth <= 767 ? 1 : 0,
         scaleY: window.innerWidth <= 767 ? 0 : 1,
-        duration: 1.5,
+        duration: compareGrayMainDuration,
         transformOrigin: window.innerWidth <= 767 ? "top" : "left",
         onStart: function () {
 
@@ -3532,13 +3547,13 @@ function initTreeDiagram() {
             scaleX: window.innerWidth <= 767 ? 0 : 1,
             scaleY: window.innerWidth <= 767 ? 1 : 0,
             transformOrigin: window.innerWidth <= 767 ? "right" : "bottom",
-            duration: 1.5,
+            duration: compareGrayMainDuration,
         })
         .from(".tree-container.is--compare .line.is--vertical.is--bottom", {
             scaleX: window.innerWidth <= 767 ? 0 : 1,
             scaleY: window.innerWidth <= 767 ? 1 : 0,
             transformOrigin: window.innerWidth <= 767 ? "left" : "top",
-            duration: 1.5,
+            duration: compareGrayMainDuration,
         }, "<")
 
         .addLabel("equal")
@@ -3598,7 +3613,7 @@ function initTreeDiagram() {
             scaleX: window.innerWidth <= 767 ? 1 : 0,
             scaleY: window.innerWidth <= 767 ? 0 : 1,
             transformOrigin: window.innerWidth <= 767 ? "top" : "left",
-            duration: 4,
+            duration: compareGrayLowerDuration,
             onComplete: function () {
                 scrambleChildLabelCompareTwo.play(0);
                 gsap.set(".label.color.is--compare", {
@@ -3632,7 +3647,7 @@ function initTreeDiagram() {
         }, "equal")
 
         .to({}, {
-            duration: 1,
+            duration: compareGrayLabelDuration,
             onReverseComplete: function () {
 
                 gsap.to(".tree-container.is--compare .tree-right-wrapper .line-wrapper-bottom .label", {
@@ -3734,10 +3749,12 @@ function initTreeDiagram() {
             }
         })
 
-        // The lower branch finishes drawing four seconds after "equal", then
-        // “Ce que tu veux vraiment” completes its one-second scramble. Start
-        // the white-diagram pass on that exact frame, without a dead pause.
-        .addLabel("compareWhiteStart", "equal+=5")
+        // Start the white pass as soon as the accelerated grey branch and its
+        // label reveal are complete, without leaving a dead scroll phase.
+        .addLabel(
+            "compareWhiteStart",
+            `equal+=${compareWhiteStartOffset}`
+        )
 
         // white line is coming in
         .from(".tree-container.is--compare .tree-left-side .line-clr", {
