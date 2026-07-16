@@ -911,6 +911,16 @@ function applyBrandAccent() {
                     !important;
             }
 
+            .section.is--tracker
+            .tracker-checkbox.is--button[data-clicked="true"] {
+                border-color: ${ACCENT_COLOR} !important;
+                background-color: ${ACCENT_COLOR} !important;
+                box-shadow:
+                    inset 0 0 .18rem rgba(247, 232, 189, .55),
+                    0 0 .4rem rgba(210, 170, 98, .4) !important;
+                animation: none !important;
+            }
+
             .section.is--tracker .tracker-checkbox.is--button::before {
                 display: none !important;
                 content: none !important;
@@ -929,8 +939,9 @@ function applyBrandAccent() {
             .section.is--tracker[data-xp-cycle-complete="true"]
             .tracker-checkbox.is--button {
                 border-color: ${ACCENT_COLOR} !important;
-                background-color: transparent !important;
+                background-color: ${ACCENT_COLOR} !important;
                 box-shadow:
+                    inset 0 0 .18rem rgba(247, 232, 189, .55),
                     0 0 .25rem rgba(247, 232, 189, .42),
                     0 0 .65rem rgba(210, 170, 98, .38) !important;
                 transition:
@@ -1737,8 +1748,30 @@ function initTrackerSection() {
                 if (trackerCopyGroup && trackerDetailsGroup) {
                     const containerRect = trackerContainer.getBoundingClientRect();
                     const copyRect = trackerCopyGroup.getBoundingClientRect();
+                    const detailsRect = trackerDetailsGroup.getBoundingClientRect();
+                    const detailAnchors = [
+                        trackerDetailsGroup.querySelector('.tracker-pompes'),
+                        trackerDetailsGroup.querySelector('.niveaux'),
+                        trackerDetailsGroup.querySelector('.tracker-header'),
+                        ...trackerDetailsGroup.querySelectorAll('.tracker-row'),
+                    ].filter(Boolean);
+                    const firstVisibleTop = Math.min(
+                        detailsRect.top,
+                        ...detailAnchors.map(element => (
+                            element.getBoundingClientRect().top
+                        ))
+                    );
+                    const internalOverflowAbove = Math.max(
+                        0,
+                        detailsRect.top - firstVisibleTop
+                    );
+                    const mobileTrackerGap = 20;
+
                     trackerDetailsGroup.style.top = `${
-                        copyRect.bottom - containerRect.top + 8
+                        copyRect.bottom
+                        - containerRect.top
+                        + mobileTrackerGap
+                        + internalOverflowAbove
                     }px`;
                 }
                 gsap.timeline()
