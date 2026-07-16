@@ -350,15 +350,16 @@ function applyBrandAccent() {
             }
 
             .section.is--timeline .timeline-access-preparation__image {
-                width: 100%;
-                height: clamp(10rem, 25vh, 15rem);
+                width: 80%;
+                height: clamp(8rem, 20vh, 12rem);
                 box-sizing: border-box;
-                justify-content: center;
+                justify-content: flex-start;
+                margin-right: auto;
                 border: 1px solid rgba(255, 255, 255, .22);
             }
 
             .section.is--timeline .timeline-access-preparation__image img {
-                object-position: center;
+                object-position: left center;
             }
 
             .section.is--timeline .timeline-panel.is--2.is--fixed {
@@ -388,20 +389,7 @@ function applyBrandAccent() {
             }
 
             .section.is--timeline .mobile-week-recurring-schedule {
-                display: grid;
-                gap: .35rem;
-                width: 100%;
-                margin-top: .55rem;
-                padding-top: .55rem;
-                border-top: 1px solid rgba(255, 255, 255, .22);
-            }
-
-            .section.is--timeline .mobile-week-recurring-schedule__line {
-                margin: 0;
-                color: rgba(255, 255, 255, .72);
-                font-size: clamp(.68rem, 2.9vw, .76rem);
-                line-height: 1.2;
-                text-transform: uppercase;
+                display: contents;
             }
 
             .section.is--timeline .timeline-panel.is--8 .text-block-4.is--mobile-friday-suppressed {
@@ -815,7 +803,7 @@ function applyBrandAccent() {
             .section.is--tracker .tracker-checkbox.is--button.is--glow
             .tracker-checkbox-inside.is--button {
                 background-color: #fff !important;
-                animation: tracker-center-square-pulse 1.05s ease-in-out infinite;
+                animation: tracker-center-square-pulse 2.1s ease-in-out infinite;
             }
 
             .section.is--tracker[data-xp-cycle-complete="true"]
