@@ -359,40 +359,29 @@ function applyBrandAccent() {
                 margin-top: .25rem;
             }
 
-            .section.is--timeline .stats-container.is--schedule-replacement .stats-wrapper {
-                padding: .75rem 1rem 1rem;
+            .section.is--timeline .timeline-panel.is--4.is--mobile-schedule-removed {
+                display: none !important;
             }
 
-            .section.is--timeline .stats-container.is--schedule-replacement .structure-container {
-                gap: .3rem;
+            .section.is--timeline .mobile-week-recurring-schedule {
+                display: grid;
+                gap: .35rem;
                 width: 100%;
-                max-width: none;
+                margin-top: .55rem;
+                padding-top: .55rem;
+                border-top: 1px solid rgba(255, 255, 255, .22);
             }
 
-            .section.is--timeline .stats-container.is--schedule-replacement .structure-wrapper {
-                gap: .2rem;
-                width: 100%;
-                padding-bottom: .4rem;
+            .section.is--timeline .mobile-week-recurring-schedule__line {
+                margin: 0;
+                color: rgba(255, 255, 255, .72);
+                font-size: clamp(.68rem, 2.9vw, .76rem);
+                line-height: 1.2;
+                text-transform: uppercase;
             }
 
-            .section.is--timeline .stats-container.is--schedule-replacement .structure-title {
-                font-size: .7rem;
-                line-height: 1.1;
-            }
-
-            .section.is--timeline .stats-container.is--schedule-replacement .structure-day {
-                color: rgba(255, 255, 255, .5);
-            }
-
-            .section.is--timeline .stats-container.is--schedule-replacement .structure-detail {
-                color: #fff;
-            }
-
-            .section.is--timeline .stats-container.is--schedule-replacement .structure-text {
-                width: 100%;
-                color: rgba(255, 255, 255, .5);
-                font-size: .56rem;
-                line-height: 1.3;
+            .section.is--timeline .timeline-panel.is--8 .text-block-4.is--mobile-friday-suppressed {
+                display: none !important;
             }
 
             .parent-section > .section.is--section,
@@ -1105,52 +1094,59 @@ function alignCompareWhiteProgressGeometry() {
     dotWrapper.style.top = `${intersectionY - targetWrapperRect.top}px`;
 }
 
-function replaceMobileStatsWithSchedule() {
+function distributeMobileScheduleAcrossWeeks() {
     if (!window.matchMedia('(max-width: 47.99rem)').matches) return;
 
-    const weekFourPanel = document.querySelector('.section.is--timeline .timeline-panel.is--4.is--fixed');
-    const statsContainer = weekFourPanel?.querySelector('.stats-container');
-    const statsInner = statsContainer?.querySelector('.stats-inner');
-    const schedule = weekFourPanel?.querySelector('.structure-container');
-
-    if (!statsContainer || !statsInner || !schedule) return;
-
-    const mobileScheduleTitles = [
-        ['Lundi à jeudi :', 'Cours + exercice'],
-        ['Vendredi :', 'Méditation guidée'],
-        ['Dimanche :', 'Purgatoire (1 à 2h)'],
+    const timelineSection = document.querySelector('.section.is--timeline');
+    const floatingSchedulePanel = timelineSection?.querySelector(
+        '.timeline-panel.is--4.is--fixed'
+    );
+    const recurringLines = [
+        'Vendredi – Méditation guidée',
+        'Dimanche – Purgatoire (1–2h)',
     ];
 
-    schedule.querySelectorAll(':scope > .structure-wrapper').forEach((scheduleRow, index) => {
-        const title = scheduleRow.querySelector('.structure-title');
-        const description = scheduleRow.querySelector('.structure-text');
-        const mobileTitleParts = mobileScheduleTitles[index];
+    floatingSchedulePanel?.classList.add('is--mobile-schedule-removed');
+    floatingSchedulePanel?.setAttribute('aria-hidden', 'true');
 
-        if (title && mobileTitleParts) {
-            const [dayLabel, detailLabel] = mobileTitleParts;
-            const day = document.createElement('span');
-            const detail = document.createElement('span');
+    [5, 6, 7, 8].forEach(panelIndex => {
+        const panel = timelineSection?.querySelector(
+            `.timeline-panel.is--${panelIndex}`
+        );
+        const modules = panel?.querySelector('.module-container');
 
-            day.className = 'structure-day';
-            day.textContent = dayLabel;
-            detail.className = 'structure-detail';
-            detail.textContent = ` ${detailLabel}`;
+        if (!modules) return;
 
-            title.replaceChildren(day, detail);
-            title.setAttribute('aria-label', `${dayLabel} ${detailLabel}`);
+        modules.querySelector('.mobile-week-recurring-schedule')?.remove();
+
+        if (panelIndex === 8) {
+            Array.from(modules.querySelectorAll('.text-block-4')).forEach(module => {
+                if (
+                    module.textContent
+                        .trim()
+                        .toLocaleLowerCase('fr')
+                        .startsWith('vendredi')
+                ) {
+                    module.classList.add('is--mobile-friday-suppressed');
+                }
+            });
         }
 
-        if (index === 2 && description) {
-            const sundayDescription = 'Réunion avec les membres de ton groupe. Si tu ne peux pas libérer 1-2h le dimanche, opte pour la formule solo.';
-            description.textContent = sundayDescription;
-            description.setAttribute('aria-label', sundayDescription);
-        } else {
-            description?.remove();
-        }
+        const recurringSchedule = document.createElement('div');
+        recurringSchedule.className = 'mobile-week-recurring-schedule';
+
+        recurringLines.forEach(label => {
+            const line = document.createElement('div');
+            line.className = (
+                'text-block-4 mobile-week-recurring-schedule__line'
+            );
+            line.textContent = label;
+            line.setAttribute('aria-label', label);
+            recurringSchedule.appendChild(line);
+        });
+
+        modules.appendChild(recurringSchedule);
     });
-
-    statsInner.replaceWith(schedule);
-    statsContainer.classList.add('is--schedule-replacement');
 }
 
 function updateWeekFourFridayLabel() {
@@ -4618,25 +4614,22 @@ function initTreeDiagram() {
 
             console.log(distanceBetween); // Distance in pixels
         }
-        let panelHeight = document.querySelector(".section.is--timeline .timeline-panel.is--4.is--fixed").offsetHeight;
+        alignMobileAccessPreparationToTimelineDot();
+        normalizeMobileTimelinePanelSpacing();
 
-        let timelineHeight = document.querySelector(".section.is--timeline .timeline-panels-wrapper").offsetHeight;
-        console.log("panelHeight:", panelHeight);
+        const timelineHeight = document.querySelector(
+            ".section.is--timeline .timeline-panels-wrapper"
+        ).offsetHeight;
         console.log("timelineHeight:", timelineHeight);
         console.log("distanceBetween:", distanceBetween);
-        console.log("calc:", `calc(${timelineHeight / 16}rem - ${distanceBetween / 16}rem - ${panelHeight / 16}rem)`);
         gsap.set(".grey-line-new", {
             top: `${distanceBetween}px`,
-            // height: `calc(${timelineHeight}px - ${distanceBetween}px - ${panelHeight + 150}px)`,
             height: timelineHeight * 2,
         })
 
         gsap.set(".line-container", {
             height: `${distanceBetween - 2}px`,
         })
-
-        alignMobileAccessPreparationToTimelineDot();
-        normalizeMobileTimelinePanelSpacing();
 
 
         // Only set styles for second text if enabled
@@ -4688,26 +4681,6 @@ function initTreeDiagram() {
 
         //     }
         // });
-
-        // gsap.set(".timeline-panel .stats-container", {
-        //     opacity: 0,
-        // });
-
-        gsap.from(".timeline-panel .stats-container .stats-wrapper", {
-            autoAlpha: 0,
-            duration: .5,
-            scrollTrigger: {
-                trigger: ".timeline-panel.is--5",
-                start: "top 55%",
-                endTrigger: ".timeline-panel.is--4.is--fixed",
-                end: "bottom top+=38%",
-                toggleActions: "play none none reverse",
-                pinnedContainer: ".parent-section",
-                clearProps: "autoAlpha",
-
-            }
-        });
-
 
         gsap.set(".section.is--groupe p.is--first", {
             paddingLeft: 0
@@ -4854,8 +4827,7 @@ function initTreeDiagram() {
         ScrollTrigger.create({
             trigger: ".section.is--compare",
             start: "bottom bottom",
-            endTrigger: ".section.is--timeline .timeline-panel.is--4.is--fixed",
-            // end: `top ${distanceBetween - 2}px`,
+            endTrigger: ".section.is--timeline .timeline-panel.is--8",
             end: `bottom top`,
             pin: ".section.is--timeline .line-container",
             pinSpacing: true,
@@ -4887,79 +4859,6 @@ function initTreeDiagram() {
 
 
 
-        ScrollTrigger.create({
-            trigger: ".section.is--compare",
-            start: "bottom bottom-=1%",
-            endTrigger: ".section.is--timeline",
-            end: "bottom top+=90%",
-            pin: ".timeline-panel .stats-container",
-            pinSpacing: "margin",
-            // markers: true,
-            pinReparent: true,
-            zIndex: 100,
-            pinnedContainer: ".parent-section",
-
-            onUpdate: function (self) {
-                const progress = self.progress;
-
-                // Only start animating values after 35% scroll progress
-                const threshold = 0.35;
-                const adjustedProgress = progress < threshold ? 0 : (progress - threshold) / (1 - threshold);
-
-                // Cap at 0.65 so values only reach 65% during scroll
-                // The remaining 35% will animate separately after scroll ends
-                const cappedProgress = Math.min(adjustedProgress * 0.65, 0.65);
-
-                // Update each stat based on capped progress
-                document.querySelectorAll('[data-target]').forEach(el => {
-                    const target = parseFloat(el.dataset.target);
-                    const currentValue = Math.round(target * cappedProgress);
-                    const valueSpan = el.querySelector('.stat-value');
-
-                    if (valueSpan) {
-                        let paddedValue = Math.abs(currentValue).toString().padStart(3, '0');
-
-                        if (target < 0) {
-                            paddedValue = '-' + paddedValue;
-                        }
-
-                        valueSpan.textContent = paddedValue;
-                        const colorInterpolate = gsap.utils.interpolate("white", ACCENT_COLOR, progress);
-                        valueSpan.style.color = colorInterpolate;
-                    }
-                });
-            },
-
-            onLeave: function () {
-                // When ScrollTrigger ends, animate the remaining 35% with GSAP
-                document.querySelectorAll('[data-target]').forEach(el => {
-                    const target = parseFloat(el.dataset.target);
-                    const valueSpan = el.querySelector('.stat-value');
-                    const targetLength = Math.abs(target).toString().length;
-
-                    if (valueSpan) {
-                        const startValue = Math.round(target * 0.65); // Start from 65%
-
-                        gsap.to({ value: startValue }, {
-                            value: target,
-                            duration: 1.5,
-                            ease: "power2.out",
-                            onUpdate: function () {
-                                const currentValue = Math.round(this.targets()[0].value);
-                                let paddedValue = Math.abs(currentValue).toString().padStart(3, '0');
-
-                                if (target < 0) {
-                                    paddedValue = '-' + paddedValue;
-                                }
-
-                                valueSpan.textContent = paddedValue;
-                            }
-                        });
-                    }
-                });
-            }
-        })
-
         // Separate trigger for the line animation
 
 
@@ -4986,20 +4885,6 @@ function initTreeDiagram() {
                     document.body.classList.remove('is-hidden');
                     document.body.classList.add('is-visible');
 
-                },
-                onLeave: () => {
-                    gsap.to(".structure-container", {
-                        opacity: 0,
-                        duration: .5,
-                        ease: "power2.out"
-                    })
-                },
-                onEnterBack: () => {
-                    gsap.to(".structure-container", {
-                        opacity: 1,
-                        duration: .5,
-                        ease: "power2.out"
-                    })
                 }
             },
         })
@@ -7399,7 +7284,7 @@ document.addEventListener("DOMContentLoaded", () => {
         removeTimelineInscriptionLabel();
         mergeTimelineAccessAndPreparation();
         rewriteMobileTrackerIntro();
-        replaceMobileStatsWithSchedule();
+        distributeMobileScheduleAcrossWeeks();
         updateWeekFourFridayLabel();
         initSplit();
         mm = gsap.matchMedia();
