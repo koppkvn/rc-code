@@ -4828,6 +4828,8 @@ function initTreeDiagram() {
         }
         alignMobileAccessPreparationToTimelineDot();
         normalizeMobileTimelinePanelSpacing();
+        document.body.classList.remove('is-hidden');
+        document.body.classList.add('is-visible');
 
         const timelineHeight = document.querySelector(
             ".section.is--timeline .timeline-panels-wrapper"
@@ -4980,55 +4982,34 @@ function initTreeDiagram() {
         // gsap.set(".line-container", {
         //     opacity: 0,
         // })
-        treeTlOne.to(".section.is--timeline .timeline-container", {
-
-            autoAlpha: 1,
-
-
-            onStart: function () {
-                alignMobileTimelineDotToCompareDot();
-
-                // createMapTimeline();
-                gsap.to(".panel [data-split='lines'] .lineInner", {
-                    yPercent: 0,
-                })
-
-                gsap.to(".panel .t-inner-wrapper.is--spec", {
-                    autoAlpha: 1,
-                    yPercent: 0,
-                    duration: 1,
-                    ease: "power2.out"
-                })
-
-                // gsap.to(".section.is--compare .inscription-rc", {
-                //     autoAlpha: 0,
-                // })
-            },
-            onReverseComplete: function () {
-
-                // gsap.to(".section.is--compare .inscription-rc", {
-                //     autoAlpha: 1,
-                // })
-
-                gsap.to(".panel [data-split='lines'] .lineInner", {
-                    yPercent: 100,
-                })
-
-                gsap.to(".panel .t-inner-wrapper.is--spec", {
-                    autoAlpha: 0,
-                    yPercent: 10,
-                    duration: 1,
-                    ease: "power2.out"
-                })
-
-            },
-
-        }, "<+=1")
-
+        treeTlOne
+            .addLabel("mobileTimelineReveal", "+=1")
+            .to(".section.is--timeline .timeline-container", {
+                autoAlpha: 1,
+                onStart: function () {
+                    document.body.classList.remove('is-hidden');
+                    document.body.classList.add('is-visible');
+                    gsap.set(".section.is--timeline .timeline-panel", {
+                        autoAlpha: 1,
+                    });
+                    alignMobileTimelineDotToCompareDot();
+                },
+            }, "mobileTimelineReveal")
+            .to(".panel [data-split='lines'] .lineInner", {
+                yPercent: 0,
+                duration: .6,
+                ease: "power2.out",
+            }, "mobileTimelineReveal")
+            .to(".panel .t-inner-wrapper.is--spec", {
+                autoAlpha: 1,
+                yPercent: 0,
+                duration: .6,
+                ease: "power2.out",
+            }, "mobileTimelineReveal")
             .to(".section.is--compare .line-wrapper-bottom > .line, .section.is--compare .line-wrapper-bottom > .label, .section.is--compare .line-wrapper-bottom > .dot-wrapper", {
                 autoAlpha: 0,
                 ease: "none"
-            }, "<")
+            }, "mobileTimelineReveal")
 
 
 
@@ -5076,6 +5057,34 @@ function initTreeDiagram() {
 
 
         if (lastSunday) {
+            const updateMobileTimelineExitVisibility = () => {
+                const timelineContainer = document.querySelector(
+                    '.section.is--timeline .timeline-container'
+                );
+                const timelineDot = document.querySelector(
+                    '.section.is--timeline .dot-wrapper-new'
+                );
+                if (!timelineContainer || !timelineDot) return;
+                if (Number(gsap.getProperty(timelineContainer, 'opacity')) < .5) {
+                    return;
+                }
+
+                const sundayRect = lastSunday.getBoundingClientRect();
+                const dotRect = timelineDot.getBoundingClientRect();
+                const sundayCenterY = sundayRect.top + sundayRect.height / 2;
+                const dotCenterY = dotRect.top + dotRect.height / 2;
+                const reachedTimelineEnd = sundayCenterY <= dotCenterY + 1;
+
+                document.body.classList.toggle(
+                    'is-hidden',
+                    reachedTimelineEnd
+                );
+                document.body.classList.toggle(
+                    'is-visible',
+                    !reachedTimelineEnd
+                );
+            };
+
             ScrollTrigger.create({
                 trigger: lastSunday,
                 start: () => {
@@ -5091,10 +5100,8 @@ function initTreeDiagram() {
                 pinnedContainer: ".parent-section",
                 invalidateOnRefresh: true,
                 onRefresh: alignMobileTimelineEndToLastSunday,
-                onEnter: () => {
-                    document.body.classList.add('is-hidden');
-                    document.body.classList.remove('is-visible');
-                },
+                onUpdate: updateMobileTimelineExitVisibility,
+                onEnter: updateMobileTimelineExitVisibility,
                 onLeaveBack: () => {
                     document.body.classList.remove('is-hidden');
                     document.body.classList.add('is-visible');
