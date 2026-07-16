@@ -396,6 +396,20 @@ function applyBrandAccent() {
                 display: none !important;
             }
 
+            body.is-hidden .section.is--timeline .timeline-panel,
+            body.is-hidden .section.is--timeline .line-container,
+            body.is-hidden .section.is--timeline .grey-line-new {
+                opacity: 0 !important;
+                transition: opacity .5s ease-in-out;
+            }
+
+            body.is-visible .section.is--timeline .timeline-panel,
+            body.is-visible .section.is--timeline .line-container,
+            body.is-visible .section.is--timeline .grey-line-new {
+                opacity: 1 !important;
+                transition: opacity .5s ease-in-out;
+            }
+
             .parent-section > .section.is--section,
             .parent-section > .section.is--groupe {
                 z-index: 20;
@@ -1061,6 +1075,38 @@ function normalizeMobileTimelinePanelSpacing() {
         panel.style.marginTop = `${targetGap - currentGap}px`;
         previousBottom = content.getBoundingClientRect().bottom;
     });
+}
+
+function alignMobileTimelineEndToLastSunday() {
+    if (!window.matchMedia('(max-width: 47.99rem)').matches) return null;
+
+    const timelineWrapper = document.querySelector(
+        '.section.is--timeline .timeline-panels-wrapper'
+    );
+    const greyLine = timelineWrapper?.querySelector('.grey-line-new');
+    const lastSunday = timelineWrapper?.querySelector(
+        '.timeline-panel.is--8 '
+        + '.mobile-week-recurring-schedule__line:last-child'
+    );
+
+    if (!timelineWrapper || !greyLine || !lastSunday) return null;
+
+    const wrapperRect = timelineWrapper.getBoundingClientRect();
+    const sundayRect = lastSunday.getBoundingClientRect();
+    const computedGreyTop = parseFloat(
+        window.getComputedStyle(greyLine).top
+    ) || 0;
+    const sundayCenterInWrapper = (
+        sundayRect.top
+        + sundayRect.height / 2
+        - wrapperRect.top
+    );
+
+    gsap.set(greyLine, {
+        height: Math.max(0, sundayCenterInWrapper - computedGreyTop),
+    });
+
+    return lastSunday;
 }
 
 function alignMobileTimelineDotToCompareDot() {
@@ -4768,6 +4814,7 @@ function initTreeDiagram() {
             top: `${distanceBetween}px`,
             height: timelineHeight * 2,
         })
+        const lastSunday = alignMobileTimelineEndToLastSunday();
 
         gsap.set(".line-container", {
             height: `${distanceBetween - 2}px`,
@@ -5004,40 +5051,32 @@ function initTreeDiagram() {
         // Separate trigger for the line animation
 
 
-        // Fixed overlay panels are not weeks. Anchor the mobile exit to the
-        // final scrolling panel so week 4 now owns the former week 5 hand-off.
-        const lastTimelinePanel = gsap.utils.toArray(".section.is--timeline .timeline-panel:not(.is--fixed)").pop();
-        const timelineTl = gsap.timeline({
-            scrollTrigger: {
-                trigger: lastTimelinePanel,
-                start: "50% top",
-                endTrigger: ".section.is--timeline",
-                end: "bottom 50%",
-                scrub: true,
-                // markers: true,
+        if (lastSunday) {
+            ScrollTrigger.create({
+                trigger: lastSunday,
+                start: () => {
+                    const timelineDot = document.querySelector(
+                        '.section.is--timeline .dot-wrapper-new'
+                    );
+                    if (!timelineDot) return 'center center';
+
+                    const dotRect = timelineDot.getBoundingClientRect();
+                    const dotCenterY = dotRect.top + dotRect.height / 2;
+                    return `center ${dotCenterY}px`;
+                },
                 pinnedContainer: ".parent-section",
+                invalidateOnRefresh: true,
+                onRefresh: alignMobileTimelineEndToLastSunday,
                 onEnter: () => {
-                    // Add class when scrolling forward into the trigger zone
                     document.body.classList.add('is-hidden');
                     document.body.classList.remove('is-visible');
-
                 },
                 onLeaveBack: () => {
-                    // Remove class when scrolling back up
                     document.body.classList.remove('is-hidden');
                     document.body.classList.add('is-visible');
-
-                }
-            },
-        })
-        // timelineTl.to(" .line-container, .grey-line-new, .stats-container .stats-inner", {
-        //     opacity: 0,
-        //     duration: .5,
-        //     ease: "linear"
-        // })
-        // timelineTl.to({}, {
-        //     duration: 3
-        // })
+                },
+            });
+        }
 
 
 
