@@ -1309,8 +1309,8 @@ function createMobileTreeRedesign() {
         </div>
         <div class="mobile-tree-redesign__formula-copy">
             <h2 class="mobile-tree-redesign__formula-title">
-                Une expérience
-                <span class="mobile-tree-redesign__formula-title-accent">Deux formules</span>
+                Une expérience,
+                <span class="mobile-tree-redesign__formula-title-accent">deux formules</span>
             </h2>
             <p class="mobile-tree-redesign__formula-text">
                 <span class="mobile-tree-redesign__formula-label">Solo :</span>
@@ -1529,6 +1529,11 @@ function initTrackerSection() {
         ".section.is--tracker .wrapper-p .text-section"
     );
     const trackerCopy = `${trackerTitleSelector}, ${trackerTextSelector}`;
+    const mobileTrackerContent = (
+        `${trackerCopy}, ` +
+        ".section.is--tracker .svg-wrapper, " +
+        ".section.is--tracker .tracker-container"
+    );
     const isMobile = window.matchMedia('(max-width: 47.99rem)').matches;
 
     buttonsToGlow.forEach(button => {
@@ -1540,10 +1545,10 @@ function initTrackerSection() {
     // })
 
     gsap.set(".tracker-highlight", {
-        autoAlpha: 0,
+        autoAlpha: isMobile ? 1 : 0,
     })
 
-    gsap.set(trackerCopy, {
+    gsap.set(isMobile ? mobileTrackerContent : trackerCopy, {
         autoAlpha: 0,
         y: 12,
     });
@@ -1559,18 +1564,16 @@ function initTrackerSection() {
             trackerTitleSelector
         );
         const trackerCopyReveal = gsap.timeline({ paused: true })
-            .to(trackerTextSelector, {
-                autoAlpha: 1,
-                y: 0,
-                duration: 2.15,
-                stagger: .04,
-                ease: "none",
-            }, 0)
-            .to(trackerTitleSelector, {
+            .to(mobileTrackerContent, {
                 autoAlpha: 1,
                 y: 0,
                 duration: 2.15,
                 ease: "none",
+                onStart: () => {
+                    buttonsToGlow.forEach(button => {
+                        button.classList.add("is--glow");
+                    });
+                },
             }, 0);
 
         ScrollTrigger.create({
@@ -1579,20 +1582,19 @@ function initTrackerSection() {
             pinnedContainer: ".section.is--intro",
             onEnter: () => {
                 if (trackerContainer && trackerTitle) {
-                    // Measure the final, unshifted title position on the exact
-                    // frame “Tu es ici” leaves the viewport, then move the
-                    // complete tracker content so the title shares the 8svh
-                    // top anchor used by the mobile diagram headings.
-                    gsap.set(trackerCopy, { y: 0 });
+                    // Measure the final title position as “Tu es ici” leaves,
+                    // then move the complete tracker section to a lower mobile
+                    // anchor than the diagram headings.
+                    gsap.set(mobileTrackerContent, { y: 0 });
                     gsap.set(trackerContainer, { y: 0 });
 
-                    const desiredTop = window.innerHeight * 0.08;
+                    const desiredTop = window.innerHeight * 0.12;
                     const titleTop = trackerTitle.getBoundingClientRect().top;
 
                     gsap.set(trackerContainer, {
                         y: desiredTop - titleTop,
                     });
-                    gsap.set(trackerCopy, { y: 12 });
+                    gsap.set(mobileTrackerContent, { y: 12 });
                 }
 
                 trackerCopyReveal.play();
@@ -1615,92 +1617,94 @@ function initTrackerSection() {
         });
     }
 
-    let tl = gsap.timeline({
-        scrollTrigger: {
-            trigger: ".section.is--tracker .tracker-container",
-            start: "top 80%",
-            end: "bottom bottom",
-            toggleActions: "play none none none",
-            // markers: true
-        }
-    })
+    if (!isMobile) {
+        let tl = gsap.timeline({
+            scrollTrigger: {
+                trigger: ".section.is--tracker .tracker-container",
+                start: "top 80%",
+                end: "bottom bottom",
+                toggleActions: "play none none none",
+                // markers: true
+            }
+        })
 
-    tl.from(".container.is--tracker .tracker-row > div:not(.tracker-row-line)", {
-        autoAlpha: 0,
-        duration: 1,
-        ease: "easeOutQuart",
-        stagger: 0.03,
-    })
+        tl.from(".container.is--tracker .tracker-row > div:not(.tracker-row-line)", {
+            autoAlpha: 0,
+            duration: 1,
+            ease: "easeOutQuart",
+            stagger: 0.03,
+        })
 
-    tl.from(".container.is--tracker .tracker-pompes", {
-        autoAlpha: 0,
-        duration: 1,
-        ease: "easeOutQuart",
-    }, "<")
+        tl.from(".container.is--tracker .tracker-pompes", {
+            autoAlpha: 0,
+            duration: 1,
+            ease: "easeOutQuart",
+        }, "<")
 
 
-    tl.to(".container.is--tracker .tracker-row .tracker-row-line", {
-        xPercent: 100,
-        duration: 1,
-        ease: "easeOutQuart",
-        stagger: 0.03,
+        tl.to(".container.is--tracker .tracker-row .tracker-row-line", {
+            xPercent: 100,
+            duration: 1,
+            ease: "easeOutQuart",
+            stagger: 0.03,
 
-        onComplete: function () {
-            // gsap.to(".purgatoire-message .wordInner", {
-            //     duration: 1,
+            onComplete: function () {
+                // gsap.to(".purgatoire-message .wordInner", {
+                //     duration: 1,
 
-            //     scrambleText: {
-            //         text: "{original}",
-            //         speed: 0.65,
-            //     },
-            // });
+                //     scrambleText: {
+                //         text: "{original}",
+                //         speed: 0.65,
+                //     },
+                // });
 
-            // gsap.to(".purgatoire-message", {
-            //     autoAlpha: 1,
-            //     duration: 1,
-            //     ease: "easeOutQuart",
-            // })
+                // gsap.to(".purgatoire-message", {
+                //     autoAlpha: 1,
+                //     duration: 1,
+                //     ease: "easeOutQuart",
+                // })
 
-            gsap.to('.tracker-highlight', {
-                autoAlpha: 1,
-                duration: 1,
-                ease: "easeOutQuart",
-            });
-
-            setTimeout(() => {
-                buttonsToGlow.forEach(button => {
-                    button.classList.toggle("is--glow");
+                gsap.to('.tracker-highlight', {
+                    autoAlpha: 1,
+                    duration: 1,
+                    ease: "easeOutQuart",
                 });
 
-            }, 2000);
+                setTimeout(() => {
+                    buttonsToGlow.forEach(button => {
+                        button.classList.toggle("is--glow");
+                    });
+
+                }, 2000);
 
 
-            // gsap.fromTo(".tracker-checkbox.is--button", {
-            //     backgroundColor: "#5f5f5f",
+                // gsap.fromTo(".tracker-checkbox.is--button", {
+                //     backgroundColor: "#5f5f5f",
 
-            // }, {
-            //     backgroundColor: "#2f2f2f",
+                // }, {
+                //     backgroundColor: "#2f2f2f",
 
-            //     duration: 1,
-            //     ease: "power1.out",
-            //     stagger: .4,
-            //     repeat: -1,
-            // })
-        }
-    }, "<")
-        .from(".iphone-wrapper", {
-            opacity: 0,
-            duration: 1,
-            ease: "easeOutQuart",
-        }, "-=1")
+                //     duration: 1,
+                //     ease: "power1.out",
+                //     stagger: .4,
+                //     repeat: -1,
+                // })
+            }
+        }, "<")
+            .from(".iphone-wrapper", {
+                opacity: 0,
+                duration: 1,
+                ease: "easeOutQuart",
+            }, "-=1")
 
-        .from(".svg-wrapper svg", {
-            opacity: 0,
-            duration: 1,
-            stagger: .2,
+            .from(".svg-wrapper svg", {
+                opacity: 0,
+                duration: 1,
+                stagger: .2,
 
-            ease: "easeOutQuart",
-        }, "-=1")
+                ease: "easeOutQuart",
+            }, "-=1")
+    }
 
 
 
@@ -5624,27 +5628,21 @@ function createMapTimeline() {
     gsap.set(".map-container", {
         willChange: "transform",
     })
+    // Fade the map title and its paragraph as one block, using the same
+    // natural exit as the previous mobile section headers.
+    mapTl.to(".section.is--map .text-wrapper-map .t-inner-wrapper", {
+        autoAlpha: 0,
+        y: -10,
+        duration: .45,
+        ease: "power1.in",
+    }, ">")
     mapTl.to(".map-container", {
         yPercent: -85,
         xPercent: 45,
         scale: 2.6,
         duration: 2.1,
         ease: "power1.out",
-        onStart: function () {
-            gsap.to(".text-wrapper-map .lineInner", {
-                yPercent: -100,
-                duration: .45,
-                ease: "power1.out",
-            })
-        },
-        onReverseComplete: function () {
-            gsap.to(".text-wrapper-map .lineInner", {
-                yPercent: 0,
-                duration: .45,
-                ease: "power1.out",
-            })
-        },
-    }, ">")
+    }, "<")
     // .to(".map-container mask rect", {
     //     xPercent: -10,
     //     yPercent: 25,
