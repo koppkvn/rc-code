@@ -342,6 +342,16 @@ function applyBrandAccent() {
                 text-transform: uppercase;
             }
 
+            .section.is--tracker .mobile-tracker-details {
+                position: absolute;
+                z-index: 3;
+                right: 0;
+                left: 0;
+                width: 100%;
+                margin: 0;
+                padding: 0;
+            }
+
             .section.is--tracker .container.is--tracker {
                 position: relative;
                 box-sizing: border-box;
@@ -1654,11 +1664,26 @@ function initTrackerSection() {
             trackerCopyGroup.append(trackerTitle, trackerParagraph);
         }
         const trackerHeading = ".section.is--tracker .mobile-tracker-copy";
-        const trackerDetails = (
-            ".section.is--tracker .container.is--tracker > .svg-wrapper, " +
-            ".section.is--tracker .container.is--tracker > " +
-            ".tracker-container"
+        const trackerInterface = trackerContainer?.querySelector(
+            ':scope > .tracker-container'
         );
+        const trackerDownloads = trackerContainer?.querySelector(
+            ':scope > .svg-wrapper'
+        );
+        let trackerDetailsGroup = trackerContainer?.querySelector(
+            ':scope > .mobile-tracker-details'
+        );
+        if (!trackerDetailsGroup && trackerInterface) {
+            trackerDetailsGroup = document.createElement('div');
+            trackerDetailsGroup.className = 'mobile-tracker-details';
+            trackerContainer.insertBefore(
+                trackerDetailsGroup,
+                trackerInterface
+            );
+            trackerDetailsGroup.append(trackerInterface);
+            if (trackerDownloads) trackerDetailsGroup.append(trackerDownloads);
+        }
+        const trackerDetails = ".section.is--tracker .mobile-tracker-details";
         if (!trackerContainer || !trackerSection) return;
 
         const trackerPlaceholder = document.createElement('div');
@@ -1692,6 +1717,13 @@ function initTrackerSection() {
                 gsap.set(trackerSection, {
                     autoAlpha: 1,
                 });
+                if (trackerCopyGroup && trackerDetailsGroup) {
+                    const containerRect = trackerContainer.getBoundingClientRect();
+                    const copyRect = trackerCopyGroup.getBoundingClientRect();
+                    trackerDetailsGroup.style.top = `${
+                        copyRect.bottom - containerRect.top + 24
+                    }px`;
+                }
                 gsap.timeline()
                     .to(trackerHeading, {
                         autoAlpha: 1,
