@@ -1029,6 +1029,82 @@ function alignMobileTimelineDotToCompareDot() {
     normalizeMobileTimelinePanelSpacing();
 }
 
+function alignCompareWhiteProgressGeometry() {
+    const compareTree = document.querySelector('.tree-container.is--compare');
+    const initialLine = compareTree?.querySelector(
+        '.tree-left-side .line.is--compare'
+    );
+    const whiteInitialLine = initialLine?.querySelector('.line-clr');
+    const whiteConnector = initialLine?.querySelector('.line-vertical-clr');
+    const greyAxis = compareTree?.querySelector('.line-vertical-wrapper');
+    const targetWrapper = compareTree?.querySelector('.line-wrapper-bottom');
+    const targetBar = targetWrapper?.querySelector('.line.is--reallywant');
+    const dotWrapper = targetWrapper?.querySelector(':scope > .dot-wrapper');
+
+    if (
+        !initialLine
+        || !whiteInitialLine
+        || !whiteConnector
+        || !greyAxis
+        || !targetWrapper
+        || !targetBar
+        || !dotWrapper
+    ) return;
+
+    const isMobile = window.matchMedia('(max-width: 47.99rem)').matches;
+    const initialRect = initialLine.getBoundingClientRect();
+    const targetRect = targetBar.getBoundingClientRect();
+    const targetWrapperRect = targetWrapper.getBoundingClientRect();
+
+    if (isMobile) {
+        // The responsive Webflow rule gives this horizontal white connector a
+        // fixed width. Measure the real distance instead, so its leading edge
+        // stops on the left border of the vertical grey branch on every phone.
+        const connectorRect = whiteConnector.getBoundingClientRect();
+        const connectorAnchorX = connectorRect.right;
+        const targetLeftX = targetRect.left;
+
+        whiteConnector.style.left = 'auto';
+        whiteConnector.style.right = '0px';
+        whiteConnector.style.width = `${Math.max(
+            0,
+            connectorAnchorX - targetLeftX
+        )}px`;
+
+        const alignedConnectorRect = whiteConnector.getBoundingClientRect();
+        const intersectionX = targetRect.left + targetRect.width / 2;
+        const intersectionY = (
+            alignedConnectorRect.top + alignedConnectorRect.height / 2
+        );
+
+        dotWrapper.style.left = `${
+            intersectionX - targetWrapperRect.left
+        }px`;
+        dotWrapper.style.top = `${
+            intersectionY - targetWrapperRect.top
+        }px`;
+        return;
+    }
+
+    // On desktop the first white segment is horizontal. Stop it at the left
+    // border of the central grey axis instead of inheriting the two-pixel
+    // overlap applied to the underlying grey line.
+    const greyAxisRect = greyAxis.getBoundingClientRect();
+    whiteInitialLine.style.left = '0px';
+    whiteInitialLine.style.right = 'auto';
+    whiteInitialLine.style.width = `${Math.max(
+        0,
+        greyAxisRect.left - initialRect.left
+    )}px`;
+
+    // Keep the circle centred on the exact intersection between the vertical
+    // grey axis and the lower horizontal branch.
+    const intersectionX = greyAxisRect.left + greyAxisRect.width / 2;
+    const intersectionY = targetRect.top + targetRect.height / 2;
+    dotWrapper.style.left = `${intersectionX - targetWrapperRect.left}px`;
+    dotWrapper.style.top = `${intersectionY - targetWrapperRect.top}px`;
+}
+
 function replaceMobileStatsWithSchedule() {
     if (!window.matchMedia('(max-width: 47.99rem)').matches) return;
 
@@ -2136,6 +2212,8 @@ function initTreeDiagram() {
     })
 
     const isMobile = window.matchMedia("(max-width: 767px)").matches;
+    alignCompareWhiteProgressGeometry();
+
     let treeTlOne;
     mm.add("(min-width: 768px)", () => {
 
