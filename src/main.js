@@ -2729,6 +2729,23 @@ function initTreeDiagram() {
 
     treeTlOne.addLabel("focusSection", "+=1")
 
+    if (isMobile) {
+        // Reveal the next section's heading and explanatory copy from the
+        // exact frame where the first branch starts growing out of TOI.
+        treeTlOne
+            .to(".section.is--compare [data-split='lines'] .lineInner", {
+                yPercent: 0,
+                duration: .55,
+                stagger: .04,
+                ease: "power1.out",
+            }, "focusSection")
+            .to(".section.is--compare .header-title, .section.is--compare .header-number", {
+                autoAlpha: 1,
+                duration: .45,
+                ease: "power1.out",
+            }, "focusSection");
+    }
+
     // start of compare animation, we scale the lines depending on the width of the screen
     treeTlOne.from(".tree-left-side .line", {
         scaleX: window.innerWidth <= 767 ? 1 : 0,
@@ -2800,9 +2817,11 @@ function initTreeDiagram() {
                 gsap.set(".label.color.is--compare", {
                     autoAlpha: 1,
                 })
-                gsap.set(".tree-child-wrapper.is--one.is--toi .label", {
-                    autoAlpha: 0,
-                })
+                if (!isMobile) {
+                    gsap.set(".tree-child-wrapper.is--one.is--toi .label", {
+                        autoAlpha: 0,
+                    })
+                }
 
                 // gsap.to(".tree-container.is--compare .tree-right-wrapper .line-wrapper-top .label", {
                 //     autoAlpha: 1,
@@ -2813,9 +2832,11 @@ function initTreeDiagram() {
                 gsap.set(".label.color.is--compare", {
                     autoAlpha: 0,
                 })
-                gsap.set(".tree-child-wrapper.is--one.is--toi .label", {
-                    autoAlpha: 1,
-                })
+                if (!isMobile) {
+                    gsap.set(".tree-child-wrapper.is--one.is--toi .label", {
+                        autoAlpha: 1,
+                    })
+                }
 
                 // gsap.to(".tree-container.is--compare .tree-right-wrapper .line-wrapper-top .label", {
                 //     autoAlpha: 0,
@@ -2848,9 +2869,11 @@ function initTreeDiagram() {
                 gsap.set(".label.color.is--compare", {
                     autoAlpha: 1,
                 })
-                gsap.set(".tree-child-wrapper.is--one.is--toi .label", {
-                    autoAlpha: 0,
-                })
+                if (!isMobile) {
+                    gsap.set(".tree-child-wrapper.is--one.is--toi .label", {
+                        autoAlpha: 0,
+                    })
+                }
 
                 gsap.to(".tree-container.is--compare .tree-right-wrapper .line-wrapper-bottom .label", {
                     autoAlpha: 1,
@@ -2861,9 +2884,11 @@ function initTreeDiagram() {
                 gsap.set(".label.color.is--compare", {
                     autoAlpha: 0,
                 })
-                gsap.set(".tree-child-wrapper.is--one.is--toi .label", {
-                    autoAlpha: 1,
-                })
+                if (!isMobile) {
+                    gsap.set(".tree-child-wrapper.is--one.is--toi .label", {
+                        autoAlpha: 1,
+                    })
+                }
 
                 // gsap.to(".tree-container.is--compare .tree-right-wrapper .line-wrapper-bottom .label", {
                 //     autoAlpha: 0,
@@ -2887,19 +2912,23 @@ function initTreeDiagram() {
             onStart: function () {
 
                 // scrambleChildLabelCompare.play(0);
-                gsap.to(".section.is--compare [data-split='lines'] .lineInner", {
-                    yPercent: 0,
-                    duration: .6,
-                    stagger: 0.05,
-                    ease: "power1.out"
-                })
+                if (!isMobile) {
+                    gsap.to(".section.is--compare [data-split='lines'] .lineInner", {
+                        yPercent: 0,
+                        duration: .6,
+                        stagger: 0.05,
+                        ease: "power1.out"
+                    })
+                }
 
                 gsap.set(".label.color.is--compare", {
                     autoAlpha: 1,
                 })
-                gsap.set(".tree-child-wrapper.is--one.is--toi .label", {
-                    autoAlpha: 0,
-                })
+                if (!isMobile) {
+                    gsap.set(".tree-child-wrapper.is--one.is--toi .label", {
+                        autoAlpha: 0,
+                    })
+                }
                 // gsap.to(".header-section.is--groupe, .header-section", {
                 //     autoAlpha: 0,
                 // })
@@ -2908,21 +2937,22 @@ function initTreeDiagram() {
                     autoAlpha: 0
                 },);
 
-                gsap.to(".section.is--compare .header-title, .section.is--compare .header-number", {
-                    duration: 1,
-                    onStart: function () {
-                        gsap.set(".section.is--compare .header-title, .section.is--compare .header-number", {
-                            autoAlpha: 1
-                        });
-                    },
+                if (!isMobile) {
+                    gsap.to(".section.is--compare .header-title, .section.is--compare .header-number", {
+                        duration: 1,
+                        onStart: function () {
+                            gsap.set(".section.is--compare .header-title, .section.is--compare .header-number", {
+                                autoAlpha: 1
+                            });
+                        },
 
-                    scrambleText: {
-                        text: "{original}",
-                        chars: 'upperCase',
-                        speed: 1,
-                        // tweenLength: false,
-                    }
-                },);
+                        scrambleText: {
+                            text: "{original}",
+                            chars: 'upperCase',
+                            speed: 1,
+                        }
+                    },);
+                }
 
                 gsap.to(".section.is--personnes [data-split='lines'] .lineInner", {
                     yPercent: -100,
@@ -2936,15 +2966,17 @@ function initTreeDiagram() {
                 gsap.set(".label.color.is--compare", {
                     autoAlpha: 0,
                 })
-                gsap.set(".tree-child-wrapper.is--one.is--toi .label", {
-                    autoAlpha: 1,
-                })
-                gsap.to(".section.is--compare [data-split='lines'] .lineInner", {
-                    yPercent: 100,
-                    duration: .6,
-                    stagger: 0.05,
-                    ease: "power1.out"
-                })
+                if (!isMobile) {
+                    gsap.set(".tree-child-wrapper.is--one.is--toi .label", {
+                        autoAlpha: 1,
+                    })
+                    gsap.to(".section.is--compare [data-split='lines'] .lineInner", {
+                        yPercent: 100,
+                        duration: .6,
+                        stagger: 0.05,
+                        ease: "power1.out"
+                    })
+                }
                 gsap.to(".header-section.is--groupe, .header-section", {
                     autoAlpha: 1,
                 })
