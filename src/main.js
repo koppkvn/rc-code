@@ -1949,6 +1949,9 @@ function initTreeDiagram() {
         gsap.set(".tree-container.is--first, .tree-container.is--second, .tree-container.is--three", {
             autoAlpha: 0,
         });
+        gsap.set(".section.is--section", {
+            autoAlpha: 1,
+        });
 
         if (mobileTree) {
             gsap.set(mobileTree, { autoAlpha: 1 });
@@ -1997,17 +2000,8 @@ function initTreeDiagram() {
                 .to({}, { duration: .65 })
 
                 // Step 2: the missing centre branch grows and reveals the
-                // section assigned to the participant.
-                .to(mobileSectionCopy, {
-                    yPercent: -100,
-                    duration: .45,
-                    stagger: .03,
-                    ease: "power1.in",
-                })
-                .to(mobileSectionHeader, {
-                    autoAlpha: 0,
-                    duration: .35,
-                }, "<")
+                // section assigned to the participant. The section title and
+                // explanatory copy remain visible during this whole phase.
                 .to(".mobile-tree-redesign__center-line", {
                     scaleY: 1,
                     duration: .7,
@@ -2018,18 +2012,32 @@ function initTreeDiagram() {
                 })
                 .to({}, { duration: .55 })
 
-                // Step 3: Ta section becomes the new root.
+                // Step 3: as soon as Ta section starts rising, the preceding
+                // diagram and its explanatory copy fade quickly together.
+                .addLabel("mobileSectionLift")
                 .to(".mobile-tree-redesign__root, .mobile-tree-redesign__first-trunk, .mobile-tree-redesign__first-horizontal, .mobile-tree-redesign__first-leg, .mobile-tree-redesign__section-label, .mobile-tree-redesign__center-line", {
                     autoAlpha: 0,
                     y: -35,
-                    duration: .65,
+                    duration: .32,
                     ease: "power2.inOut",
-                })
+                }, "mobileSectionLift")
+                .to(mobileSectionCopy, {
+                    yPercent: -100,
+                    autoAlpha: 0,
+                    duration: .3,
+                    stagger: .02,
+                    ease: "power1.in",
+                }, "mobileSectionLift")
+                .to(mobileSectionHeader, {
+                    autoAlpha: 0,
+                    duration: .3,
+                    ease: "power1.in",
+                }, "mobileSectionLift")
                 .to(".mobile-tree-redesign__subtree", {
                     y: "-9.35rem",
                     duration: .8,
                     ease: "power2.inOut",
-                }, "<")
+                }, "mobileSectionLift")
                 .to({}, { duration: .45 })
 
                 // Step 4: the group and solo branches draw, and their current
