@@ -261,6 +261,14 @@ function applyBrandAccent() {
                 font-size: 2.3rem;
             }
 
+            .section.is--tracker .big-title-section {
+                margin-top: 1.2rem;
+            }
+
+            .section.is--tracker .wrapper-p {
+                margin-top: .85rem;
+            }
+
             .big-title-section.is--timeline {
                 max-width: none;
                 font-size: clamp(1.5rem, 6.6vw, 1.65rem);
@@ -1234,7 +1242,28 @@ function initTrackerSection() {
         autoAlpha: 0,
     })
 
-    gsap.from(".section.is--tracker [data-split='lines'] .lineInner", {
+    gsap.set(".section.is--tracker .big-title-section", {
+        autoAlpha: 0,
+        y: 12,
+    });
+    gsap.set(".section.is--tracker .big-title-section .lineInner", {
+        yPercent: 0,
+    });
+
+    gsap.to(".section.is--tracker .big-title-section", {
+        autoAlpha: 1,
+        y: 0,
+        duration: 2.15,
+        ease: "none",
+        scrollTrigger: {
+            trigger: ".section.is--tracker",
+            start: "top 80%",
+            toggleActions: "play none none none",
+            markers: false
+        }
+    });
+
+    gsap.from(".section.is--tracker [data-split='lines']:not(.big-title-section) .lineInner", {
         yPercent: 100,
         duration: 1,
         ease: "easeOutQuart",
