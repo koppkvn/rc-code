@@ -3810,9 +3810,11 @@ function initTreeDiagram() {
             ease: "linear",
         })
 
-        //dot is coming in
+        // The point is the single hand-off cue for the mobile diagram.
+        .addLabel("compareDotReveal")
         .from(".tree-container.is--compare .dot-wrapper", {
             autoAlpha: 0,
+            duration: .6,
             onStart: function () {
                 gsap.fromTo(".tree-container.is--compare .dot-wrapper .dot .dot-bg", {
                     scale: 0,
@@ -3826,8 +3828,39 @@ function initTreeDiagram() {
                 })
             },
 
-        })
+        }, "compareDotReveal");
 
+    if (isMobile) {
+        // As the point fades in, remove every diagram element to its right in
+        // the same interval. The page heading deliberately stays untouched.
+        treeTlOne
+            .to([
+                ".mobile-tree-redesign__toi",
+                ".tree-container.is--compare .tree-left-side .line.is--compare",
+                ".tree-container.is--compare .line.is--vertical.is--top",
+                ".tree-container.is--compare .line.is--vertical.is--bottom",
+                ".tree-container.is--compare .tree-right-wrapper .line-wrapper-top > .line",
+                ".tree-container.is--compare .tree-right-wrapper .line-wrapper-top > .label",
+                ".tree-container.is--compare .tree-right-wrapper .line-wrapper-bottom > .line",
+                ".tree-container.is--compare .tree-right-wrapper .line-wrapper-bottom > .label",
+            ], {
+                autoAlpha: 0,
+                duration: .6,
+                ease: "power1.inOut",
+            }, "compareDotReveal")
+            // The white route into the point clears first, so it never lingers
+            // over the rest of the fading grey diagram.
+            .to([
+                ".tree-container.is--compare .tree-left-side .line-clr",
+                ".tree-container.is--compare .tree-left-side .line-vertical-clr",
+            ], {
+                autoAlpha: 0,
+                duration: .24,
+                ease: "power2.out",
+            }, "compareDotReveal");
+    }
+
+    treeTlOne
         .to({}, {
             onStart: function () {
                 mm.add("(max-width: 767px)", () => {
