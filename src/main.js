@@ -281,6 +281,181 @@ function applyBrandAccent() {
                 line-height: 1.3;
             }
 
+            .parent-section > .section.is--section,
+            .parent-section > .section.is--groupe {
+                z-index: 20;
+                pointer-events: none;
+            }
+
+            .parent-section .tree-container.is--first,
+            .parent-section .tree-container.is--second,
+            .parent-section .tree-container.is--three {
+                visibility: hidden;
+            }
+
+            .mobile-tree-redesign {
+                position: absolute;
+                z-index: 12;
+                inset: 0;
+                display: block;
+                width: 100%;
+                height: 100svh;
+                pointer-events: none;
+                color: rgba(255, 255, 255, .92);
+                font-family: inherit;
+            }
+
+            .mobile-tree-redesign__diagram {
+                position: absolute;
+                top: 36%;
+                left: 50%;
+                width: min(90vw, 24rem);
+                height: 26rem;
+                translate: -50% 0;
+            }
+
+            .mobile-tree-redesign__node,
+            .mobile-tree-redesign__label {
+                position: absolute;
+                left: 50%;
+                translate: -50% 0;
+                font-size: .86rem;
+                line-height: 1.12;
+                letter-spacing: .025em;
+                text-align: center;
+                white-space: nowrap;
+            }
+
+            .mobile-tree-redesign__node {
+                top: 0;
+            }
+
+            .mobile-tree-redesign__line {
+                position: absolute;
+                display: block;
+                background: rgba(255, 255, 255, .72);
+                transform-origin: top center;
+            }
+
+            .mobile-tree-redesign__line.is--vertical {
+                width: 1px;
+            }
+
+            .mobile-tree-redesign__line.is--horizontal {
+                height: 1px;
+                transform-origin: center center;
+            }
+
+            .mobile-tree-redesign__first-trunk {
+                top: 2rem;
+                left: 50%;
+                height: 3.15rem;
+            }
+
+            .mobile-tree-redesign__first-horizontal {
+                top: 5.15rem;
+                left: 15%;
+                width: 70%;
+            }
+
+            .mobile-tree-redesign__first-leg {
+                top: 5.15rem;
+                height: 2.5rem;
+            }
+
+            .mobile-tree-redesign__first-leg.is--left {
+                left: 15%;
+            }
+
+            .mobile-tree-redesign__first-leg.is--right {
+                left: 85%;
+            }
+
+            .mobile-tree-redesign__section-label {
+                top: 8rem;
+            }
+
+            .mobile-tree-redesign__section-label.is--left {
+                left: 15%;
+            }
+
+            .mobile-tree-redesign__section-label.is--right {
+                left: 85%;
+            }
+
+            .mobile-tree-redesign__label-prefix {
+                display: block;
+                color: rgba(255, 255, 255, .9);
+            }
+
+            .mobile-tree-redesign__label-accent,
+            .mobile-tree-redesign__current,
+            .mobile-tree-redesign__toi {
+                display: block;
+                color: ${ACCENT_COLOR};
+            }
+
+            .mobile-tree-redesign__center-line {
+                top: 5.15rem;
+                left: 50%;
+                height: 5.7rem;
+            }
+
+            .mobile-tree-redesign__subtree {
+                position: absolute;
+                top: 11.35rem;
+                left: 0;
+                width: 100%;
+                height: 14rem;
+            }
+
+            .mobile-tree-redesign__second-trunk {
+                top: 2rem;
+                left: 50%;
+                height: 3.15rem;
+            }
+
+            .mobile-tree-redesign__second-horizontal {
+                top: 5.15rem;
+                left: 15%;
+                width: 70%;
+            }
+
+            .mobile-tree-redesign__second-leg {
+                top: 5.15rem;
+                height: 2.5rem;
+            }
+
+            .mobile-tree-redesign__second-leg.is--left {
+                left: 15%;
+            }
+
+            .mobile-tree-redesign__second-leg.is--right {
+                left: 85%;
+            }
+
+            .mobile-tree-redesign__choice-label {
+                top: 8rem;
+            }
+
+            .mobile-tree-redesign__choice-label.is--left {
+                left: 15%;
+            }
+
+            .mobile-tree-redesign__choice-label.is--right {
+                left: 85%;
+            }
+
+            .mobile-tree-redesign__toi-line {
+                top: 5.15rem;
+                left: 50%;
+                height: 5.2rem;
+            }
+
+            .mobile-tree-redesign__toi {
+                top: 10.75rem;
+            }
+
             .container.is--map .map-wrapper::after {
                 content: "";
                 position: absolute;
@@ -513,6 +688,57 @@ function updateWeekFourFridayLabel() {
     const fridayLabel = 'Vendredi – Conclusion';
     fridayModule.textContent = fridayLabel;
     fridayModule.setAttribute('aria-label', fridayLabel);
+}
+
+function createMobileTreeRedesign() {
+    if (!window.matchMedia('(max-width: 47.99rem)').matches) return null;
+
+    const parentSection = document.querySelector('.parent-section');
+    if (!parentSection) return null;
+
+    const existingTree = parentSection.querySelector('.mobile-tree-redesign');
+    if (existingTree) return existingTree;
+
+    const mobileTree = document.createElement('div');
+    mobileTree.className = 'mobile-tree-redesign';
+    mobileTree.setAttribute('aria-hidden', 'true');
+    mobileTree.innerHTML = `
+        <div class="mobile-tree-redesign__diagram">
+            <div class="mobile-tree-redesign__node mobile-tree-redesign__root">REBOOT CAMP</div>
+            <span class="mobile-tree-redesign__line is--vertical mobile-tree-redesign__first-trunk"></span>
+            <span class="mobile-tree-redesign__line is--horizontal mobile-tree-redesign__first-horizontal"></span>
+            <span class="mobile-tree-redesign__line is--vertical mobile-tree-redesign__first-leg is--left"></span>
+            <span class="mobile-tree-redesign__line is--vertical mobile-tree-redesign__first-leg is--right"></span>
+
+            <div class="mobile-tree-redesign__label mobile-tree-redesign__section-label is--left">
+                <span class="mobile-tree-redesign__label-prefix">SECTION</span>
+                <span class="mobile-tree-redesign__label-accent">CHAOS</span>
+            </div>
+            <div class="mobile-tree-redesign__label mobile-tree-redesign__section-label is--right">
+                <span class="mobile-tree-redesign__label-prefix">SECTION</span>
+                <span class="mobile-tree-redesign__label-accent">COSMOS</span>
+            </div>
+
+            <span class="mobile-tree-redesign__line is--vertical mobile-tree-redesign__center-line"></span>
+
+            <div class="mobile-tree-redesign__subtree">
+                <div class="mobile-tree-redesign__node mobile-tree-redesign__current">TA SECTION</div>
+                <span class="mobile-tree-redesign__line is--vertical mobile-tree-redesign__second-trunk"></span>
+                <span class="mobile-tree-redesign__line is--horizontal mobile-tree-redesign__second-horizontal"></span>
+                <span class="mobile-tree-redesign__line is--vertical mobile-tree-redesign__second-leg is--left"></span>
+                <span class="mobile-tree-redesign__line is--vertical mobile-tree-redesign__second-leg is--right"></span>
+
+                <div class="mobile-tree-redesign__label mobile-tree-redesign__choice-label is--left">EN GROUPE</div>
+                <div class="mobile-tree-redesign__label mobile-tree-redesign__choice-label is--right">EN SOLO</div>
+
+                <span class="mobile-tree-redesign__line is--vertical mobile-tree-redesign__toi-line"></span>
+                <div class="mobile-tree-redesign__label mobile-tree-redesign__toi">TOI</div>
+            </div>
+        </div>
+    `;
+
+    parentSection.appendChild(mobileTree);
+    return mobileTree;
 }
 
 
@@ -1718,6 +1944,176 @@ function initTreeDiagram() {
         .set(".tree-child-wrapper .label", {
             autoAlpha: 0,
         })
+
+    if (isMobile) {
+        const mobileTree = createMobileTreeRedesign();
+        const mobileSectionCopy = ".section.is--section [data-split='lines'] .lineInner";
+        const mobileSectionHeader = ".section.is--section .header-title, .section.is--section .header-number";
+        const mobileGroupCopy = ".section.is--groupe h2[data-split='lines'] .lineInner, .section.is--groupe p[data-split='lines'].is--first .lineInner";
+        const mobileGroupHeader = ".section.is--groupe .header-title, .section.is--groupe .header-number";
+
+        gsap.set(".tree-container.is--first, .tree-container.is--second, .tree-container.is--three", {
+            autoAlpha: 0,
+        });
+
+        if (mobileTree) {
+            gsap.set(mobileTree, { autoAlpha: 1 });
+            gsap.set(".mobile-tree-redesign__first-trunk, .mobile-tree-redesign__first-leg, .mobile-tree-redesign__center-line, .mobile-tree-redesign__second-trunk, .mobile-tree-redesign__second-leg, .mobile-tree-redesign__toi-line", {
+                scaleY: 0,
+                transformOrigin: "top",
+            });
+            gsap.set(".mobile-tree-redesign__first-horizontal, .mobile-tree-redesign__second-horizontal", {
+                scaleX: 0,
+                transformOrigin: "center",
+            });
+            gsap.set(".mobile-tree-redesign__section-label, .mobile-tree-redesign__current, .mobile-tree-redesign__choice-label, .mobile-tree-redesign__toi", {
+                autoAlpha: 0,
+            });
+
+            treeTlOne
+                // Step 1: Reboot Camp splits into Chaos and Cosmos. No centre
+                // branch exists until the following scroll phase.
+                .to(".mobile-tree-redesign__first-trunk", {
+                    scaleY: 1,
+                    duration: .55,
+                })
+                .to(".mobile-tree-redesign__first-horizontal", {
+                    scaleX: 1,
+                    duration: .65,
+                })
+                .to(".mobile-tree-redesign__first-leg", {
+                    scaleY: 1,
+                    duration: .55,
+                })
+                .to(".mobile-tree-redesign__section-label", {
+                    autoAlpha: 1,
+                    duration: .4,
+                })
+                .to(mobileSectionCopy, {
+                    yPercent: 0,
+                    duration: .55,
+                    stagger: .04,
+                    ease: "power1.out",
+                }, "<")
+                .to(mobileSectionHeader, {
+                    autoAlpha: 1,
+                    duration: .55,
+                    ease: "power1.out",
+                }, "<")
+                .to({}, { duration: .65 })
+
+                // Step 2: the missing centre branch grows and reveals the
+                // section assigned to the participant.
+                .to(mobileSectionCopy, {
+                    yPercent: -100,
+                    duration: .45,
+                    stagger: .03,
+                    ease: "power1.in",
+                })
+                .to(mobileSectionHeader, {
+                    autoAlpha: 0,
+                    duration: .35,
+                }, "<")
+                .to(".mobile-tree-redesign__center-line", {
+                    scaleY: 1,
+                    duration: .7,
+                })
+                .to(".mobile-tree-redesign__current", {
+                    autoAlpha: 1,
+                    duration: .4,
+                })
+                .to({}, { duration: .55 })
+
+                // Step 3: Ta section becomes the new root.
+                .to(".mobile-tree-redesign__root, .mobile-tree-redesign__first-trunk, .mobile-tree-redesign__first-horizontal, .mobile-tree-redesign__first-leg, .mobile-tree-redesign__section-label, .mobile-tree-redesign__center-line", {
+                    autoAlpha: 0,
+                    y: -35,
+                    duration: .65,
+                    ease: "power2.inOut",
+                })
+                .to(".mobile-tree-redesign__subtree", {
+                    y: "-9.35rem",
+                    duration: .8,
+                    ease: "power2.inOut",
+                }, "<")
+                .to({}, { duration: .45 })
+
+                // Step 4: the group and solo branches draw, and their current
+                // explanatory copy appears at exactly the same moment.
+                .to(".mobile-tree-redesign__second-trunk", {
+                    scaleY: 1,
+                    duration: .55,
+                })
+                .to(".mobile-tree-redesign__second-horizontal", {
+                    scaleX: 1,
+                    duration: .65,
+                })
+                .to(".mobile-tree-redesign__second-leg", {
+                    scaleY: 1,
+                    duration: .55,
+                })
+                .to(".mobile-tree-redesign__choice-label", {
+                    autoAlpha: 1,
+                    duration: .4,
+                })
+                .to(mobileGroupCopy, {
+                    yPercent: 0,
+                    duration: .55,
+                    stagger: .04,
+                    ease: "power1.out",
+                }, "<")
+                .to(mobileGroupHeader, {
+                    autoAlpha: 1,
+                    duration: .55,
+                    ease: "power1.out",
+                }, "<")
+                .to({}, { duration: .65 })
+
+                // Step 5: Toi appears in the centre, then hands off to the
+                // existing transition without changing its choreography.
+                .to(mobileGroupCopy, {
+                    yPercent: -100,
+                    duration: .45,
+                    stagger: .03,
+                    ease: "power1.in",
+                })
+                .to(mobileGroupHeader, {
+                    autoAlpha: 0,
+                    duration: .35,
+                }, "<")
+                .to(".mobile-tree-redesign__toi-line", {
+                    scaleY: 1,
+                    duration: .7,
+                })
+                .to(".mobile-tree-redesign__toi", {
+                    autoAlpha: 1,
+                    duration: .4,
+                })
+                .to({}, { duration: .5 })
+                .to(mobileTree, {
+                    autoAlpha: 0,
+                    duration: .25,
+                    onStart: function () {
+                        gsap.set(".tree-container.is--three", { autoAlpha: 1 });
+                        gsap.set(".tree-container.is--three > *", { autoAlpha: 0 });
+                        gsap.set(".tree-container.is--three .tree-child-wrapper.is--one", {
+                            autoAlpha: 1,
+                            yPercent: -564,
+                        });
+                        gsap.set(".tree-container.is--three .tree-child-wrapper.is--one .line", {
+                            autoAlpha: 0,
+                        });
+                        gsap.set(".tree-container.is--three .tree-child-wrapper.is--one .label", {
+                            autoAlpha: 1,
+                        });
+                    },
+                    onReverseComplete: function () {
+                        gsap.set(".tree-container.is--three", { autoAlpha: 0 });
+                    },
+                });
+        }
+    } else {
+        treeTlOne
         // .to(".tree-container.is--first .tree-header-wrapper .label", {
         //     autoAlpha: 1,
         //     onStart: function () {
@@ -2277,6 +2673,7 @@ function initTreeDiagram() {
         },);
     })
 
+    }
 
     treeTlOne.addLabel("focusSection", "+=1")
 
