@@ -299,6 +299,22 @@ function applyBrandAccent() {
                 box-shadow: none !important;
             }
 
+            .section.is--tracker[data-mobile-scroll-locked="true"] {
+                position: fixed;
+                z-index: 40;
+                inset: 0;
+                width: 100%;
+                height: 100svh;
+                overflow: hidden;
+                background: #000;
+            }
+
+            .section.is--tracker[data-mobile-scroll-locked="true"]
+            .container.is--tracker {
+                height: 100svh;
+                padding-top: 8svh;
+            }
+
             .section.is--tracker .header-section.is--tracker,
             .section.is--tracker .container.is--tracker .header-line {
                 display: none !important;
@@ -1586,27 +1602,22 @@ function initTrackerSection() {
             pinnedContainer: ".section.is--intro",
             onEnter: () => {
                 if (trackerContainer && trackerSection) {
-                    // Place the tracker on its real final screen as soon as
-                    // “Tu es ici” leaves. The 8svh container padding matches
-                    // the mobile diagram headings, so no measured transform is
-                    // needed and the content cannot drift with another scroll.
+                    // Overlay the tracker directly on its final mobile screen
+                    // as “Tu es ici” leaves. This avoids measuring a section
+                    // while the intro is pinned and keeps the heading on the
+                    // same 8svh anchor as the following diagram headings.
                     gsap.set(trackerContainer, { y: 0 });
                     gsap.set(mobileTrackerContent, { y: 0 });
 
-                    const trackerTop = (
+                    trackerSection.dataset.mobileFlowTop = String(
                         trackerSection.getBoundingClientRect().top +
                         window.scrollY
                     );
-
-                    window.lenis?.scrollTo(trackerTop, {
-                        immediate: true,
-                        force: true,
-                    });
-                    window.lenis?.stop();
                     trackerSection.setAttribute(
                         'data-mobile-scroll-locked',
                         'true'
                     );
+                    window.lenis?.stop();
                 }
 
                 trackerCopyReveal.restart();
@@ -2170,7 +2181,21 @@ function initScrollLock() {
 
         // Set flag to true to prevent future executions
         contentUnlocked = true;
+        const mobileFlowTop = Number(
+            trackerSection?.dataset.mobileFlowTop
+        );
+        if (
+            trackerSection?.getAttribute('data-mobile-scroll-locked') ===
+            'true' &&
+            Number.isFinite(mobileFlowTop)
+        ) {
+            window.lenis?.scrollTo(mobileFlowTop, {
+                immediate: true,
+                force: true,
+            });
+        }
         trackerSection?.removeAttribute('data-mobile-scroll-locked');
+        trackerSection?.removeAttribute('data-mobile-flow-top');
 
         // Show all sections after tracker
         allSectionsAfterTracker.forEach(section => {
