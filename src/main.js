@@ -392,9 +392,10 @@ function applyBrandAccent() {
             .mobile-tree-redesign__copy-text {
                 width: 100%;
                 margin: .85rem auto 0 0;
-                color: rgba(255, 255, 255, .62);
-                font-size: .75rem;
-                line-height: 1.4;
+                color: #fff;
+                font-size: .9375rem;
+                line-height: 1.25;
+                letter-spacing: 0;
                 text-align: left;
                 text-transform: uppercase;
             }
@@ -422,9 +423,10 @@ function applyBrandAccent() {
             .mobile-tree-redesign__formula-text {
                 width: 100%;
                 margin: .65rem auto 0 0;
-                color: rgba(255, 255, 255, .62);
-                font-size: .7rem;
-                line-height: 1.35;
+                color: #fff;
+                font-size: .9375rem;
+                line-height: 1.25;
+                letter-spacing: 0;
                 text-align: left;
                 text-transform: uppercase;
             }
@@ -1664,39 +1666,14 @@ function initScrollLock() {
         section.style.display = 'none';
     });
 
-    if (trackerSection) {
-        let trackerLandingCompleted = false;
-
-        requestAnimationFrame(() => {
-            window.lenis?.resize?.();
-            ScrollTrigger.refresh();
-
-            ScrollTrigger.create({
-                trigger: trackerSection,
-                // Start the controlled landing while the tracker is entering
-                // the viewport. Waiting until its top reached 12% created a
-                // perceptible first stop before the actual locked position.
-                start: 'top 72%',
-                once: true,
-                onEnter: () => {
-                    if (trackerLandingCompleted || contentUnlocked || !window.lenis) return;
-
-                    trackerLandingCompleted = true;
-                    const lockedTrackerBottom = Math.max(
-                        0,
-                        document.documentElement.scrollHeight - window.innerHeight
-                    );
-
-                    window.lenis.scrollTo(lockedTrackerBottom, {
-                        duration: .8,
-                        immediate: false,
-                        lock: true,
-                        force: true,
-                    });
-                },
-            });
-        });
-    }
+    // Recalculate the natural page limit after hiding the following sections.
+    // There is deliberately no programmatic scroll or temporary input lock:
+    // the user's current gesture can continue uninterrupted until the real
+    // bottom of the tracker.
+    requestAnimationFrame(() => {
+        window.lenis?.resize?.();
+        ScrollTrigger.refresh();
+    });
 
     // Function to check if all buttons clicked and counter is zero
     function checkTrackerComplete() {
@@ -2224,6 +2201,13 @@ function initTreeDiagram() {
             gsap.set(".mobile-tree-redesign__formula-title, .mobile-tree-redesign__formula-text", {
                 autoAlpha: 0,
                 y: 12,
+            });
+            gsap.set(".section.is--compare .header-pres.is--compare", {
+                autoAlpha: 0,
+                y: 12,
+            });
+            gsap.set(".section.is--compare .header-pres.is--compare [data-split='lines'] .lineInner", {
+                yPercent: 0,
             });
 
             treeTlOne
@@ -2977,19 +2961,14 @@ function initTreeDiagram() {
     treeTlOne.addLabel("focusSection", "+=1")
 
     if (isMobile) {
-        // Reveal the next section's heading and explanatory copy from the
-        // exact frame where the first branch starts growing out of TOI.
+        // Match the two preceding mobile headings: a long, natural opacity
+        // fade that progresses throughout the first diagram branch.
         treeTlOne
-            .to(".section.is--compare [data-split='lines'] .lineInner", {
-                yPercent: 0,
-                duration: .55,
-                stagger: .04,
-                ease: "power1.out",
-            }, "focusSection")
-            .to(".section.is--compare .header-title, .section.is--compare .header-number", {
+            .to(".section.is--compare .header-pres.is--compare", {
                 autoAlpha: 1,
-                duration: .45,
-                ease: "power1.out",
+                y: 0,
+                duration: 2.15,
+                ease: "none",
             }, "focusSection");
     }
 
