@@ -300,10 +300,10 @@ function applyBrandAccent() {
                 position: absolute;
                 z-index: 4;
                 top: var(--mobile-section-title-top);
-                right: 0;
-                left: 0;
+                right: auto;
+                left: 1.25rem;
                 display: flex;
-                width: 100%;
+                width: calc(100% - 1.25rem);
                 margin: 0 auto 0 0;
                 padding: 0;
                 flex-direction: column;
@@ -1639,10 +1639,6 @@ function initTrackerSection() {
             y: 12,
         });
     }
-    gsap.set(".section.is--tracker .big-title-section .lineInner, .section.is--tracker .wrapper-p .lineInner", {
-        yPercent: 0,
-    });
-
     if (isMobile) {
         const trackerContainer = document.querySelector(
             '.section.is--tracker .container.is--tracker'
@@ -6657,8 +6653,22 @@ function initBasicFormValidation() {
 
 function initSplit() {
     let elementToSplit = document.querySelectorAll('[data-split="lines"]');
+    const isMobile = window.matchMedia('(max-width: 47.99rem)').matches;
 
     elementToSplit.forEach(target => {
+        // The mobile tracker copy already fades and rises as one block.
+        // Keeping its native markup gives it the exact same visual geometry as
+        // the redesigned section headings and avoids SplitText's line padding.
+        if (
+            isMobile
+            && target.matches(
+                '.section.is--tracker .big-title-section, '
+                + '.section.is--tracker .wrapper-p .text-section'
+            )
+        ) {
+            return;
+        }
+
         let splitInstance = new SplitText(target, {
             type: "lines",
             mask: "lines",
