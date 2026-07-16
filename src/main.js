@@ -280,6 +280,10 @@ function applyBrandAccent() {
                 padding-bottom: .5rem;
             }
 
+            .section.is--timeline .timeline-panel.is--5 .text-block-4.is--label {
+                display: none !important;
+            }
+
             .section.is--timeline .dot-wrapper-new {
                 width: .7rem;
                 height: .7rem;
@@ -398,12 +402,17 @@ function applyBrandAccent() {
                 top: 8%;
                 right: auto;
                 left: 1.25rem;
+                display: flex;
                 width: min(calc(100% - 2.5rem), 25rem);
+                flex-direction: column;
+                align-items: flex-start;
                 text-align: left;
             }
 
             .mobile-tree-redesign__copy-title {
+                width: 100%;
                 margin: 0;
+                padding: 0;
                 color: rgba(255, 255, 255, .96);
                 font-size: 2.3rem;
                 font-weight: inherit;
@@ -415,6 +424,7 @@ function applyBrandAccent() {
             .mobile-tree-redesign__copy-text {
                 width: 100%;
                 margin: .85rem auto 0 0;
+                padding: 0;
                 color: #fff;
                 font-size: .9375rem;
                 line-height: 1.25;
@@ -429,12 +439,17 @@ function applyBrandAccent() {
                 top: 8%;
                 right: auto;
                 left: 1.25rem;
+                display: flex;
                 width: min(calc(100% - 2.5rem), 25rem);
+                flex-direction: column;
+                align-items: flex-start;
                 text-align: left;
             }
 
             .mobile-tree-redesign__formula-title {
+                width: 100%;
                 margin: 0 0 .85rem;
+                padding: 0;
                 color: rgba(255, 255, 255, .96);
                 font-size: 2.3rem;
                 font-weight: inherit;
@@ -444,8 +459,9 @@ function applyBrandAccent() {
             }
 
             .mobile-tree-redesign__formula-text {
-                width: 100%;
+                width: calc(100% - .12rem);
                 margin: .65rem auto 0 0;
+                padding: 0 0 0 .12rem;
                 color: #fff;
                 font-size: .9375rem;
                 line-height: 1.25;
@@ -480,11 +496,6 @@ function applyBrandAccent() {
             .section.is--compare .label.color.is--compare {
                 visibility: hidden !important;
                 opacity: 0 !important;
-            }
-
-            .section.is--compare .tree-container.is--compare .inscription-rc {
-                top: -2.5rem;
-                z-index: 5;
             }
 
             .mobile-tree-redesign__diagram {
@@ -821,6 +832,12 @@ function rewriteMobileTrackerIntro() {
     const mobileIntro = 'Renforce la structure de tes journées avec un tracker où streaks, bonus et classements te maintiennent engagé.';
     trackerIntro.textContent = mobileIntro;
     trackerIntro.setAttribute('aria-label', mobileIntro);
+}
+
+function removeTimelineInscriptionLabel() {
+    document.querySelectorAll(
+        '.tree-container.is--compare .inscription-rc'
+    ).forEach(label => label.remove());
 }
 
 function mergeTimelineAccessAndPreparation() {
@@ -2183,16 +2200,6 @@ function initTreeDiagram() {
         paused: true
     });
 
-    const scrambleInscriptionRc = gsap.to(".tree-container.is--compare .inscription-rc", {
-        duration: 1,
-        scrambleText: {
-            text: "{original}",
-            speed: 0.65,
-        },
-        paused: true
-    });
-
-
     //TEST
     // gsap.set(".header-section.is--sections", {
     //     autoAlpha: 1
@@ -2207,10 +2214,6 @@ function initTreeDiagram() {
     gsap.set(".tree-container.is--compare .tree-right-wrapper .label", {
         autoAlpha: 0,
     })
-    gsap.set(".tree-container.is--compare .inscription-rc", {
-        autoAlpha: 0,
-    })
-
     gsap.set(".section.is--timeline .timeline-wrapper", {
         autoAlpha: 0
     })
@@ -3396,22 +3399,11 @@ function initTreeDiagram() {
 
         })
 
-        // scramble animation of inscription rc
         .to({}, {
             onStart: function () {
-                // scrambleInscriptionRc.play(0);
-                gsap.to(".tree-container.is--compare .inscription-rc", {
-                    autoAlpha: 1,
-                })
                 mm.add("(max-width: 767px)", () => {
                     createMapTimeline();
                     initFormAnimaton();
-
-                })
-            },
-            onReverseComplete: function () {
-                gsap.to(".tree-container.is--compare .inscription-rc", {
-                    autoAlpha: 0,
                 })
             }
         }, "<")
@@ -3451,21 +3443,16 @@ function initTreeDiagram() {
                 // Scale by 2
                 scale: 2,
 
-                // Now we don't need to subtract the offset since it's built into the transform origin
                 x: () => {
-                    const element = document.querySelector(".tree-wrapper.is--compare");
-                    if (!element) return 0;
+                    const timelineDot = document.querySelector(
+                        ".tree-container.is--compare .line-wrapper-bottom > .dot-wrapper .dot"
+                    );
+                    if (!timelineDot) return 0;
 
-                    const rect = element.getBoundingClientRect();
-                    const currentLeft = rect.left;
+                    const dotRect = timelineDot.getBoundingClientRect();
+                    const dotCenter = dotRect.left + dotRect.width / 2;
 
-                    // Since transform origin is already offset, just center normally
-                    const treeLeftSide = document.querySelector(".tree-left-side");
-                    const treeLeftSideWidth = treeLeftSide ? treeLeftSide.offsetWidth : 0;
-                    const targetLeft = window.innerWidth / 2;
-
-                    // Adjust for the transform origin offset
-                    return targetLeft - currentLeft - treeLeftSideWidth;
+                    return window.innerWidth / 2 - dotCenter;
                 },
 
                 y: () => {
@@ -3519,13 +3506,6 @@ function initTreeDiagram() {
                 },
 
             }, "<")
-
-
-
-            .to(".tree-container.is--compare .inscription-rc", {
-                autoAlpha: 0,
-                duration: 1,
-            }, "-=0.1")  // Slight overlap for smooth fade
 
 
 
@@ -3656,7 +3636,7 @@ function initTreeDiagram() {
     position: fixed;
     top: ${grayLineTop}px;  /* Use the exact position of the gray line */
     left: 0;  /* Start from left edge of screen */
-    width: calc(50% - 10px);  /* Width to center of screen */
+    width: 50%;  /* End exactly at the horizontal center */
     height: 2px;  /* Match the gray line height */
     background-color: white;
     transform: translateY(-50%) scaleX(0);  /* Center vertically and start scaled to 0 */
@@ -4667,13 +4647,6 @@ function initTreeDiagram() {
 
                 }
             }, "<")
-            // Keep the inscription label attached to the top of the vertical
-            // branch. As the branch rises with the scroll, the label follows
-            // it at a constant distance and remains visible.
-            .set(".section.is--compare .inscription-rc", {
-                autoAlpha: 1,
-            })
-
         // gsap.set(".line-container", {
         //     opacity: 0,
         // })
@@ -7276,6 +7249,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.fonts.ready.then(() => {
         enhanceBarcelonaDateCard();
+        removeTimelineInscriptionLabel();
         mergeTimelineAccessAndPreparation();
         rewriteMobileTrackerIntro();
         replaceMobileStatsWithSchedule();
