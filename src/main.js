@@ -289,14 +289,10 @@ function applyBrandAccent() {
             }
 
             .section.is--tracker .big-title-section {
-                position: relative;
-                top: -1rem;
                 margin-top: 0;
             }
 
             .section.is--tracker .wrapper-p {
-                position: relative;
-                top: -1rem;
                 margin-top: var(--mobile-section-copy-gap);
             }
 
@@ -1595,6 +1591,12 @@ function initTrackerSection() {
             '.section.is--tracker .container.is--tracker'
         );
         const trackerSection = document.querySelector('.section.is--tracker');
+        const trackerTitle = trackerContainer?.querySelector(
+            ':scope > .big-title-section'
+        );
+        const sectionReference = document.querySelector(
+            '.mobile-tree-redesign__copy'
+        );
         const trackerHeading = (
             ".section.is--tracker .container.is--tracker > " +
             ".big-title-section, " +
@@ -1638,10 +1640,27 @@ function initTrackerSection() {
                 gsap.set(trackerSection, {
                     autoAlpha: 1,
                 });
+                // Measure the actual final heading positions instead of relying
+                // on the native Webflow spacing of two different containers.
+                // This makes the tracker title finish at the exact same height
+                // as "Une structure en deux sections".
+                gsap.set(trackerHeading, { y: 0 });
+                const trackerTitleTop = (
+                    trackerTitle?.getBoundingClientRect().top || 0
+                );
+                const referenceTop = (
+                    sectionReference?.getBoundingClientRect().top
+                    || trackerTitleTop
+                );
+                const trackerHeadingFinalY = referenceTop - trackerTitleTop;
+                gsap.set(trackerHeading, {
+                    autoAlpha: 0,
+                    y: trackerHeadingFinalY + 12,
+                });
                 gsap.timeline()
                     .to(trackerHeading, {
                         autoAlpha: 1,
-                        y: 0,
+                        y: trackerHeadingFinalY,
                         duration: 2.15,
                         ease: "none",
                         overwrite: true,
