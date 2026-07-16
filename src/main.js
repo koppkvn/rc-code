@@ -295,10 +295,24 @@ function applyBrandAccent() {
                 box-sizing: border-box;
                 padding-top: 8svh;
                 border-top: 0 !important;
+                background-image: none !important;
+                box-shadow: none !important;
             }
 
+            .section.is--tracker .header-section.is--tracker,
             .section.is--tracker .container.is--tracker .header-line {
                 display: none !important;
+                border-top: 0 !important;
+                background: none !important;
+                box-shadow: none !important;
+            }
+
+            .section.is--tracker .container.is--tracker::before,
+            .section.is--tracker .container.is--tracker::after,
+            .section.is--tracker .header-section.is--tracker::before,
+            .section.is--tracker .header-section.is--tracker::after {
+                display: none !important;
+                content: none !important;
             }
 
             .big-title-section.is--timeline {
@@ -1474,10 +1488,13 @@ function initIntro() {
 function initTrackerSection() {
 
     const buttonsToGlow = document.querySelectorAll(".is--glow");
-    const trackerCopy = (
-        ".section.is--tracker .big-title-section, "
-        + ".section.is--tracker .wrapper-p"
+    const trackerTitleSelector = (
+        ".section.is--tracker .big-title-section"
     );
+    const trackerTextSelector = (
+        ".section.is--tracker .wrapper-p .text-section"
+    );
+    const trackerCopy = `${trackerTitleSelector}, ${trackerTextSelector}`;
     const isMobile = window.matchMedia('(max-width: 47.99rem)').matches;
 
     buttonsToGlow.forEach(button => {
@@ -1505,15 +1522,22 @@ function initTrackerSection() {
             '.section.is--tracker .container.is--tracker'
         );
         const trackerTitle = document.querySelector(
-            '.section.is--tracker .big-title-section'
+            trackerTitleSelector
         );
-        const trackerCopyReveal = gsap.to(trackerCopy, {
-            autoAlpha: 1,
-            y: 0,
-            duration: 2.15,
-            ease: "none",
-            paused: true,
-        });
+        const trackerCopyReveal = gsap.timeline({ paused: true })
+            .to(trackerTextSelector, {
+                autoAlpha: 1,
+                y: 0,
+                duration: 2.15,
+                stagger: .04,
+                ease: "none",
+            }, 0)
+            .to(trackerTitleSelector, {
+                autoAlpha: 1,
+                y: 0,
+                duration: 2.15,
+                ease: "none",
+            }, 0);
 
         ScrollTrigger.create({
             trigger: ".section.is--intro .ici-wrapper",
