@@ -1546,9 +1546,10 @@ function initTrackerSection() {
     );
     const trackerCopy = `${trackerTitleSelector}, ${trackerTextSelector}`;
     const mobileTrackerContent = (
-        `${trackerCopy}, ` +
-        ".section.is--tracker .svg-wrapper, " +
-        ".section.is--tracker .tracker-container"
+        ".section.is--tracker .container.is--tracker > .big-title-section, " +
+        ".section.is--tracker .container.is--tracker > .wrapper-p, " +
+        ".section.is--tracker .container.is--tracker > .svg-wrapper, " +
+        ".section.is--tracker .container.is--tracker > .tracker-container"
     );
     const isMobile = window.matchMedia('(max-width: 47.99rem)').matches;
 
@@ -1584,17 +1585,6 @@ function initTrackerSection() {
             '.section.is--tracker .container.is--tracker'
         );
         const trackerSection = document.querySelector('.section.is--tracker');
-        const trackerCopyReveal = gsap.timeline({ paused: true })
-            .to(mobileTrackerContent, {
-                autoAlpha: 1,
-                duration: 2.15,
-                ease: "none",
-                onStart: () => {
-                    buttonsToGlow.forEach(button => {
-                        button.classList.add("is--glow");
-                    });
-                },
-            }, 0);
 
         ScrollTrigger.create({
             trigger: ".section.is--intro .ici-wrapper",
@@ -1618,11 +1608,35 @@ function initTrackerSection() {
                         'true'
                     );
                     window.lenis?.stop();
-                }
 
-                trackerCopyReveal.restart();
+                    gsap.killTweensOf(mobileTrackerContent);
+                    gsap.set(trackerSection, {
+                        autoAlpha: 1,
+                    });
+                    gsap.fromTo(mobileTrackerContent, {
+                        autoAlpha: 0,
+                        y: 0,
+                    }, {
+                        autoAlpha: 1,
+                        y: 0,
+                        duration: 2.15,
+                        ease: "none",
+                        overwrite: true,
+                    });
+                    buttonsToGlow.forEach(button => {
+                        button.classList.add("is--glow");
+                    });
+                }
             },
-            onLeaveBack: () => trackerCopyReveal.reverse(),
+            onLeaveBack: () => {
+                trackerSection?.removeAttribute(
+                    'data-mobile-scroll-locked'
+                );
+                gsap.set(mobileTrackerContent, {
+                    autoAlpha: 0,
+                    y: 0,
+                });
+            },
             markers: false,
         });
     } else {
