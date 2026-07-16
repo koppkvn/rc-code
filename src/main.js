@@ -576,6 +576,7 @@ function applyBrandAccent() {
             }
 
             .mobile-tree-redesign__diagram {
+                --mobile-first-diagram-offset: 2rem;
                 position: absolute;
                 top: 39svh;
                 left: 50%;
@@ -601,6 +602,7 @@ function applyBrandAccent() {
             }
 
             .mobile-tree-redesign__root {
+                top: var(--mobile-first-diagram-offset);
                 backface-visibility: hidden;
                 transform: translate3d(0, 0, 0);
             }
@@ -622,19 +624,19 @@ function applyBrandAccent() {
             }
 
             .mobile-tree-redesign__first-trunk {
-                top: 2rem;
+                top: calc(2rem + var(--mobile-first-diagram-offset));
                 left: 50%;
                 height: 3.15rem;
             }
 
             .mobile-tree-redesign__first-horizontal {
-                top: 5.15rem;
+                top: calc(5.15rem + var(--mobile-first-diagram-offset));
                 left: 15%;
                 width: 70%;
             }
 
             .mobile-tree-redesign__first-leg {
-                top: 5.15rem;
+                top: calc(5.15rem + var(--mobile-first-diagram-offset));
                 height: 2.5rem;
             }
 
@@ -647,7 +649,7 @@ function applyBrandAccent() {
             }
 
             .mobile-tree-redesign__section-label {
-                top: 8rem;
+                top: calc(8rem + var(--mobile-first-diagram-offset));
             }
 
             .mobile-tree-redesign__section-label.is--left {
@@ -671,9 +673,9 @@ function applyBrandAccent() {
             }
 
             .mobile-tree-redesign__center-line {
-                top: 5.15rem;
+                top: calc(5.15rem + var(--mobile-first-diagram-offset));
                 left: 50%;
-                height: 5.7rem;
+                height: calc(5.7rem - var(--mobile-first-diagram-offset));
             }
 
             .mobile-tree-redesign__subtree {
@@ -1589,6 +1591,16 @@ function initTrackerSection() {
             '.section.is--tracker .container.is--tracker'
         );
         const trackerSection = document.querySelector('.section.is--tracker');
+        const trackerHeading = (
+            ".section.is--tracker .container.is--tracker > " +
+            ".big-title-section, " +
+            ".section.is--tracker .container.is--tracker > .wrapper-p"
+        );
+        const trackerDetails = (
+            ".section.is--tracker .container.is--tracker > .svg-wrapper, " +
+            ".section.is--tracker .container.is--tracker > " +
+            ".tracker-container"
+        );
         if (!trackerContainer || !trackerSection) return;
 
         const trackerPlaceholder = document.createElement('div');
@@ -1603,25 +1615,39 @@ function initTrackerSection() {
             autoAlpha: 0,
         });
         gsap.set(trackerContainer, {
+            autoAlpha: 1,
+        });
+        gsap.set(trackerHeading, {
+            autoAlpha: 0,
+            y: 12,
+        });
+        gsap.set(trackerDetails, {
             autoAlpha: 0,
         });
         ScrollTrigger.create({
-            // Wait until the complete intro screen has naturally left the
-            // viewport. Using the tracker's placeholder prevents the fixed
-            // overlay from covering the final intro elements prematurely.
+            // Begin just before the placeholder reaches the top so the reveal
+            // feels continuous with the final movement of the intro.
             trigger: trackerPlaceholder,
-            start: "top top",
+            start: "top 5%",
             onEnter: () => {
                 window.lenis?.stop();
                 gsap.set(trackerSection, {
                     autoAlpha: 1,
                 });
-                gsap.to(trackerContainer, {
-                    autoAlpha: 1,
-                    duration: 2.15,
-                    ease: "none",
-                    overwrite: true,
-                });
+                gsap.timeline()
+                    .to(trackerHeading, {
+                        autoAlpha: 1,
+                        y: 0,
+                        duration: 2.15,
+                        ease: "none",
+                        overwrite: true,
+                    }, 0)
+                    .to(trackerDetails, {
+                        autoAlpha: 1,
+                        duration: 2.15,
+                        ease: "none",
+                        overwrite: true,
+                    }, 0);
                 buttonsToGlow.forEach(button => {
                     button.classList.add("is--glow");
                 });
@@ -2913,6 +2939,10 @@ function initTreeDiagram() {
                     autoAlpha: 0,
                 });
         }
+
+        // The comparison section must start on the very next scroll frame:
+        // this label sits exactly where the persistent TOI finishes rising.
+        treeTlOne.addLabel("mobileCompareStart");
     } else {
         treeTlOne
         // .to(".tree-container.is--first .tree-header-wrapper .label", {
@@ -3476,7 +3506,10 @@ function initTreeDiagram() {
 
     }
 
-    treeTlOne.addLabel("focusSection", "+=1")
+    treeTlOne.addLabel(
+        "focusSection",
+        isMobile ? "mobileCompareStart" : "+=1"
+    )
     const compareGrayMainDuration = .75;
     const compareGrayLowerDuration = 1.8;
     const compareGrayLabelDuration = .55;
@@ -3548,7 +3581,7 @@ function initTreeDiagram() {
             scaleY: window.innerWidth <= 767 ? 1 : 0,
             transformOrigin: window.innerWidth <= 767 ? "right" : "bottom",
             duration: compareGrayMainDuration,
-        })
+        }, `focusSection+=${compareGrayMainDuration}`)
         .from(".tree-container.is--compare .line.is--vertical.is--bottom", {
             scaleX: window.innerWidth <= 767 ? 0 : 1,
             scaleY: window.innerWidth <= 767 ? 1 : 0,
@@ -3556,7 +3589,10 @@ function initTreeDiagram() {
             duration: compareGrayMainDuration,
         }, "<")
 
-        .addLabel("equal")
+        .addLabel(
+            "equal",
+            `focusSection+=${compareGrayMainDuration * 2}`
+        )
         .from(".tree-container.is--compare .tree-right-wrapper .line-wrapper-top .line", {
             scaleX: window.innerWidth <= 767 ? 1 : 0,
             scaleY: window.innerWidth <= 767 ? 0 : 1,
@@ -3772,21 +3808,6 @@ function initTreeDiagram() {
             transformOrigin: window.innerWidth <= 767 ? "right" : "top",
             duration: 1.5,
             ease: "linear",
-
-            onStart: function () {
-                mm.add("(max-width: 767px)", () => {
-                    gsap.to(".section.is--compare [data-split='lines'] .lineInner", {
-                        yPercent: -100,
-                    })
-                })
-            },
-            onReverseComplete: function () {
-                mm.add("(max-width: 767px)", () => {
-                    gsap.to(".section.is--compare [data-split='lines'] .lineInner", {
-                        yPercent: 0,
-                    })
-                })
-            }
         })
 
         //dot is coming in
@@ -5051,6 +5072,15 @@ function initTreeDiagram() {
                     });
                     alignMobileTimelineDotToCompareDot();
                 },
+            }, "mobileTimelineReveal")
+            // Keep the comparison heading throughout the completed diagram.
+            // It only yields once "Accès et préparation" approaches during
+            // the timeline hand-off.
+            .to(".section.is--compare .header-pres.is--compare", {
+                autoAlpha: 0,
+                y: -10,
+                duration: .6,
+                ease: "power1.inOut",
             }, "mobileTimelineReveal")
             .to(".panel [data-split='lines'] .lineInner", {
                 yPercent: 0,
