@@ -272,6 +272,11 @@ function applyBrandAccent() {
                 padding-bottom: .5rem;
             }
 
+            .section.is--timeline .dot-wrapper-new {
+                width: .7rem;
+                height: .7rem;
+            }
+
             .section.is--timeline .timeline-panel.is--1 .timeline-access-preparation {
                 width: 88vw;
                 gap: .7rem;
@@ -457,6 +462,11 @@ function applyBrandAccent() {
             .section.is--compare .label.color.is--compare {
                 visibility: hidden !important;
                 opacity: 0 !important;
+            }
+
+            .section.is--compare .tree-container.is--compare .inscription-rc {
+                top: -2.5rem;
+                z-index: 5;
             }
 
             .mobile-tree-redesign__diagram {
@@ -847,6 +857,66 @@ function mergeTimelineAccessAndPreparation() {
     // footprint; the existing dynamic width calculation then keeps every
     // following week and the map hand-off aligned.
     preparationPanel?.remove();
+}
+
+function alignMobileAccessPreparationToTimelineDot() {
+    if (!window.matchMedia('(max-width: 47.99rem)').matches) return;
+
+    const accessContent = document.querySelector(
+        '.section.is--timeline .timeline-panel.is--1 .timeline-access-preparation'
+    );
+    const accessTitle = accessContent?.querySelector(
+        '.timeline-access-preparation__title'
+    );
+    const timelineDot = document.querySelector(
+        '.section.is--timeline .dot-wrapper-new'
+    );
+
+    if (!accessContent || !accessTitle || !timelineDot) return;
+
+    // Measure from the unshifted position so refreshes never accumulate an
+    // additional offset.
+    gsap.set(accessContent, { y: 0 });
+
+    const titleRect = accessTitle.getBoundingClientRect();
+    const dotRect = timelineDot.getBoundingClientRect();
+    const dotCenterY = dotRect.top + dotRect.height / 2;
+
+    gsap.set(accessContent, {
+        y: dotCenterY - titleRect.top,
+    });
+}
+
+function alignMobileTimelineDotToCompareDot() {
+    if (!window.matchMedia('(max-width: 47.99rem)').matches) return;
+
+    const outgoingDot = document.querySelector(
+        '.tree-container.is--compare .line-wrapper-bottom > .dot-wrapper .dot'
+    );
+    const incomingDot = document.querySelector(
+        '.section.is--timeline .dot-wrapper-new'
+    );
+
+    if (!outgoingDot || !incomingDot) return;
+
+    // Always measure the incoming point from its native position so repeated
+    // forward/reverse transitions cannot accumulate a transform offset.
+    gsap.set(incomingDot, { x: 0, y: 0 });
+
+    const outgoingRect = outgoingDot.getBoundingClientRect();
+    const incomingRect = incomingDot.getBoundingClientRect();
+    const outgoingCenterX = outgoingRect.left + outgoingRect.width / 2;
+    const outgoingCenterY = outgoingRect.top + outgoingRect.height / 2;
+    const incomingCenterX = incomingRect.left + incomingRect.width / 2;
+    const incomingCenterY = incomingRect.top + incomingRect.height / 2;
+
+    gsap.set(incomingDot, {
+        x: outgoingCenterX - incomingCenterX,
+        y: outgoingCenterY - incomingCenterY,
+    });
+
+    // The first timeline content uses this same point as its vertical anchor.
+    alignMobileAccessPreparationToTimelineDot();
 }
 
 function replaceMobileStatsWithSchedule() {
@@ -4394,6 +4464,8 @@ function initTreeDiagram() {
             height: `${distanceBetween - 2}px`,
         })
 
+        alignMobileAccessPreparationToTimelineDot();
+
 
         // Only set styles for second text if enabled
         if (shouldAnimateSecond) {
@@ -4547,12 +4619,12 @@ function initTreeDiagram() {
 
                 }
             }, "<")
-            // .addLabel("timelineStart")
-            .to(".section.is--compare .inscription-rc",
-                {
-                    autoAlpha: 0,
-
-                }, "<")
+            // Keep the inscription label attached to the top of the vertical
+            // branch. As the branch rises with the scroll, the label follows
+            // it at a constant distance and remains visible.
+            .set(".section.is--compare .inscription-rc", {
+                autoAlpha: 1,
+            })
 
         // gsap.set(".line-container", {
         //     opacity: 0,
@@ -4563,6 +4635,8 @@ function initTreeDiagram() {
 
 
             onStart: function () {
+                alignMobileTimelineDotToCompareDot();
+
                 // createMapTimeline();
                 gsap.to(".panel [data-split='lines'] .lineInner", {
                     yPercent: 0,
@@ -4600,7 +4674,7 @@ function initTreeDiagram() {
 
         }, "<+=1")
 
-            .to(".section.is--compare .line-wrapper-bottom", {
+            .to(".section.is--compare .line-wrapper-bottom > .line, .section.is--compare .line-wrapper-bottom > .label, .section.is--compare .line-wrapper-bottom > .dot-wrapper", {
                 autoAlpha: 0,
                 ease: "none"
             }, "<")
