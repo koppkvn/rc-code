@@ -1849,12 +1849,19 @@ function initTrackerSection() {
             });
         };
 
+        const introExitAnchor = document.querySelector('.ici-wrapper');
+
         ScrollTrigger.create({
-            trigger: trackerPlaceholder,
-            // Reveal across the final 60% of the approach to the tracker,
-            // matching the scroll-driven mobile tree-title choreography.
-            start: "top 65%",
+            // Do not reveal the tracker while "Tu es ici" is still visible.
+            // Its bottom edge must have completely crossed the top of the
+            // viewport before the scroll-controlled transition can begin.
+            trigger: introExitAnchor || trackerPlaceholder,
+            start: introExitAnchor ? "bottom top" : "top 65%",
+            endTrigger: trackerPlaceholder,
             end: "top 5%",
+            pinnedContainer: introExitAnchor
+                ? ".section.is--intro"
+                : undefined,
             scrub: true,
             animation: mobileTrackerReveal,
             onEnter: prepareMobileTrackerReveal,
