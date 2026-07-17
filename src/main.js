@@ -1701,6 +1701,11 @@ function initTrackerSection() {
         const positionMobileTrackerDetails = () => {
             if (!trackerCopyGroup || !trackerDetailsGroup) return;
 
+            // Always measure from the native Webflow position. A hidden mobile
+            // row has a zero rectangle, so reusing the previously shifted
+            // wrapper would otherwise add its top offset again on every pass.
+            trackerDetailsGroup.style.removeProperty('top');
+
             const containerRect = trackerContainer.getBoundingClientRect();
             const copyRect = trackerCopyGroup.getBoundingClientRect();
             const detailsRect = trackerDetailsGroup.getBoundingClientRect();
@@ -1709,7 +1714,11 @@ function initTrackerSection() {
                 trackerDetailsGroup.querySelector('.niveaux'),
                 trackerDetailsGroup.querySelector('.tracker-header'),
                 ...trackerDetailsGroup.querySelectorAll('.tracker-row'),
-            ].filter(Boolean);
+            ].filter(element => (
+                element
+                && element.getClientRects().length > 0
+                && window.getComputedStyle(element).display !== 'none'
+            ));
             const firstVisibleTop = Math.min(
                 detailsRect.top,
                 ...detailAnchors.map(element => (
