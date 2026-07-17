@@ -890,6 +890,7 @@ function applyBrandAccent() {
                 justify-content: flex-start;
                 gap: .5rem;
                 margin-top: 2rem;
+                margin-left: 1.25rem;
                 color: #fff;
                 opacity: 1;
             }
