@@ -901,6 +901,12 @@ function applyBrandAccent() {
                 opacity: 1;
             }
 
+            .section.is--tracker .svg-wrapper > svg {
+                width: 4.8rem !important;
+                height: auto !important;
+                flex: 0 0 auto;
+            }
+
             .section.is--tracker .wait-message {
                 display: none !important;
             }
