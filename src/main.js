@@ -903,8 +903,9 @@ function applyBrandAccent() {
                 border: .0625rem solid ${ACCENT_COLOR} !important;
                 background-color: transparent !important;
                 transform: none !important;
+                will-change: border-color, box-shadow;
                 animation:
-                    tracker-gold-border-pulse 3.2s ease-in-out infinite
+                    tracker-gold-border-pulse 3.4s ease-in-out infinite
                     !important;
             }
 
@@ -935,6 +936,15 @@ function applyBrandAccent() {
                 transform: scale(1) !important;
             }
 
+            .section.is--tracker
+            .tracker-checkbox.is--button[data-clicked="true"] {
+                border-color: ${ACCENT_COLOR} !important;
+                box-shadow:
+                    inset 0 0 .14rem rgba(247, 232, 189, .34),
+                    0 0 .38rem rgba(210, 170, 98, .38) !important;
+                animation: none !important;
+            }
+
             .section.is--tracker[data-xp-cycle-complete="true"]
             .tracker-checkbox.is--button
             .tracker-checkbox-inside.is--button {
@@ -951,15 +961,55 @@ function applyBrandAccent() {
             @keyframes tracker-gold-border-pulse {
                 0%,
                 100% {
-                    border-color: rgba(210, 170, 98, .58);
-                    box-shadow: 0 0 .16rem rgba(210, 170, 98, .18);
+                    border-color: rgba(210, 170, 98, .62);
+                    box-shadow:
+                        inset 0 0 .08rem rgba(247, 232, 189, .08),
+                        0 0 .14rem rgba(210, 170, 98, .16);
                 }
 
-                50% {
+                9% {
                     border-color: ${ACCENT_COLOR};
                     box-shadow:
-                        0 0 .28rem rgba(247, 232, 189, .42),
-                        0 0 .7rem rgba(210, 170, 98, .42);
+                        inset 0 0 .12rem rgba(247, 232, 189, .32),
+                        0 0 .3rem rgba(247, 232, 189, .42),
+                        0 0 .58rem rgba(210, 170, 98, .34);
+                }
+
+                15% {
+                    border-color: rgba(210, 170, 98, .72);
+                    box-shadow:
+                        inset 0 0 .08rem rgba(247, 232, 189, .12),
+                        0 0 .18rem rgba(210, 170, 98, .2);
+                }
+
+                24% {
+                    border-color: #f7e8bd;
+                    box-shadow:
+                        inset 0 0 .18rem rgba(247, 232, 189, .58),
+                        0 0 .38rem rgba(247, 232, 189, .58),
+                        0 0 .9rem rgba(210, 170, 98, .54);
+                }
+
+                42% {
+                    border-color: ${ACCENT_COLOR};
+                    box-shadow:
+                        inset 0 0 .22rem rgba(247, 232, 189, .5),
+                        0 0 .48rem rgba(247, 232, 189, .5),
+                        0 0 1.15rem rgba(210, 170, 98, .48);
+                }
+
+                68% {
+                    border-color: rgba(210, 170, 98, .76);
+                    box-shadow:
+                        inset 0 0 .1rem rgba(247, 232, 189, .16),
+                        0 0 .24rem rgba(210, 170, 98, .24);
+                }
+            }
+
+            @media (prefers-reduced-motion: reduce) {
+                .section.is--tracker .tracker-checkbox.is--button {
+                    box-shadow: 0 0 .3rem rgba(210, 170, 98, .32);
+                    animation: none !important;
                 }
             }
         }
