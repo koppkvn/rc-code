@@ -1776,7 +1776,7 @@ function initTrackerSection() {
                 gsap.getProperty(trackerCopyGroup, 'y')
             ) || 0;
             const finalCopyBottom = copyRect.bottom - copyAnimationY;
-            const mobileTrackerGap = 35;
+            const mobileTrackerGap = 40.25;
 
             trackerDetailsGroup.style.setProperty(
                 'top',
