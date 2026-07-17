@@ -6519,6 +6519,701 @@ function initFormAnimaton() {
         initAccordionCSS();
     });
 
+    return;
+
+    gsap.set(".section.is--fields, .section.is--achat, .section.is--faq, .section.is--footerlast", {
+        display: "none",
+    })
+
+
+
+
+
+    // Add button/checkbox logic
+    const textButton = document.querySelector('.text-checkbox.is--button');
+
+    if (textButton) {
+        // Add hover animations
+        textButton.addEventListener('mouseenter', function () {
+            // Skip hover effect if button was already clicked
+            if (this.getAttribute('data-clicked') === 'true') {
+                return;
+            }
+
+            // Subtle glow/pulse effect on hover
+            gsap.to(this, {
+                scale: 1.05,
+                duration: 0.2,
+                border: '.0625rem solid white'
+            });
+        });
+
+        textButton.addEventListener('mouseleave', function () {
+            // Skip if button was already clicked
+            if (this.getAttribute('data-clicked') === 'true') {
+                return;
+            }
+
+            // Return to normal state
+            gsap.to(this, {
+                border: '.0625rem solid transparent',
+                scale: 1,
+                duration: 0.2
+            });
+        });
+
+        textButton.addEventListener('click', function () {
+            // Check if button was already clicked
+            if (this.getAttribute('data-clicked') === 'true') {
+                return; // Do nothing if already clicked
+            }
+
+            // Mark as clicked
+            this.setAttribute('data-clicked', 'true');
+
+            // Toggle white border on the button
+            this.style.border = '.0625rem solid white';
+
+            // Remove any hover effects when clicked
+            gsap.to(this, {
+                boxShadow: 'none',
+                scale: 1,
+                duration: 0.2
+            });
+
+            // Find the inside div and animate it
+            const inside = this.querySelector('.tracker-checkbox-inside.is--button');
+            if (inside) {
+                // Animate the inside div with GSAP
+                gsap.fromTo(inside,
+                    { opacity: 0, scale: 1.6 },
+                    { opacity: 1, scale: 1, duration: 1, ease: "back.out(1.7)" }
+                );
+            }
+
+
+            //EXECUTE CODE AFTER CHECKBOX
+
+            gsap.set(".section.is--fields, .section.is--achat, .section.is--faq, .section.is--footerlast", {
+                display: "block",
+            })
+
+            ScrollTrigger.refresh();
+
+            setTimeout(() => {
+                window.lenis.scrollTo(".section.is--fields", {
+                    duration: 1.2,
+                    immediate: false
+                });
+                initAccordionCSS();
+
+            }, 300);
+        });
+    }
+
+    let animationLocked = false;
+
+    //here
+    gsap.set(".section.is--form", {
+        opacity: 0,
+    })
+    const tl2 = gsap.timeline({
+        scrollTrigger: {
+            trigger: ".section.is--form",
+            start: "top center",
+            end: "bottom top",
+            scrub: true,
+            // markers: true,
+        }
+    })
+
+    // Add your animations here
+    tl2.to(".section.is--map", {
+        // your animation properties
+        opacity: 0,
+
+    })
+        .to(".section.is--form", {
+            opacity: 1,
+            duration: 1,
+        })
+
+    const tl = gsap.timeline({
+        scrollTrigger: {
+            trigger: ".section.is--form",
+            start: "top top",
+            end: "+=300%",
+            pin: ".section.is--form .container.is--form",
+            pinSpacing: true,
+            scrub: true,
+            // pinReparent: true,
+            // markers: true,
+            onUpdate: (self) => {
+                // Lock the timeline at 100% once it reaches the end
+                if (self.progress >= 0.99 && !animationLocked) {
+                    animationLocked = true;
+                    tl.progress(1);
+                }
+                // Prevent scrubbing backwards once locked
+                if (animationLocked) {
+                    tl.progress(1);
+                }
+            }
+        }
+    })
+
+    tl.from(".section.is--form .container.is--form [data-split='chars'] .charInner", {
+        opacity: 0.2,
+        duration: 1,
+        stagger: 0.1,
+        ease: "easeOutQuart",
+    })
+
+
+
+}
+
+function initBasicFormValidation() {
+    const forms = document.querySelectorAll('[data-form-validate]');
+
+
+
+
+    // Helpers for birthdate
+    const isValidDDMMYYYY = (val) => {
+        const m = /^(\d{2})\.(\d{2})\.(\d{4})$/.exec(val.trim());
+        if (!m) return false;
+        const day = parseInt(m[1], 10);
+        const month = parseInt(m[2], 10);
+        const year = parseInt(m[3], 10);
+
+        if (year < 1900 || year > 2100) return false;
+        if (month < 1 || month > 12) return false;
+        if (day < 1 || day > 31) return false;
+
+        const d = new Date(year, month - 1, day);
+        return d.getFullYear() === year && d.getMonth() === month - 1 && d.getDate() === day;
+    };
+
+    const toISOFromDDMMYYYY = (val) => {
+        const m = /^(\d{2})\.(\d{2})\.(\d{4})$/.exec(val.trim());
+        if (!m) return val.trim();
+        const [_, dd, mm, yyyy] = m;
+        return `${yyyy}-${mm}-${dd}`;
+    };
+
+    forms.forEach((form) => {
+
+        const hasMultiStep = form.querySelectorAll('.form-step').length > 0;
+        if (hasMultiStep) {
+            // Skip this form, multi-step handler will take care of it
+            return;
+        }
+
+        const fields = form.querySelectorAll('[data-validate] input, [data-validate] textarea');
+        const submitButtonDiv = form.querySelector('[data-submit]');
+        const submitInput = submitButtonDiv.querySelector('input[type="submit"]');
+
+        const formLoadTime = new Date().getTime();
+
+        // Optional: normalize birthdate fields right before submit if they carry data-birthdate-normalize
+        const normalizeBirthdatesIfNeeded = () => {
+            form.querySelectorAll('[data-birthdate-normalize]').forEach((el) => {
+                const v = el.value.trim();
+                if (v && isValidDDMMYYYY(v)) {
+                    // Put ISO back into the same field or into a hidden mirror
+                    // Here we overwrite the same field value. Remove this line if you prefer hidden inputs.
+                    el.value = toISOFromDDMMYYYY(v);
+                }
+            });
+        };
+
+        const validateField = (field) => {
+            const parent = field.closest('[data-validate]');
+            const minLength = field.getAttribute('min');
+            const maxLength = field.getAttribute('max');
+            const type = field.getAttribute('type');
+            const placeholder = field.getAttribute('placeholder') || '';
+            const isBirthdateField = field.hasAttribute('data-birthdate') || placeholder.includes('dd.mm.');
+            const isPhoneField = type === 'tel';
+
+            // E.164 international phone format validator
+            const isValidPhone = (val) => {
+                // E.164 international format: +[country code][number]
+                // Examples: +41 79 123 45 67, +1 555 123 4567, +33 6 12 34 56 78
+                const cleaned = val.replace(/\s/g, '');
+                // Must start with +, followed by 1-3 digit country code, then 4-12 more digits
+                // Total length after + should be between 7-15 digits (E.164 standard)
+                return /^\+[1-9]\d{6,14}$/.test(cleaned);
+            };
+
+            let isValid = true;
+
+            // Filled state
+            if (field.value.trim() !== '') parent.classList.add('is--filled');
+            else parent.classList.remove('is--filled');
+
+            // Length rules
+            if (minLength && field.value.length < parseInt(minLength, 10)) isValid = false;
+            if (maxLength && field.value.length > parseInt(maxLength, 10)) isValid = false;
+
+            // Email format
+            if (type === 'email' && !/\S+@\S+\.\S+/.test(field.value)) isValid = false;
+
+            // Phone format (E.164 international format)
+            if (isPhoneField && field.value.trim() !== '' && !isValidPhone(field.value)) {
+                isValid = false;
+            }
+
+            // Birthdate format dd.mm.yyyy
+            if (isBirthdateField && field.value.trim() !== '' && !isValidDDMMYYYY(field.value)) {
+                isValid = false;
+            }
+
+            // UI classes
+            if (isValid) {
+                parent.classList.remove('is--error');
+                parent.classList.add('is--success');
+            } else {
+                parent.classList.remove('is--success');
+                parent.classList.add('is--error');
+            }
+
+            return isValid;
+        };
+
+        const startLiveValidation = (field) => {
+            field.addEventListener('input', function () {
+                validateField(field);
+            });
+        };
+
+        const validateAndStartLiveValidationForAll = () => {
+            let allValid = true;
+            let firstInvalidField = null;
+
+            fields.forEach((field) => {
+                const valid = validateField(field);
+                if (!valid && !firstInvalidField) firstInvalidField = field;
+                if (!valid) allValid = false;
+                startLiveValidation(field);
+            });
+
+            if (firstInvalidField) firstInvalidField.focus();
+            return allValid;
+        };
+
+        const isSpam = () => {
+            const currentTime = new Date().getTime();
+            const timeDifference = (currentTime - formLoadTime) / 1000;
+            return timeDifference < 5;
+        };
+
+        // ADD THIS NEW FUNCTION
+        const isHoneypotFilled = () => {
+            const honeypotField = form.querySelector('[data-honeypot]');
+            if (!honeypotField) return false; // No honeypot field, skip check
+            return honeypotField.value.trim() !== '';
+        };
+
+        submitButtonDiv.addEventListener('click', function () {
+            if (validateAndStartLiveValidationForAll()) {
+                if (isSpam()) {
+                    alert('Form submitted too quickly. Please try again.');
+                    return;
+                }
+                // ADD THIS CHECK
+                if (isHoneypotFilled()) {
+                    console.log('Bot detected via honeypot');
+                    return; // Silently fail for bots
+                }
+                normalizeBirthdatesIfNeeded();
+                submitInput.click();
+            }
+        });
+
+        form.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter' && event.target.tagName !== 'TEXTAREA') {
+                event.preventDefault();
+                if (validateAndStartLiveValidationForAll()) {
+                    if (isSpam()) {
+                        alert('Form submitted too quickly. Please try again.');
+                        return;
+                    }
+                    // ADD THIS CHECK
+                    if (isHoneypotFilled()) {
+                        console.log('Bot detected via honeypot');
+                        return; // Silently fail for bots
+                    }
+                    normalizeBirthdatesIfNeeded();
+                    submitInput.click();
+                }
+            }
+        });
+    });
+}
+
+
+
+function initSplit() {
+    let elementToSplit = document.querySelectorAll('[data-split="lines"]');
+    const isMobile = window.matchMedia('(max-width: 47.99rem)').matches;
+
+    elementToSplit.forEach(target => {
+        // The mobile tracker copy already fades and rises as one block.
+        // Keeping its native markup gives it the exact same visual geometry as
+        // the redesigned section headings and avoids SplitText's line padding.
+        if (
+            isMobile
+            && target.matches(
+                '.section.is--tracker .big-title-section, '
+                + '.section.is--tracker .wrapper-p .text-section'
+            )
+        ) {
+            return;
+        }
+
+        let splitInstance = new SplitText(target, {
+            type: "lines",
+            mask: "lines",
+            linesClass: "lineInner",
+            ignore: ".sup",
+        });
+
+
+    });
+
+
+    let elementToSplitWords = document.querySelectorAll('[data-split="words"]');
+
+    elementToSplitWords.forEach(target => {
+        let splitInstance = new SplitText(target, {
+            type: "words",
+            mask: "words",
+            wordsClass: "wordInner",
+            ignore: ".sup",
+        });
+    });
+
+
+    let elementToSplitChars = document.querySelectorAll('[data-split="chars"]');
+
+    elementToSplitChars.forEach(target => {
+        let splitInstance = new SplitText(target, {
+            type: "words, chars",
+            mask: "chars",
+            charsClass: "charInner",
+            wordsClass: "wordWrapper",
+            ignore: ".sup",
+        });
+    });
+
+}
+
+
+function initAgeGate() {
+
+    // scrollToTop();
+
+    window.lenis.stop();
+    gsap.set(" .header .logo ", {
+        autoAlpha: 0,
+    });
+    gsap.set(".overlay-logo-wrapper", {
+        position: "absolute",
+    })
+
+    gsap.set(".overlay-load", {
+        backgroundColor: "rgba(0, 0, 0, 0)",
+        position: "fixed",
+        pointerEvents: "none",
+    });
+
+    gsap.set(".overlay-load", {
+        opacity: 1
+    })
+
+    //WATCH OUT
+
+    const yesBtn = document.querySelector('.button.is--yes');
+    const noBtn = document.querySelector('.button.is--no');
+
+    let tl = gsap.timeline({ defaults: { ease: "easeOutQuart" } });
+
+    // Number animation: uses an object for the value, then updates the text
+    let numberObj = { val: 0 };
+    tl.to(".overlay-logo-div", {
+        xPercent: 100,
+        duration: 1.5,
+        ease: "easeInOutQuart",
+        onComplete: function () {
+            gsap.set(".overlay-logo-div", {
+                autoAlpha: 0,
+            })
+        }
+    }, 0) // <--- Start at 0s
+
+        .to(numberObj, {
+            val: 100,
+            duration: 2,
+            onUpdate: function () {
+                // Always round or floor for integers, and append "%"
+                document.querySelector(".logo-number .lineInner").textContent = Math.round(numberObj.val) + "%";
+            }
+        }, 0)
+
+        .to(".overlay-load .overlay-logo ", {
+            y: -100,
+            ease: "easeInOutQuart",
+            duration: 1,
+        })
+        .to(".logo-number .lineInner", {
+            yPercent: -100,
+            duration: 1,
+            ease: "easeInOutQuart",
+        }, "<")
+
+
+        .from(".overlay-text-wrapper [data-split='lines'] .lineInner", {
+            yPercent: 100,
+            stagger: 0.1,
+            duration: 1,
+            ease: "easeInOutQuart",
+            onComplete: function () {
+                gsap.set(".overlay-load", {
+                    pointerEvents: "auto",
+                })
+            }
+        }, "<")
+
+        .from(".overlay-line", {
+            transformOrigin: "center",
+            scaleX: 0,
+            opacity: 0,
+            duration: 1,
+            ease: "easeInOutQuart",
+        }, "<")
+
+
+    document.querySelectorAll('.overlay-button-wrapper .button .lineInner').forEach(btn => {
+        let originalText = btn.textContent.toUpperCase();
+
+        btn.addEventListener('mouseenter', () => {
+            gsap.to(btn, {
+                duration: 0.5,
+                color: ACCENT_COLOR,
+                scrambleText: {
+                    text: originalText,
+                    chars: "upperCase", // or "alpha", "numbers", etc.
+                    speed: 0.7,
+                }
+            });
+        });
+
+        btn.addEventListener('mouseleave', () => {
+            gsap.to(btn, {
+                duration: 0.5,
+                color: "#878787",
+            });
+        });
+    })
+    // "Yes" → execute code (e.g., hide age gate, init site)
+    yesBtn.addEventListener('click', () => {
+        gsap.set(".overlay-load", {
+            pointerEvents: "none",
+        })
+
+        tl.to(".overlay-line", {
+            scaleX: 0,
+            opacity: 0,
+            duration: 1,
+            ease: "easeOutQuart",
+        },)
+
+
+        tl.add(Flip.fit(".overlay-load .overlay-logo", ".header .logo", {
+            duration: 1.2,
+            ease: "easeOutQuart",
+            scale: true,
+            onComplete: function () {
+                gsap.set(".overlay-load .overlay-logo", {
+                    display: "none",
+                })
+
+                gsap.set(".header .logo", {
+                    autoAlpha: 1,
+                })
+            }
+        }), "<")
+
+            .to(".overlay-text-wrapper .lineInner", {
+                autoAlpha: 0,
+                yPercent: -100,
+            }, "<")
+            .add(() => {
+                tlHeroAnimation.play();
+                window.lenis.start();
+            }, "<+.2")
+    });
+
+    // "No" → redirect to another website
+    noBtn.addEventListener('click', () => {
+        window.location.href = 'https://www.elioavilamunoz.com'; // Change to your target URL
+    });
+
+
+
+
+}
+
+
+function initHeroAnimation() {
+    window.lenis.scrollTo(0, { immediate: true });
+    //WATCH OUT
+    // document.body.removeAttribute('data-preload');
+
+    const bgVideo = document.getElementById("hero-bg-video");
+
+
+
+    gsap.set(".container.is--hero .scroll-circle", {
+        rotation: -90,
+        transformOrigin: "center"
+    })
+    gsap.set(".button.button--secondary, .hero-video", {
+        autoAlpha: 0,
+    })
+
+    gsap.set(".hero-content .title--1, .hero-content .p-hero", {
+        autoAlpha: 0,
+        y: 12,
+    });
+    gsap.set(".hero-content .title--1 .lineInner, .hero-content .p-hero .lineInner", {
+        yPercent: 0,
+    });
+
+    gsap.set(bgVideo, { opacity: 0 });
+
+    let tl = gsap.timeline({ paused: true })
+
+
+
+    tl.to(".hero-content .title--1, .hero-content .p-hero", {
+        autoAlpha: 1,
+        y: 0,
+        duration: 2.15,
+        ease: "none",
+        onStart: function () {
+            gsap.set(".button.button--secondary, .hero-video", {
+                autoAlpha: 1,
+            })
+
+            console.log("start")
+            // gsap.to(".scroll-arrow", {
+            //     y: 45,
+            //     duration: 1.2,
+            //     ease: "easeOutQuart",
+            //     repeat: -1,
+            //     delay: 1.2,
+            //     repeatDelay: 1
+            // })
+        }
+    })
+
+
+        .from(".hero-content .button", {
+            autoAlpha: 0,
+            yPercent: 100,
+            duration: 1,
+            ease: "easeOutQuart"
+        }, "<")
+        .to(".header .button--secondary", {
+            duration: 1,
+            ease: "easeOutQuart",
+            scrambleText: {
+                text: "{original}",
+                chars: "upperCase",
+                speed: 1,
+                tweenLength: false,
+                revealDelay: 0.5
+            }
+
+        }, "<")
+        .from(".header .shop", {
+            autoAlpha: 0,
+            duration: 1,
+            ease: "easeOutQuart"
+        }, "<")
+
+        .fromTo(".container.is--hero .scroll-circle", {
+            drawSVG: "0% 0%"
+        }, {
+            drawSVG: "0% 100%",
+            duration: 1,
+            ease: "easeOutQuart"
+        }, "<")
+        .from(".container.is--hero .scroll-arrow", {
+            autoAlpha: 0,
+            duration: 1,
+            ease: "power1.out"
+        }, "<")
+
+        .call(() => {
+            if (bgVideo && bgVideo.paused) {
+                // Start the video
+                bgVideo.play().catch(() => { });
+
+                // Wait for the video to actually start playing, then fade it in
+                bgVideo.addEventListener('playing', () => {
+                    gsap.to(bgVideo, {
+                        opacity: 0.45,
+                        duration: 0.5,
+                        ease: "easeOutQuart"
+                    });
+                }, { once: true }); // Use once: true so the event only fires once
+            }
+        }, null, .2);
+
+    // bgVideo.addEventListener('playing', () => {
+    //     gsap.set(bgVideo, { opacity: 0.8 });
+    // });
+    const btn = document.querySelector('.button.is--main');
+    const targetSection = document.querySelector('.container.is--intro');
+
+    btn.addEventListener('click', () => {
+        // Get the top position of the target section
+        const sectionTop = targetSection.getBoundingClientRect().top + window.scrollY;
+        // Add your offset (e.g., 50px)
+        const offset = 400;
+        // Use Lenis to scroll smoothly
+        lenis.scrollTo(sectionTop + offset, { duration: 1.2, immediate: false });
+    });
+
+
+    document.querySelectorAll('.button.button--secondary').forEach(btn => {
+        let originalText = btn.textContent.toUpperCase();
+
+        btn.addEventListener('mouseenter', () => {
+            gsap.to(btn, {
+                duration: 0.5,
+                color: ACCENT_COLOR,
+                scrambleText: {
+                    text: originalText,
+                    chars: "upperCase", // or "alpha", "numbers", etc.
+                    speed: 0.7,
+                }
+            });
+        });
+
+        btn.addEventListener('mouseleave', () => {
+            gsap.to(btn, {
+                duration: 0.5,
+                color: "white",
+            });
+        });
+    })
+
+    return tl;
 }
 
 
