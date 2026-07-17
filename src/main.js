@@ -2591,9 +2591,7 @@ function initScrollLock() {
                     gsap.set(mobileTrackerContainer, { y: compensationY });
                 }
 
-                const layoutShift = -compensationY;
                 const scrollStart = window.scrollY;
-                const scrollDistance = layoutShift + nudgeDistance;
                 const transition = { progress: 0 };
 
                 gsap.to(transition, {
@@ -2603,12 +2601,8 @@ function initScrollLock() {
                     onUpdate: () => {
                         const progress = transition.progress;
                         const scrollTarget = (
-                            scrollStart + scrollDistance * progress
+                            scrollStart + nudgeDistance * progress
                         );
-
-                        gsap.set(mobileTrackerContainer, {
-                            y: compensationY * (1 - progress),
-                        });
 
                         if (window.lenis) {
                             window.lenis.scrollTo(scrollTarget, {
@@ -2620,7 +2614,11 @@ function initScrollLock() {
                         }
                     },
                     onComplete: () => {
-                        gsap.set(mobileTrackerContainer, { clearProps: 'y' });
+                        // Keep the local hand-off compensation. Clearing it
+                        // here would reintroduce the fixed-to-flow jump, while
+                        // converting it into scroll can skip an entire screen
+                        // on iOS. It affects only the tracker visually and
+                        // never changes the following sections' geometry.
                         window.lenis?.start();
                     },
                 });
