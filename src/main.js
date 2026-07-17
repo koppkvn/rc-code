@@ -355,16 +355,10 @@ function applyBrandAccent() {
             .section.is--tracker .container.is--tracker {
                 position: relative;
                 box-sizing: border-box;
-                min-height: 100svh;
                 padding-top: var(--mobile-section-title-top);
                 border-top: 0 !important;
                 background-image: none !important;
                 box-shadow: none !important;
-            }
-
-            .section.is--tracker,
-            .mobile-tracker-placeholder {
-                overflow-anchor: none;
             }
 
             .section.is--tracker[data-mobile-tracker-overlay="true"] {
@@ -2464,30 +2458,47 @@ function initScrollLock() {
             '.mobile-tracker-placeholder'
         );
         let shouldNudgeMobileScroll = false;
-        let mobileTrackerRestingTop = null;
+        let mobileTrackerAnchorTop = null;
+        let mobileTrackerContainer = null;
         if (
             trackerSection?.getAttribute('data-mobile-tracker-overlay') ===
             'true' &&
             trackerPlaceholder
         ) {
+            const trackerAnchor = trackerSection.querySelector(
+                '.mobile-tracker-copy'
+            );
+            mobileTrackerContainer = trackerSection.querySelector(
+                '.container.is--tracker'
+            );
+            mobileTrackerAnchorTop = trackerAnchor?.getBoundingClientRect().top;
             const trackerTop = (
                 trackerPlaceholder.getBoundingClientRect().top +
                 window.scrollY
             );
-
-            // Put the tracker back into the document flow before restoring
-            // the scroll position. Doing this in the opposite order lets
-            // Safari anchor the viewport to the new layout for one frame,
-            // which makes the whole tracker jump down and then back up.
-            trackerPlaceholder.replaceWith(trackerSection);
-            trackerSection.removeAttribute('data-mobile-tracker-overlay');
-            trackerSection.getBoundingClientRect();
-            window.scrollTo(0, trackerTop);
             window.lenis?.scrollTo(trackerTop, {
                 immediate: true,
                 force: true,
             });
-            mobileTrackerRestingTop = trackerTop;
+            window.scrollTo(0, trackerTop);
+            trackerPlaceholder.replaceWith(trackerSection);
+            trackerSection.removeAttribute('data-mobile-tracker-overlay');
+
+            // Compensate only the tracker's visual position. This prevents
+            // its fixed-to-flow hand-off from flashing at a different height
+            // without changing the document geometry or ScrollTrigger pins.
+            if (
+                trackerAnchor &&
+                mobileTrackerContainer &&
+                Number.isFinite(mobileTrackerAnchorTop)
+            ) {
+                const anchorTopAfterUnlock = (
+                    trackerAnchor.getBoundingClientRect().top
+                );
+                gsap.set(mobileTrackerContainer, {
+                    y: mobileTrackerAnchorTop - anchorTopAfterUnlock,
+                });
+            }
             shouldNudgeMobileScroll = true;
         }
 
@@ -2506,35 +2517,81 @@ function initScrollLock() {
                     return;
                 }
 
-                // ScrollTrigger adds its pin spacing during refresh. Reapply
-                // the stable tracker position synchronously so no intermediate
-                // layout is ever painted on mobile.
-                const refreshedTrackerTop = (
-                    trackerSection.getBoundingClientRect().top +
-                    window.scrollY
-                );
-                mobileTrackerRestingTop = refreshedTrackerTop;
-                window.scrollTo(0, mobileTrackerRestingTop);
-                window.lenis?.scrollTo(mobileTrackerRestingTop, {
-                    immediate: true,
-                    force: true,
-                });
-                window.lenis?.start();
-
                 const nudgeDistance = Math.min(
                     28,
                     window.innerHeight * .03
                 );
-                window.lenis?.scrollTo(
-                    mobileTrackerRestingTop + nudgeDistance,
-                    {
-                        duration: .85,
-                        force: true,
-                        easing: progress => (
-                            1 - Math.pow(1 - progress, 3)
-                        ),
-                    }
+                const trackerAnchor = trackerSection.querySelector(
+                    '.mobile-tracker-copy'
                 );
+                if (!mobileTrackerContainer) {
+                    window.lenis?.start();
+                    window.lenis?.scrollTo(
+                        window.scrollY + nudgeDistance,
+                        {
+                            duration: .85,
+                            force: true,
+                            easing: progress => (
+                                1 - Math.pow(1 - progress, 3)
+                            ),
+                        }
+                    );
+                    return;
+                }
+                let compensationY = Number(
+                    gsap.getProperty(mobileTrackerContainer, 'y')
+                ) || 0;
+
+                // Refresh may adjust pin spacing. Absorb any resulting visual
+                // difference into the same local compensation, never into a
+                // forced global scroll position.
+                if (
+                    trackerAnchor &&
+                    mobileTrackerContainer &&
+                    Number.isFinite(mobileTrackerAnchorTop)
+                ) {
+                    const refreshedAnchorTop = (
+                        trackerAnchor.getBoundingClientRect().top
+                    );
+                    compensationY += (
+                        mobileTrackerAnchorTop - refreshedAnchorTop
+                    );
+                    gsap.set(mobileTrackerContainer, { y: compensationY });
+                }
+
+                const layoutShift = -compensationY;
+                const scrollStart = window.scrollY;
+                const scrollDistance = layoutShift + nudgeDistance;
+                const transition = { progress: 0 };
+
+                gsap.to(transition, {
+                    progress: 1,
+                    duration: .85,
+                    ease: 'power3.out',
+                    onUpdate: () => {
+                        const progress = transition.progress;
+                        const scrollTarget = (
+                            scrollStart + scrollDistance * progress
+                        );
+
+                        gsap.set(mobileTrackerContainer, {
+                            y: compensationY * (1 - progress),
+                        });
+
+                        if (window.lenis) {
+                            window.lenis.scrollTo(scrollTarget, {
+                                immediate: true,
+                                force: true,
+                            });
+                        } else {
+                            window.scrollTo(0, scrollTarget);
+                        }
+                    },
+                    onComplete: () => {
+                        gsap.set(mobileTrackerContainer, { clearProps: 'y' });
+                        window.lenis?.start();
+                    },
+                });
             });
         });
     }
