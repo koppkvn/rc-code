@@ -355,6 +355,7 @@ function applyBrandAccent() {
             .section.is--tracker .container.is--tracker {
                 position: relative;
                 box-sizing: border-box;
+                min-height: 100svh;
                 padding-top: var(--mobile-section-title-top);
                 border-top: 0 !important;
                 background-image: none !important;
@@ -2505,8 +2506,8 @@ function initScrollLock() {
                 if (!shouldNudgeMobileScroll) return;
 
                 const nudgeDistance = Math.min(
-                    48,
-                    window.innerHeight * .045
+                    28,
+                    window.innerHeight * .03
                 );
                 window.lenis?.scrollTo(
                     window.scrollY + nudgeDistance,
