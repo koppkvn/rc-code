@@ -362,6 +362,11 @@ function applyBrandAccent() {
                 box-shadow: none !important;
             }
 
+            .section.is--tracker,
+            .mobile-tracker-placeholder {
+                overflow-anchor: none;
+            }
+
             .section.is--tracker[data-mobile-tracker-overlay="true"] {
                 position: fixed;
                 z-index: 40;
@@ -2459,6 +2464,7 @@ function initScrollLock() {
             '.mobile-tracker-placeholder'
         );
         let shouldNudgeMobileScroll = false;
+        let mobileTrackerRestingTop = null;
         if (
             trackerSection?.getAttribute('data-mobile-tracker-overlay') ===
             'true' &&
@@ -2468,13 +2474,20 @@ function initScrollLock() {
                 trackerPlaceholder.getBoundingClientRect().top +
                 window.scrollY
             );
+
+            // Put the tracker back into the document flow before restoring
+            // the scroll position. Doing this in the opposite order lets
+            // Safari anchor the viewport to the new layout for one frame,
+            // which makes the whole tracker jump down and then back up.
+            trackerPlaceholder.replaceWith(trackerSection);
+            trackerSection.removeAttribute('data-mobile-tracker-overlay');
+            trackerSection.getBoundingClientRect();
+            window.scrollTo(0, trackerTop);
             window.lenis?.scrollTo(trackerTop, {
                 immediate: true,
                 force: true,
             });
-            window.scrollTo(0, trackerTop);
-            trackerPlaceholder.replaceWith(trackerSection);
-            trackerSection.removeAttribute('data-mobile-tracker-overlay');
+            mobileTrackerRestingTop = trackerTop;
             shouldNudgeMobileScroll = true;
         }
 
@@ -2487,16 +2500,33 @@ function initScrollLock() {
                 window.lenis?.resize?.();
                 ScrollTrigger.refresh(true);
                 window.lenis?.resize?.();
-                window.lenis?.start();
 
-                if (!shouldNudgeMobileScroll) return;
+                if (!shouldNudgeMobileScroll) {
+                    window.lenis?.start();
+                    return;
+                }
+
+                // ScrollTrigger adds its pin spacing during refresh. Reapply
+                // the stable tracker position synchronously so no intermediate
+                // layout is ever painted on mobile.
+                const refreshedTrackerTop = (
+                    trackerSection.getBoundingClientRect().top +
+                    window.scrollY
+                );
+                mobileTrackerRestingTop = refreshedTrackerTop;
+                window.scrollTo(0, mobileTrackerRestingTop);
+                window.lenis?.scrollTo(mobileTrackerRestingTop, {
+                    immediate: true,
+                    force: true,
+                });
+                window.lenis?.start();
 
                 const nudgeDistance = Math.min(
                     28,
                     window.innerHeight * .03
                 );
                 window.lenis?.scrollTo(
-                    window.scrollY + nudgeDistance,
+                    mobileTrackerRestingTop + nudgeDistance,
                     {
                         duration: .85,
                         force: true,
