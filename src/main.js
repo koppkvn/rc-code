@@ -902,23 +902,9 @@ function applyBrandAccent() {
                 border: .0625rem solid ${ACCENT_COLOR} !important;
                 background-color: transparent !important;
                 transform: none !important;
-            }
-
-            .section.is--tracker
-            .tracker-checkbox.is--button:not([data-clicked="true"]) {
                 animation:
-                    tracker-gold-border-pulse 2.8s ease-in-out infinite
+                    tracker-gold-border-pulse 3.2s ease-in-out infinite
                     !important;
-            }
-
-            .section.is--tracker
-            .tracker-checkbox.is--button[data-clicked="true"] {
-                border-color: ${ACCENT_COLOR} !important;
-                background-color: ${ACCENT_COLOR} !important;
-                box-shadow:
-                    inset 0 0 .18rem rgba(247, 232, 189, .55),
-                    0 0 .4rem rgba(210, 170, 98, .4) !important;
-                animation: none !important;
             }
 
             .section.is--tracker .tracker-checkbox.is--button::before {
@@ -936,28 +922,29 @@ function applyBrandAccent() {
                 animation: none !important;
             }
 
-            .section.is--tracker[data-xp-cycle-complete="true"]
-            .tracker-checkbox.is--button {
-                border-color: ${ACCENT_COLOR} !important;
-                background-color: ${ACCENT_COLOR} !important;
+            .section.is--tracker
+            .tracker-checkbox.is--button[data-clicked="true"]
+            .tracker-checkbox-inside.is--button {
+                visibility: visible !important;
+                opacity: 1 !important;
+                background: ${ACCENT_COLOR} !important;
                 box-shadow:
-                    inset 0 0 .18rem rgba(247, 232, 189, .55),
-                    0 0 .25rem rgba(247, 232, 189, .42),
-                    0 0 .65rem rgba(210, 170, 98, .38) !important;
-                transition:
-                    border-color .22s ease-out,
-                    background-color .22s ease-out,
-                    box-shadow .22s ease-out;
+                    inset 0 0 .16rem rgba(247, 232, 189, .72),
+                    0 0 .35rem rgba(210, 170, 98, .5) !important;
+                transform: scale(1) !important;
             }
 
             .section.is--tracker[data-xp-cycle-complete="true"]
             .tracker-checkbox.is--button
             .tracker-checkbox-inside.is--button {
-                visibility: hidden !important;
-                opacity: 0 !important;
-                background: transparent !important;
-                box-shadow: none !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+                background: ${ACCENT_COLOR} !important;
+                box-shadow:
+                    inset 0 0 .16rem rgba(247, 232, 189, .72),
+                    0 0 .35rem rgba(210, 170, 98, .5) !important;
                 animation: none !important;
+                transform: scale(1) !important;
             }
 
             @keyframes tracker-gold-border-pulse {
@@ -1711,6 +1698,45 @@ function initTrackerSection() {
             trackerDetailsGroup.append(trackerInterface);
             if (trackerDownloads) trackerDetailsGroup.append(trackerDownloads);
         }
+        const positionMobileTrackerDetails = () => {
+            if (!trackerCopyGroup || !trackerDetailsGroup) return;
+
+            const containerRect = trackerContainer.getBoundingClientRect();
+            const copyRect = trackerCopyGroup.getBoundingClientRect();
+            const detailsRect = trackerDetailsGroup.getBoundingClientRect();
+            const detailAnchors = [
+                trackerDetailsGroup.querySelector('.tracker-pompes'),
+                trackerDetailsGroup.querySelector('.niveaux'),
+                trackerDetailsGroup.querySelector('.tracker-header'),
+                ...trackerDetailsGroup.querySelectorAll('.tracker-row'),
+            ].filter(Boolean);
+            const firstVisibleTop = Math.min(
+                detailsRect.top,
+                ...detailAnchors.map(element => (
+                    element.getBoundingClientRect().top
+                ))
+            );
+            const internalOverflowAbove = Math.max(
+                0,
+                detailsRect.top - firstVisibleTop
+            );
+            const copyAnimationY = Number(
+                gsap.getProperty(trackerCopyGroup, 'y')
+            ) || 0;
+            const finalCopyBottom = copyRect.bottom - copyAnimationY;
+            const mobileTrackerGap = 28;
+
+            trackerDetailsGroup.style.setProperty(
+                'top',
+                `${
+                    finalCopyBottom
+                    - containerRect.top
+                    + mobileTrackerGap
+                    + internalOverflowAbove
+                }px`,
+                'important'
+            );
+        };
         const trackerDetails = ".section.is--tracker .mobile-tracker-details";
         if (!trackerContainer || !trackerSection) return;
 
@@ -1745,35 +1771,11 @@ function initTrackerSection() {
                 gsap.set(trackerSection, {
                     autoAlpha: 1,
                 });
-                if (trackerCopyGroup && trackerDetailsGroup) {
-                    const containerRect = trackerContainer.getBoundingClientRect();
-                    const copyRect = trackerCopyGroup.getBoundingClientRect();
-                    const detailsRect = trackerDetailsGroup.getBoundingClientRect();
-                    const detailAnchors = [
-                        trackerDetailsGroup.querySelector('.tracker-pompes'),
-                        trackerDetailsGroup.querySelector('.niveaux'),
-                        trackerDetailsGroup.querySelector('.tracker-header'),
-                        ...trackerDetailsGroup.querySelectorAll('.tracker-row'),
-                    ].filter(Boolean);
-                    const firstVisibleTop = Math.min(
-                        detailsRect.top,
-                        ...detailAnchors.map(element => (
-                            element.getBoundingClientRect().top
-                        ))
-                    );
-                    const internalOverflowAbove = Math.max(
-                        0,
-                        detailsRect.top - firstVisibleTop
-                    );
-                    const mobileTrackerGap = 20;
-
-                    trackerDetailsGroup.style.top = `${
-                        copyRect.bottom
-                        - containerRect.top
-                        + mobileTrackerGap
-                        + internalOverflowAbove
-                    }px`;
-                }
+                positionMobileTrackerDetails();
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(positionMobileTrackerDetails);
+                });
+                document.fonts?.ready.then(positionMobileTrackerDetails);
                 gsap.timeline()
                     .to(trackerHeading, {
                         autoAlpha: 1,
