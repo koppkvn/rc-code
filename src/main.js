@@ -324,7 +324,7 @@ function applyBrandAccent() {
             }
 
             .section.is--tracker .mobile-tracker-copy > .wrapper-p {
-                width: 100%;
+                width: min(calc(100% - 1.25rem), 25rem);
                 margin: var(--mobile-section-copy-gap) 0 0;
                 padding: 0;
             }
