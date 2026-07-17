@@ -857,6 +857,11 @@ function applyBrandAccent() {
                 pointer-events: none !important;
             }
 
+            .section.is--tracker .tracker-wrapper-mobile {
+                mask-image: none !important;
+                -webkit-mask-image: none !important;
+            }
+
             .tracker-row.is--mobile-hidden {
                 display: none !important;
             }
@@ -901,12 +906,15 @@ function applyBrandAccent() {
             }
 
             .section.is--tracker .tracker-checkbox.is--button {
+                position: relative;
+                box-sizing: border-box;
+                overflow: visible !important;
                 border: .0625rem solid ${ACCENT_COLOR} !important;
                 background-color: transparent !important;
                 transform: none !important;
                 will-change: border-color, box-shadow;
                 animation:
-                    tracker-gold-border-pulse 3.4s ease-in-out infinite
+                    tracker-gold-border-pulse 2.4s ease-in-out infinite
                     !important;
             }
 
@@ -962,48 +970,20 @@ function applyBrandAccent() {
             @keyframes tracker-gold-border-pulse {
                 0%,
                 100% {
-                    border-color: rgba(210, 170, 98, .62);
+                    border-color: rgba(210, 170, 98, .68);
                     box-shadow:
-                        inset 0 0 .08rem rgba(247, 232, 189, .08),
-                        0 0 .14rem rgba(210, 170, 98, .16);
-                }
-
-                9% {
-                    border-color: ${ACCENT_COLOR};
-                    box-shadow:
-                        inset 0 0 .12rem rgba(247, 232, 189, .32),
-                        0 0 .3rem rgba(247, 232, 189, .42),
-                        0 0 .58rem rgba(210, 170, 98, .34);
-                }
-
-                15% {
-                    border-color: rgba(210, 170, 98, .72);
-                    box-shadow:
-                        inset 0 0 .08rem rgba(247, 232, 189, .12),
+                        inset 0 0 0 .0625rem rgba(210, 170, 98, .2),
+                        inset 0 0 .12rem rgba(247, 232, 189, .14),
                         0 0 .18rem rgba(210, 170, 98, .2);
                 }
 
-                24% {
+                50% {
                     border-color: #f7e8bd;
                     box-shadow:
-                        inset 0 0 .18rem rgba(247, 232, 189, .58),
-                        0 0 .38rem rgba(247, 232, 189, .58),
-                        0 0 .9rem rgba(210, 170, 98, .54);
-                }
-
-                42% {
-                    border-color: ${ACCENT_COLOR};
-                    box-shadow:
-                        inset 0 0 .22rem rgba(247, 232, 189, .5),
-                        0 0 .48rem rgba(247, 232, 189, .5),
-                        0 0 1.15rem rgba(210, 170, 98, .48);
-                }
-
-                68% {
-                    border-color: rgba(210, 170, 98, .76);
-                    box-shadow:
-                        inset 0 0 .1rem rgba(247, 232, 189, .16),
-                        0 0 .24rem rgba(210, 170, 98, .24);
+                        inset 0 0 0 .0625rem rgba(247, 232, 189, .7),
+                        inset 0 0 .3rem rgba(247, 232, 189, .62),
+                        0 0 .42rem rgba(247, 232, 189, .58),
+                        0 0 1rem rgba(210, 170, 98, .52);
                 }
             }
 
