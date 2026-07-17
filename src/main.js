@@ -1801,44 +1801,69 @@ function initTrackerSection() {
             autoAlpha: 1,
         });
         gsap.set(trackerHeading, {
+            autoAlpha: 1,
+            y: 0,
+        });
+        gsap.set(`${trackerTitleSelector}, ${trackerTextSelector}`, {
             autoAlpha: 0,
             y: 12,
         });
         gsap.set(trackerDetails, {
             autoAlpha: 0,
         });
+
+        const mobileTrackerReveal = gsap.timeline({ paused: true });
+        mobileTrackerReveal
+            .to(trackerTitleSelector, {
+                autoAlpha: 1,
+                y: 0,
+                duration: 2.15,
+                ease: "none",
+                overwrite: true,
+            }, 0)
+            .to(trackerTextSelector, {
+                autoAlpha: 1,
+                y: 0,
+                duration: 2.15,
+                ease: "none",
+                overwrite: true,
+            }, 0)
+            .to(trackerDetails, {
+                autoAlpha: 1,
+                duration: 2.15,
+                ease: "none",
+                overwrite: true,
+            }, 0);
+
+        const prepareMobileTrackerReveal = () => {
+            gsap.set(trackerSection, {
+                autoAlpha: 1,
+            });
+            positionMobileTrackerDetails();
+            requestAnimationFrame(() => {
+                requestAnimationFrame(positionMobileTrackerDetails);
+            });
+            document.fonts?.ready.then(positionMobileTrackerDetails);
+            buttonsToGlow.forEach(button => {
+                button.classList.add("is--glow");
+            });
+        };
+
         ScrollTrigger.create({
-            // Begin just before the placeholder reaches the top so the reveal
-            // feels continuous with the final movement of the intro.
             trigger: trackerPlaceholder,
-            start: "top 5%",
-            onEnter: () => {
+            // Reveal across the final 60% of the approach to the tracker,
+            // matching the scroll-driven mobile tree-title choreography.
+            start: "top 65%",
+            end: "top 5%",
+            scrub: true,
+            animation: mobileTrackerReveal,
+            onEnter: prepareMobileTrackerReveal,
+            onEnterBack: prepareMobileTrackerReveal,
+            onLeave: () => {
                 window.lenis?.stop();
-                gsap.set(trackerSection, {
-                    autoAlpha: 1,
-                });
-                positionMobileTrackerDetails();
-                requestAnimationFrame(() => {
-                    requestAnimationFrame(positionMobileTrackerDetails);
-                });
-                document.fonts?.ready.then(positionMobileTrackerDetails);
-                gsap.timeline()
-                    .to(trackerHeading, {
-                        autoAlpha: 1,
-                        y: 0,
-                        duration: 2.15,
-                        ease: "none",
-                        overwrite: true,
-                    }, 0)
-                    .to(trackerDetails, {
-                        autoAlpha: 1,
-                        duration: 2.15,
-                        ease: "none",
-                        overwrite: true,
-                    }, 0);
-                buttonsToGlow.forEach(button => {
-                    button.classList.add("is--glow");
-                });
+            },
+            onLeaveBack: () => {
+                gsap.set(trackerSection, { autoAlpha: 0 });
             },
             markers: false,
         });
